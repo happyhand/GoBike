@@ -1,4 +1,7 @@
-﻿using GoBike.Member.Core.Interface.Service;
+﻿using GoBike.Member.Repository.Interface;
+using GoBike.Member.Repository.Managers;
+using GoBike.Member.Repository.Models.Core;
+using GoBike.Member.Service.Interface;
 using GoBike.Member.Service.Managers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,8 +24,25 @@ namespace GoBike.Member.API
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.Configure<DBSetting>(options =>
+			{
+				options.ConnectionString = Configuration.GetSection("MongoConnection:ConnectionString").Value;
+				options.MemberDatabase = Configuration.GetSection("MongoConnection:MemberDatabase").Value;
+			});
 			services.AddScoped<IMemberService, MemberService>();
-			Service.DIContainer.RunDI(services);
+			services.AddScoped<IMemberRepository, MemberRepository>();
+
+			services.AddCors(options =>
+			{
+				// CorsPolicy 是自訂的 Policy 名稱
+				options.AddPolicy("ProductNoPolicy", policy =>
+				{
+					policy.WithOrigins("http://www.6stest.com")
+						  .AllowAnyHeader()
+						  .AllowAnyMethod()
+						  .AllowCredentials();
+				});
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +58,7 @@ namespace GoBike.Member.API
 			}
 
 			app.UseHttpsRedirection();
+			app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
 			app.UseMvc();
 		}
 	}

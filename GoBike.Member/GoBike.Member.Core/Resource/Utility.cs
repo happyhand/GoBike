@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Data;
 using System.IO;
@@ -12,8 +11,8 @@ namespace GoBike.Member.Core.Resource
 	{
 		#region AES 加解密功能
 
-		public static string AES_KEY = "123abc456def7890";
-		public static string AES_IV = "abc123def456ghijk";
+		public static string AES_KEY = "1234567890123456";
+		public static string AES_IV = "6543210987654321";
 
 		/// <summary>
 		/// AES 加密
@@ -98,7 +97,7 @@ namespace GoBike.Member.Core.Resource
 		/// </summary>
 		/// <param name="dt">dt</param>
 		/// <returns>FileStreamResult</returns>
-		public static FileStreamResult ExportExcel(DataTable dt, string sheetName)
+		public static MemoryStream ExportExcel(DataTable dt, string sheetName)
 		{
 			#region 建立 Excel 資料串流
 
@@ -119,7 +118,8 @@ namespace GoBike.Member.Core.Resource
 			#region 回傳資料串流
 
 			memoryStream.Seek(0, SeekOrigin.Begin);
-			return new FileStreamResult(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			return memoryStream;
+			//return new FileStreamResult(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
 			#endregion 回傳資料串流
 		}

@@ -1,8 +1,8 @@
 ﻿using GoBike.Member.API.Models.Response;
-using GoBike.Member.Core.Interface.Models.Misc;
-using GoBike.Member.Core.Interface.Service;
+using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace GoBike.Member.API.Controllers
 {
@@ -20,17 +20,23 @@ namespace GoBike.Member.API.Controllers
 		}
 
 		[HttpPost]
-		public ResultModel Post(string account, string password)
+		public ResultModel Post(RequestData requestData)
 		{
-			IResultModel result = this.memberService.Login(account, password);
-			switch (result.ResultCode)
+			Tuple<int, string> result = this.memberService.Login(requestData.Account, requestData.Password);
+			switch (result.Item1)
 			{
 				case 1:
-					return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
+					return new ResultModel() { ResultCode = result.Item1, ResultMessage = result.Item2 };
 
 				default:
-					return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
+					return new ResultModel() { ResultCode = result.Item1, ResultMessage = result.Item2 };
 			}
+		}
+
+		public class RequestData
+		{
+			public string Account { get; set; }
+			public string Password { get; set; }
 		}
 	}
 }

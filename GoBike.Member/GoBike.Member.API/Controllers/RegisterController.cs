@@ -1,8 +1,9 @@
 ﻿using GoBike.Member.API.Models.Response;
-using GoBike.Member.Core.Interface.Models.Misc;
-using GoBike.Member.Core.Interface.Service;
+using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace GoBike.Member.API.Controllers
 {
@@ -19,31 +20,18 @@ namespace GoBike.Member.API.Controllers
 			this.memberService = memberService;
 		}
 
-		[HttpGet]
-		public string Get(string account, string password)
-		{
-			return "ok";
-		}
-
 		[HttpPost]
-		public ResultModel Post(DataObj data)
+		public async Task<ResultModel> Post(RequestData requestData)
 		{
-			this.logger.LogInformation($"Account:{data.account}  Password:{data.password}");
-			IResultModel result = this.memberService.Register(data.account, data.password);
-			switch (result.ResultCode)
-			{
-				case 1:
-					return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
-
-				default:
-					return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
-			}
+			this.logger.LogInformation($"Register Member >>> Account:{requestData.Account}  Password:{requestData.Password}");
+			Tuple<int, string> result = await this.memberService.Register(requestData.Account, requestData.Password);
+			return new ResultModel() { ResultCode = result.Item1, ResultMessage = result.Item2, ResultData = result.Item2 };
 		}
 
-		public class DataObj
+		public class RequestData
 		{
-			public string account { get; set; }
-			public string password { get; set; }
+			public string Account { get; set; }
+			public string Password { get; set; }
 		}
 	}
 }

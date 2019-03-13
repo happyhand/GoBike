@@ -1,5 +1,5 @@
 ﻿using GoBike.Member.API.Models.Response;
-using GoBike.Member.Core.Interface.Service;
+using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
