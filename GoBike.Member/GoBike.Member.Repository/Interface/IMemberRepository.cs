@@ -8,12 +8,18 @@ namespace GoBike.Member.Repository.Interface
 {
 	public interface IMemberRepository
 	{
-		Task<Tuple<int, string>> CreateMember(MemberData memberData);
+		Task<bool> CreateMember(MemberData memberData);
+
+		Task<int> CreateMemberSerialNumber();
 
 		Task<MemberData> GetMemebrData(int id);
 
 		Task<MemberData> GetMemebrData(string account);
 
-		Task<int> CreateMemberSerialNumber();
+		Task<MemberData> GetMemebrData(string account, string password);
+
+		Task<bool> UpdateMemebrData(MemberData memberData);
+
+		Task<bool> DeleteMemebrData(int id);
 	}
 }

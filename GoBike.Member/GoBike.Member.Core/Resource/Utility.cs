@@ -11,8 +11,8 @@ namespace GoBike.Member.Core.Resource
 	{
 		#region AES 加解密功能
 
-		public static string AES_KEY = "1234567890123456";
-		public static string AES_IV = "6543210987654321";
+		public static string AES_KEY = "1133557799224466";
+		public static string AES_IV = "2244668800113355";
 
 		/// <summary>
 		/// AES 加密

@@ -32,17 +32,17 @@ namespace GoBike.Member.API
 			services.AddScoped<IMemberService, MemberService>();
 			services.AddScoped<IMemberRepository, MemberRepository>();
 
-			services.AddCors(options =>
-			{
-				// CorsPolicy 是自訂的 Policy 名稱
-				options.AddPolicy("ProductNoPolicy", policy =>
-				{
-					policy.WithOrigins("http://www.6stest.com")
-						  .AllowAnyHeader()
-						  .AllowAnyMethod()
-						  .AllowCredentials();
-				});
-			});
+			//services.AddCors(options =>
+			//{
+			//	// CorsPolicy 是自訂的 Policy 名稱
+			//	options.AddPolicy("ProductNoPolicy", policy =>
+			//	{
+			//		policy.WithOrigins("http://www.6stest.com")
+			//			  .AllowAnyHeader()
+			//			  .AllowAnyMethod()
+			//			  .AllowCredentials();
+			//	});
+			//});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +58,7 @@ namespace GoBike.Member.API
 			}
 
 			app.UseHttpsRedirection();
-			app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
+			//app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
 			app.UseMvc();
 		}
 	}

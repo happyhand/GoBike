@@ -33,5 +33,21 @@ namespace GoBike.Member.API
 			WebHost.CreateDefaultBuilder(args)
 				.UseStartup<Startup>()
 				.UseNLog();
+
+		//WebHost.CreateDefaultBuilder(args)
+		//			.ConfigureAppConfiguration((hostContext, config) =>
+		//			{
+		//				var env = hostContext.HostingEnvironment;
+		//				config
+		//				.AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+		//				.AddJsonFile(path: $"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+		//			})
+		//			.UseStartup<Startup>()
+		//			.ConfigureLogging(logging =>
+		//			{
+		//				logging.ClearProviders();
+		//				logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+		//			})
+		//			.UseNLog();  // NLog: setup NLog for Dependency injection
 	}
 }
