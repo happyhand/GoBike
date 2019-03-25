@@ -7,3 +7,15 @@
 /GoBike.Member/GoBike.Member.Service/obj
 /GoBike.Member/GoBike.Member.Service/bin
 /GoBike.Member/.vs
+/GoBike.API/GoBike.API.Service/bin
+/GoBike.API/GoBike.API.Service/obj
+/GoBike.API/GoBike.API.Repository/obj
+/GoBike.API/GoBike.API.Repository/bin
+/GoBike.API/GoBike.API.Core/obj
+/GoBike.API/GoBike.API.Core/bin
+/GoBike.API/GoBike.API.App/obj
+/GoBike.API/GoBike.API.App/bin
+/GoBike.API/.vs
+/GoBike.CDN/.vs
+/GoBike.CDN/GoBike.CDN/obj
+/GoBike.CDN/GoBike.CDN/bin
