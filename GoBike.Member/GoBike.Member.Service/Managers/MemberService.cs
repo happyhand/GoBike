@@ -1,4 +1,6 @@
-﻿using GoBike.Member.Core.Resource;
+﻿using AutoMapper;
+using GoBike.Member.Core.Models;
+using GoBike.Member.Core.Resource;
 using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
 using GoBike.Member.Service.Interface;
@@ -22,6 +24,11 @@ namespace GoBike.Member.Service.Managers
         private readonly ILogger<MemberService> logger;
 
         /// <summary>
+        /// mapper
+        /// </summary>
+        private readonly IMapper mapper;
+
+        /// <summary>
         /// memberRepository
         /// </summary>
         private readonly IMemberRepository memberRepository;
@@ -36,9 +43,10 @@ namespace GoBike.Member.Service.Managers
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="memberRepository">memberRepository</param>
-        public MemberService(ILogger<MemberService> logger, IMemberRepository memberRepository, IOptions<SmtpSetting> smtpSetting)
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IOptions<SmtpSetting> smtpSetting)
         {
             this.logger = logger;
+            this.mapper = mapper;
             this.memberRepository = memberRepository;
             this.smtpSetting = smtpSetting;
         }
@@ -46,46 +54,37 @@ namespace GoBike.Member.Service.Managers
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberID">memberID</param>
         /// <param name="memberInfo">memberInfo</param>
-        /// <returns>MemberInfoDto</returns>
-        public async Task<MemberInfoDto> EditData(string memberID, MemberInfoDto memberInfo)
+        /// <returns>Tuple(MemberInfoDto, string)</returns>
+        public async Task<Tuple<MemberInfoDto, string>> EditData(MemberInfoDto memberInfo)
         {
             try
             {
-                MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberID);
+                MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
                 if (memberData == null)
                 {
-                    return null;
+                    this.logger.LogError($"Edit Data Error >>> ID:{memberInfo.MemberID}\nThe member is not exist.");
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
                 }
 
-                memberData.BirthDayDate = string.IsNullOrEmpty(memberInfo.BirthDayDate) ? memberData.BirthDayDate : editRequest.BirthDayDate;
-                memberData.BodyHeight = string.IsNullOrEmpty(memberInfo.BodyHeight) ? memberData.BodyHeight : Convert.ToDecimal(editRequest.BodyHeight);
-                memberData.BodyWeight = string.IsNullOrEmpty(memberInfo.BodyWeight) ? memberData.BodyWeight : Convert.ToDecimal(editRequest.BodyWeight);
-                memberData.Gender = string.IsNullOrEmpty(memberInfo.Gender) ? memberData.Gender : editRequest.Gender;
-                if (!string.IsNullOrEmpty(editRequest.Mobile))
+                string updateMemberDataHandlerResult = this.UpdateMemberDataHandler(memberInfo, ref memberData);
+                if (!string.IsNullOrEmpty(updateMemberDataHandlerResult))
                 {
-                    if (!Utility.IsValidMobile(editRequest.Mobile))
-                    {
-                        return new EditDataRespone() { ResultCode = -2, ResultMessage = "The mobile format error." };
-                    }
-
-                    memberData.Mobile = editRequest.Mobile;
+                    return Tuple.Create<MemberInfoDto, string>(null, updateMemberDataHandlerResult);
                 }
 
-                memberData.Nickname = string.IsNullOrEmpty(editRequest.Nickname) ? memberData.Nickname : editRequest.Nickname;
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
-                    return new EditDataRespone() { ResultCode = 0, ResultMessage = "Edit Data Fail" };
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員資料更新失敗.");
                 }
 
-                return new EditDataRespone() { ResultCode = 1, ResultMessage = "Edit Data Success", MemberData = memberData };
+                return Tuple.Create(this.mapper.Map<MemberInfoDto>(memberData), string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Forget Password Error >>> ID:{editRequest.MemberID}\n{ex}");
-                return new EditDataRespone() { ResultCode = -999, ResultMessage = "Edit Data Error" };
+                this.logger.LogError($"Edit Data Error >>> ID:{memberInfo.MemberID} Data:{memberInfo.GetData}\n{ex}");
+                return Tuple.Create<MemberInfoDto, string>(null, "會員資料更新發生錯誤.");
             }
         }
 
@@ -93,15 +92,15 @@ namespace GoBike.Member.Service.Managers
         /// 忘記密碼
         /// </summary>
         /// <param name="email">email</param>
-        /// <returns>bool</returns>
-        public async Task<bool> ForgetPassword(string email)
+        /// <returns>string</returns>
+        public async Task<string> ForgetPassword(string email)
         {
             try
             {
                 MemberData member = await this.memberRepository.GetMemebrDataByEmail(email);
                 if (member == null)
                 {
-                    return new ForgetPasswordRespone() { ResultCode = -1, ResultMessage = "The email is not exist." };
+                    return "會員不存在.";
                 }
 
                 MailContext mailContext = new MailContext()
@@ -118,12 +117,12 @@ namespace GoBike.Member.Service.Managers
                 };
 
                 Utility.SendMail(mailContext);
-                return new ForgetPasswordRespone() { ResultCode = 1, ResultMessage = "Sent Email" };
+                return string.Empty;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Forget Password Error >>> Email:{email}\n{ex}");
-                return new ForgetPasswordRespone() { ResultCode = -999, ResultMessage = "Forget Password Error" };
+                return "發送郵件發生錯誤.";
             }
         }
 
@@ -131,23 +130,23 @@ namespace GoBike.Member.Service.Managers
         /// 取得會員資訊
         /// </summary>
         /// <param name="memberID">memberID</param>
-        /// <returns>MemberInfoDto</returns>
-        public async Task<MemberInfoDto> GetMemberInfo(string memberID)
+        /// <returns>Tuple(MemberInfoDto, string)</returns>
+        public async Task<Tuple<MemberInfoDto, string>> GetMemberInfo(string memberID)
         {
             try
             {
                 MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberID);
                 if (memberData == null)
                 {
-                    return new GetMemberInfoRespone() { ResultCode = -1, ResultMessage = "The member is not exist." };
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
                 }
 
-                return new GetMemberInfoRespone() { ResultCode = 1, ResultMessage = "Get Member Info Success", MemberData = memberData };
+                return Tuple.Create(this.mapper.Map<MemberInfoDto>(memberData), string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Info Error >>> ID:{memberID}\n{ex}");
-                return new GetMemberInfoRespone() { ResultCode = -999, ResultMessage = "Get Member Info Error" };
+                return Tuple.Create<MemberInfoDto, string>(null, "取得會員資料發生錯誤.");
             }
         }
 
@@ -156,30 +155,34 @@ namespace GoBike.Member.Service.Managers
         /// </summary>
         /// <param name="email">email</param>
         /// <param name="password">password</param>
-        /// <returns>bool</returns>
-        public async Task<bool> Login(string email, string password)
+        /// <returns>Tuple(LoginInfoDto, string)</returns>
+        public async Task<Tuple<LoginInfoDto, string>> Login(string email, string password)
         {
             try
             {
                 if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    return new LoginRespone() { ResultCode = -1, ResultMessage = "The email or password is empty.", MemberID = string.Empty, Token = string.Empty };
+                    return Tuple.Create<LoginInfoDto, string>(null, "信箱或密碼無效.");
                 }
 
                 MemberData member = await this.memberRepository.GetMemebrDataByEmail(email);
-                if (member == null || !Utility.DecryptAES(member.Password).Equals(password))
+                if (member == null)
                 {
-                    return new LoginRespone() { ResultCode = 0, ResultMessage = "Login Fail", MemberID = string.Empty, Token = string.Empty };
+                    return Tuple.Create<LoginInfoDto, string>(null, "無法根據信箱查詢到相關會員.");
+                }
+
+                if (!Utility.DecryptAES(member.Password).Equals(password))
+                {
+                    return Tuple.Create<LoginInfoDto, string>(null, "密碼驗證失敗.");
                 }
 
                 string token = $"{Utility.EncryptAES(email)}{Utility.SeparateFlag}{Utility.EncryptAES(password)}";
-
-                return new LoginRespone() { ResultCode = 1, ResultMessage = "Login Success", MemberID = member.Id.ToString(), Token = token };
+                return Tuple.Create(new LoginInfoDto() { MemberID = member.MemberID, Token = token }, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Login Error >>> Email:{email} Password:{password}\n{ex}");
-                return new LoginRespone() { ResultCode = -999, ResultMessage = "Login Error", MemberID = string.Empty, Token = string.Empty };
+                return Tuple.Create<LoginInfoDto, string>(null, "登入發生錯誤.");
             }
         }
 
@@ -187,12 +190,12 @@ namespace GoBike.Member.Service.Managers
         /// 會員登入 (token)
         /// </summary>
         /// <param name="token">token</param>
-        /// <returns>bool</returns>
-        public async Task<bool> Login(string token)
+        /// <returns>Tuple(LoginInfoDto, string)</returns>
+        public async Task<Tuple<LoginInfoDto, string>> Login(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
-                return new LoginRespone() { ResultCode = -2, ResultMessage = "The token is empty.", MemberID = string.Empty, Token = string.Empty };
+                return Tuple.Create<LoginInfoDto, string>(null, "自動登入驗證碼無效.");
             }
 
             string[] dataArr = token.Split(Utility.SeparateFlag);
@@ -206,51 +209,45 @@ namespace GoBike.Member.Service.Managers
         /// </summary>
         /// <param name="email">email</param>
         /// <param name="password">password</param>
-        /// <returns>bool</returns>
-        public async Task<bool> Register(string email, string password)
+        /// <returns>string</returns>
+        public async Task<string> Register(string email, string password)
         {
             try
             {
                 if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    return new RegisterRespone() { ResultCode = -4, ResultMessage = "The email or password is empty." };
+                    return "信箱或密碼無效.";
                 }
 
                 if (!Utility.IsValidEmail(email))
                 {
-                    return new RegisterRespone() { ResultCode = -3, ResultMessage = "The email format error." };
+                    return "信箱格式錯誤.";
                 }
 
                 if (!this.IsValidPassword(password))
                 {
-                    return new RegisterRespone() { ResultCode = -2, ResultMessage = "The password format error." };
+                    return "密碼格式錯誤.";
                 }
 
-                bool memberIsExist = await this.memberRepository.GetMemebrDataByEmail(email) != null;
-                if (memberIsExist)
+                bool emailIsRegister = await this.memberRepository.GetMemebrDataByEmail(email) != null;
+                if (emailIsRegister)
                 {
-                    return new RegisterRespone() { ResultCode = -1, ResultMessage = "The member is existed." };
+                    return "此信箱已經被註冊.";
                 }
 
-                MemberData member = new MemberData()
-                {
-                    Email = email,
-                    Password = Utility.EncryptAES(password),
-                    CreateDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
-                };
-
+                MemberData member = this.CreateNewMemberData(email, password);
                 bool isSuccess = await this.memberRepository.CreateMember(member);
-                if (isSuccess)
+                if (!isSuccess)
                 {
-                    return new RegisterRespone() { ResultCode = 1, ResultMessage = "Register Member Success" };
+                    return "會員註冊失敗";
                 }
 
-                return new RegisterRespone() { ResultCode = 0, ResultMessage = "Register Member Fail" };
+                return string.Empty;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Register Member Error >>> Email:{email} Password:{password}\n{ex}");
-                return new RegisterRespone() { ResultCode = -999, ResultMessage = "Register Member Error" };
+                return "會員註冊發生錯誤";
             }
         }
 
@@ -288,34 +285,62 @@ namespace GoBike.Member.Service.Managers
             return true;
         }
 
-        private bool OnUpdateMemberData(MemberInfoDto memberInfo, out MemberData memberData)
+        /// <summary>
+        /// 會員資料更新處理
+        /// </summary>
+        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberData">memberData</param>
+        /// <returns>string</returns>
+        private string UpdateMemberDataHandler(MemberInfoDto memberInfo, ref MemberData memberData)
         {
-            //if (!string.IsNullOrEmpty(memberInfo.BirthDayDate))
-            //    memberData.BirthDayDate = memberInfo.BirthDayDate;
+            if (!string.IsNullOrEmpty(memberInfo.BirthDayDate))
+                memberData.BirthDayDate = memberInfo.BirthDayDate;
 
-            //if (memberInfo.BodyHeight.HasValue)
-            //    memberData.BodyHeight = memberInfo.BodyHeight.Value;
+            if (memberInfo.BodyHeight.HasValue)
+                memberData.BodyHeight = memberInfo.BodyHeight.Value;
 
-            //if (memberInfo.BodyWeight.HasValue)
-            //    memberData.BodyWeight = memberInfo.BodyWeight.Value;
+            if (memberInfo.BodyWeight.HasValue)
+                memberData.BodyWeight = memberInfo.BodyWeight.Value;
 
-            //if (memberInfo.Gender.HasValue)
-            //    memberData.Gender = memberInfo.Gender.Value;
+            if (memberInfo.Gender.HasValue)
+                memberData.Gender = memberInfo.Gender.Value;
 
-            //if (!string.IsNullOrEmpty(memberInfo.Mobile))
-            //    memberData.Mobile = memberInfo.Mobile;
+            if (!string.IsNullOrEmpty(memberInfo.Mobile))
+            {
+                if (!Utility.IsValidMobile(memberInfo.Mobile))
+                {
+                    this.logger.LogError($"Update Member Data Handler Error >>> id:{memberData.Id} Data:{memberInfo.GetData}\nMobile valid fail.");
+                    return "手機格式驗證失敗.";
+                }
 
-            //if (!string.IsNullOrEmpty(editRequest.Mobile))
-            //{
-            //    if (!Utility.IsValidMobile(editRequest.Mobile))
-            //    {
-            //        return new EditDataRespone() { ResultCode = -2, ResultMessage = "The mobile format error." };
-            //    }
+                memberData.Mobile = memberInfo.Mobile;
+            }
 
-            //    memberData.Mobile = editRequest.Mobile;
-            //}
+            if (!string.IsNullOrEmpty(memberInfo.Nickname))
+            {
+                memberData.Nickname = memberInfo.Nickname;
+            }
 
-            //memberData.Nickname = string.IsNullOrEmpty(editRequest.Nickname) ? memberData.Nickname : editRequest.Nickname;
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 創建新會員資料
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <returns>MemberData</returns>
+        private MemberData CreateNewMemberData(string email, string password)
+        {
+            DateTime createDate = DateTime.Now;
+            string memberID = $"{Guid.NewGuid().ToString().Substring(0, 4)}-{createDate:yyyy}-{createDate:MMdd}";
+            return new MemberData()
+            {
+                MemberID = memberID,
+                Email = email,
+                Password = Utility.EncryptAES(password),
+                CreateDate = createDate.ToString("yyyy/MM/dd HH:mm:ss"),
+            };
         }
     }
 }

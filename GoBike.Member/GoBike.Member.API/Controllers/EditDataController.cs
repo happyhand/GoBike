@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using GoBike.API.App.Applibs;
-using GoBike.API.App.Applibs.Filters;
-using GoBike.API.App.Models.Response;
-using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Models.Member;
+﻿using GoBike.Member.Service.Interface;
+using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
@@ -15,7 +10,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 會員編輯
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EditDataController : ControllerBase
     {
@@ -23,11 +18,6 @@ namespace GoBike.API.App.Controllers.Member
         /// logger
         /// </summary>
         private readonly ILogger<EditDataController> logger;
-
-        /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
 
         /// <summary>
         /// memberService
@@ -39,69 +29,27 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="memberService">memberService</param>
-        public EditDataController(ILogger<EditDataController> logger, IMapper mapper, IMemberService memberService)
+        public EditDataController(ILogger<EditDataController> logger, IMemberService memberService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.memberService = memberService;
         }
 
         /// <summary>
-        /// Post
+        /// POST
         /// </summary>
-        /// <returns>ResultModel</returns>
+        /// <param name="memberInfo">memberInfo</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        [CheckLoginActionFilter(true)]
-        public async Task<ResultModel> Post(RequestData requestData)
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
-            string memberID = HttpContext.Session.GetObject<string>(Utility.Session_MemberID);
-            EditDataRespone result = await this.memberService.EditData(new EditDataRequest()
+            Tuple<MemberInfoDto, string> result = await this.memberService.EditData(memberInfo);
+            if (string.IsNullOrEmpty(result.Item2))
             {
-                MemberID = memberID,
-                BirthDayDate = requestData.BirthDayDate,
-                BodyHeight = requestData.BodyHeight,
-                BodyWeight = requestData.BodyWeight,
-                Gender = requestData.Gender,
-                Mobile = requestData.Mobile,
-                Nickname = requestData.Nickname
-            });
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage, ResultData = this.mapper.Map<MemberInfo>(result.MemberData) };
-        }
+                return Ok(result.Item1);
+            }
 
-        /// <summary>
-        /// 請求參數
-        /// </summary>
-        public class RequestData
-        {
-            /// <summary>
-            /// Gets or sets BirthDayDate
-            /// </summary>
-            public string BirthDayDate { get; set; }
-
-            /// <summary>
-            /// Gets or sets BodyHeight
-            /// </summary>
-            public string BodyHeight { get; set; }
-
-            /// <summary>
-            /// Gets or sets BodyWeight
-            /// </summary>
-            public string BodyWeight { get; set; }
-
-            /// <summary>
-            /// Gets or sets Gender
-            /// </summary>
-            public string Gender { get; set; }
-
-            /// <summary>
-            /// Gets or sets Mobile
-            /// </summary>
-            public string Mobile { get; set; }
-
-            /// <summary>
-            /// Gets or sets Nickname
-            /// </summary>
-            public string Nickname { get; set; }
+            return BadRequest(result.Item2);
         }
     }
 }

@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using GoBike.API.App.Applibs;
-using GoBike.API.App.Applibs.Filters;
-using GoBike.API.App.Models.Response;
-using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Models.Member;
+using GoBike.Member.Service.Interface;
+using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
@@ -15,7 +11,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 取得會員資訊
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class GetMemberInfoController : ControllerBase
     {
@@ -23,11 +19,6 @@ namespace GoBike.API.App.Controllers.Member
         /// logger
         /// </summary>
         private readonly ILogger logger;
-
-        /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
 
         /// <summary>
         /// memberService
@@ -39,24 +30,27 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="memberService">memberService</param>
-        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMapper mapper, IMemberService memberService)
+        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.memberService = memberService;
         }
 
         /// <summary>
-        /// GET
+        /// POST
         /// </summary>
-        /// <returns>ResultModel</returns>
+        /// <param name="memberID">memberID</param>
+        /// <returns>IActionResult</returns>
         [HttpGet]
-        [CheckLoginActionFilter(true)]
-        public async Task<ResultModel> Get()
+        public async Task<IActionResult> Post(string memberID)
         {
-            string memberID = HttpContext.Session.GetObject<string>(Utility.Session_MemberID);
-            GetMemberInfoRespone result = await this.memberService.GetMemberInfo(memberID);
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage, ResultData = this.mapper.Map<MemberInfo>(result.MemberData) };
+            Tuple<MemberInfoDto, string> result = await this.memberService.GetMemberInfo(memberID);
+            if (string.IsNullOrEmpty(result.Item2))
+            {
+                return Ok(result.Item1);
+            }
+
+            return BadRequest(result.Item2);
         }
     }
 }

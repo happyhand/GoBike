@@ -1,6 +1,6 @@
-﻿using GoBike.Member.Core.Resource;
-using GoBike.Member.Repository.Interface;
+﻿using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
+using GoBike.Member.Repository.Models.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -57,7 +57,7 @@ namespace GoBike.Member.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Create Member Error >>> ID:{memberData.Id} Email:{memberData.Email} Password:{memberData.Password}\n{ex}");
+                this.logger.LogError($"Create Member Error >>> MemberID:{memberData.MemberID} Email:{memberData.Email} Password:{memberData.Password}\n{ex}");
                 return false;
             }
         }
@@ -71,12 +71,13 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                DeleteResult result = await this.memberDatas.DeleteManyAsync(option => option.Id.ToString().Equals(id));
+                var filter = Builders<MemberData>.Filter.Eq("_id", ObjectId.Parse(id));
+                DeleteResult result = await this.memberDatas.DeleteManyAsync(filter);
                 return result.IsAcknowledged && result.DeletedCount > 0;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Memebr Data Error >>> ID:{id}\n{ex}");
+                this.logger.LogError($"Delete Memebr Data Error >>> ID:{id}\n{ex}");
                 return false;
             }
         }
@@ -90,7 +91,8 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                return await this.memberDatas.Find(memberData => memberData.Email.Equals(email)).FirstOrDefaultAsync();
+                var filter = Builders<MemberData>.Filter.Eq("Email", email);
+                return await this.memberDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -127,12 +129,13 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                ReplaceOneResult result = await this.memberDatas.ReplaceOneAsync(option => option.Id.Equals(memberData.Id), memberData, new UpdateOptions { IsUpsert = true });
+                var filter = Builders<MemberData>.Filter.Eq("_id", memberData.Id);
+                ReplaceOneResult result = await this.memberDatas.ReplaceOneAsync(filter, memberData);
                 return result.IsAcknowledged && result.ModifiedCount > 0;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Memebr Data Error >>> ID:{memberData.Id} Email:{memberData.Email}\n{ex}");
+                this.logger.LogError($"Update Memebr Data Error >>> ID:{memberData.Id}\n{ex}");
                 return false;
             }
         }
@@ -141,7 +144,7 @@ namespace GoBike.Member.Repository.Managers
         ///// 建立會員序號
         ///// </summary>
         ///// <returns>long</returns>
-        //public async Task<long> CreateMemberSerialNumber()
+        //private async Task<string> CreateMemberSerialNumber()
         //{
         //    long count = await this.serialNumbers.CountDocumentsAsync(new BsonDocument());
         //    if (count == 0)

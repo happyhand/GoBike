@@ -1,8 +1,5 @@
-﻿using GoBike.API.App.Applibs;
-using GoBike.API.App.Models.Response;
-using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Response;
+﻿using GoBike.Member.Service.Interface;
+using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,7 +10,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 會員登入
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -41,56 +38,38 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="requestData">requestData</param>
-        /// <returns>ResultModel</returns>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<ResultModel> Post(RequestData requestData)
+        [Route("api/[controller]")]
+        public async Task<IActionResult> Post(string email, string password)
         {
-            try
+            Tuple<LoginInfoDto, string> result = await this.memberService.Login(email, password);
+            if (string.IsNullOrEmpty(result.Item2))
             {
-                LoginRespone result;
-                if (string.IsNullOrEmpty(requestData.Token))
-                {
-                    result = await this.memberService.Login(requestData.Email, requestData.Password);
-                }
-                else
-                {
-                    result = await this.memberService.Login(requestData.Token);
-                }
-
-                if (result.ResultCode == 1)
-                {
-                    this.HttpContext.Session.SetObject(Utility.Session_MemberID, result.MemberID);
-                }
-
-                return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage, ResultData = result.Token };
+                return Ok(result.Item1);
             }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Login Error >>> Email:{requestData.Email} Password:{requestData.Password} Token:{requestData.Token} \n{ex}");
-                return new ResultModel() { ResultCode = -999, ResultMessage = "Login Error" };
-            }
+
+            return BadRequest(result.Item2);
         }
 
         /// <summary>
-        /// 請求參數
+        /// POST
         /// </summary>
-        public class RequestData
+        /// <param name="token">token</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [Route("api/[controller]/token")]
+        public async Task<IActionResult> Post(string token)
         {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
+            Tuple<LoginInfoDto, string> result = await this.memberService.Login(token);
+            if (string.IsNullOrEmpty(result.Item2))
+            {
+                return Ok(result.Item1);
+            }
 
-            /// <summary>
-            /// Gets or sets Password
-            /// </summary>
-            public string Password { get; set; }
-
-            /// <summary>
-            /// Gets or sets Token
-            /// </summary>
-            public string Token { get; set; }
+            return BadRequest(result.Item2);
         }
     }
 }

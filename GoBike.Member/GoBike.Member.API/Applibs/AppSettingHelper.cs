@@ -1,4 +1,7 @@
-﻿namespace GoBike.Member.App.Applibs
+﻿using GoBike.Member.Core.Resource;
+using GoBike.Member.Repository.Models.Core;
+
+namespace GoBike.Member.App.Applibs
 {
     /// <summary>
     /// APP 設定資料

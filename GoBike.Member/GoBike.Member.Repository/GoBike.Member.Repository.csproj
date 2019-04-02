@@ -5,11 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Core\**" />
     <Compile Remove="Models\Member\**" />
-    <EmbeddedResource Remove="Models\Core\**" />
     <EmbeddedResource Remove="Models\Member\**" />
-    <None Remove="Models\Core\**" />
     <None Remove="Models\Member\**" />
   </ItemGroup>
 
@@ -19,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GoBike.Ｍember.Core\GoBike.Member.Core.csproj" />
+    <ProjectReference Include="..\GoBike.Member.Core\GoBike.Member.Core.csproj" />
   </ItemGroup>
 
 </Project>

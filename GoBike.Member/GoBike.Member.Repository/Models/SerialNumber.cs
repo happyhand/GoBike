@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace GoBike.Member.Repository.Models.Core
+namespace GoBike.Member.Repository.Models
 {
     /// <summary>
     /// 流水序號
@@ -23,6 +23,6 @@ namespace GoBike.Member.Repository.Models.Core
         /// Gets or sets SequenceValue
         /// </summary>
         [BsonElement("SequenceValue")]
-        public long SequenceValue { get; set; }
+        public string SequenceValue { get; set; }
     }
 }

@@ -3,6 +3,11 @@
     public class MemberInfoDto
     {
         /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        public string MemberID { get; set; }
+
+        /// <summary>
         /// Gets or sets BirthDayDate
         /// </summary>
         public string BirthDayDate { get; set; }
@@ -36,5 +41,22 @@
         /// Gets or sets Nickname
         /// </summary>
         public string Nickname { get; set; }
+
+        /// <summary>
+        /// Gets GetData
+        /// </summary>
+        public string GetData
+        {
+            get
+            {
+                return $"BirthDayDate:{this.BirthDayDate} " +
+                 $"BodyHeight:{this.BodyHeight} " +
+                 $"BodyWeight:{this.BodyWeight}" +
+                 $"Email:{this.Email}" +
+                 $"Gender:{this.Gender}" +
+                 $"Mobile:{this.Mobile}" +
+                 $"Nickname:{this.Nickname}";
+            }
+        }
     }
 }

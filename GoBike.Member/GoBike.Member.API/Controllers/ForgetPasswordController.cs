@@ -1,6 +1,4 @@
-﻿using GoBike.API.App.Models.Response;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Response;
+﻿using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -10,7 +8,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 忘記密碼
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ForgetPasswordController : ControllerBase
     {
@@ -36,25 +34,20 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// Post
+        /// POST
         /// </summary>
-        /// <returns>ResultModel</returns>
+        /// <param name="requestData">requestData</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<ResultModel> Post(RequestData requestData)
+        public async Task<IActionResult> Post(string email)
         {
-            ForgetPasswordRespone result = await this.memberService.ForgetPassword(requestData.Email);
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
-        }
+            string result = await this.memberService.ForgetPassword(email);
+            if (string.IsNullOrEmpty(result))
+            {
+                return Ok("已發送郵件.");
+            }
 
-        /// <summary>
-        /// 請求參數
-        /// </summary>
-        public class RequestData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
+            return BadRequest(result);
         }
     }
 }

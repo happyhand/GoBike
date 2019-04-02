@@ -1,5 +1,4 @@
-﻿using GoBike.API.App.Applibs;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -12,17 +11,17 @@ namespace GoBike.API.App.Controllers.Member
     [ApiController]
     public class RedisSessionController : ControllerBase
     {
-        /// <summary>
-        /// GET
-        /// </summary>
-        /// <returns>string</returns>
-        [HttpGet]
-        public string Get()
-        {
-            string preLoginDate = HttpContext.Session.GetObject<string>("LoginDate");
-            string loginDate = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}";
-            HttpContext.Session.SetObject("LoginDate", loginDate);
-            return $"Pre Login Date:{preLoginDate}/nLogin Date:{loginDate}";
-        }
+        ///// <summary>
+        ///// GET
+        ///// </summary>
+        ///// <returns>string</returns>
+        //[HttpGet]
+        //public string Get()
+        //{
+        //    string preLoginDate = HttpContext.Session.GetObject<string>("LoginDate");
+        //    string loginDate = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}";
+        //    HttpContext.Session.SetObject("LoginDate", loginDate);
+        //    return $"Pre Login Date:{preLoginDate}/nLogin Date:{loginDate}";
+        //}
     }
 }

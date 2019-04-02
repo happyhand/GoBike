@@ -1,4 +1,4 @@
-﻿namespace GoBike.Member.Core.Resource
+﻿namespace GoBike.Member.Repository.Models.Core
 {
     /// <summary>
     /// MongoDB 設定資料

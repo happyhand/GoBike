@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GoBike.Member.Repository\GoBike.Member.Repository.csproj" />
     <ProjectReference Include="..\GoBike.Member.Service\GoBike.Member.Service.csproj" />
-    <ProjectReference Include="..\GoBike.Ｍember.Core\GoBike.Member.Core.csproj" />
+    <ProjectReference Include="..\GoBike.Member.Core\GoBike.Member.Core.csproj" />
   </ItemGroup>
 
 </Project>

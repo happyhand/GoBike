@@ -28,6 +28,11 @@ namespace GoBike.Member.Repository.Models
         public ObjectId Id { get; set; }
 
         /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        public string MemberID { get; set; }
+
+        /// <summary>
         /// Gets or sets Password
         /// </summary>
         [BsonElement("Password")]
