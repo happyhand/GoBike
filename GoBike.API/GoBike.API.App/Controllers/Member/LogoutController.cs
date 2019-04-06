@@ -1,8 +1,8 @@
-﻿using GoBike.API.App.Models.Response;
-using Microsoft.AspNetCore.Http;
+﻿using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
 {
@@ -11,7 +11,7 @@ namespace GoBike.API.App.Controllers.Member
     /// </summary>
     [Route("api/member/[controller]")]
     [ApiController]
-    public class LogoutController : ControllerBase
+    public class LogoutController : ApiController
     {
         /// <summary>
         /// logger
@@ -28,21 +28,21 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// GET
         /// </summary>
-        /// <returns>ResultModel</returns>
-        [HttpPost]
-        public ResultModel Post()
+        /// <returns>IActionResult</returns>
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
             try
             {
                 HttpContext.Session.Clear();
-                return new ResultModel() { ResultCode = 1, ResultMessage = "Logout Success" };
+                return Ok("會員已登出.");
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Logout Error\n{ex}");
-                return new ResultModel() { ResultCode = -999, ResultMessage = "Logout Error" };
+                return BadRequest("會員登出發生錯誤.");
             }
         }
     }

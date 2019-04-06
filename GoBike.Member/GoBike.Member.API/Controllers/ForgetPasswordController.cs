@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace GoBike.API.App.Controllers.Member
+namespace GoBike.Member.API.Controllers
 {
     /// <summary>
     /// 忘記密碼

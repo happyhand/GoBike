@@ -1,4 +1,4 @@
-﻿using GoBike.API.App.Applibs;
+﻿using GoBike.API.Core.Applibs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -31,19 +31,12 @@ namespace GoBike.Member.Service.Interface
         Task<Tuple<MemberInfoDto, string>> GetMemberInfo(string memberID);
 
         /// <summary>
-        /// 會員登入 (normal)
+        /// 會員登入
         /// </summary>
         /// <param name="email">email</param>
         /// <param name="password">password</param>
-        /// <returns>Tuple(LoginInfoDto, string)</returns>
-        Task<Tuple<LoginInfoDto, string>> Login(string email, string password);
-
-        /// <summary>
-        /// 會員登入 (token)
-        /// </summary>
-        /// <param name="token">token</param>
-        /// <returns>Tuple(LoginInfoDto, string)</returns>
-        Task<Tuple<LoginInfoDto, string>> Login(string token);
+        /// <returns>Tuple(string, string)</returns>
+        Task<Tuple<string, string>> Login(string email, string password);
 
         /// <summary>
         /// 會員註冊

@@ -1,8 +1,9 @@
-﻿using GoBike.API.App.Models.Response;
-using GoBike.API.Service.Interface.Member;
+﻿using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Response;
+using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
@@ -12,7 +13,7 @@ namespace GoBike.API.App.Controllers.Member
     /// </summary>
     [Route("api/member/[controller]")]
     [ApiController]
-    public class RegisterController : ControllerBase
+    public class RegisterController : ApiController
     {
         /// <summary>
         /// logger
@@ -38,19 +39,32 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="requestData">requestData</param>
-        /// <returns>ResultModel</returns>
+        /// <param name="inputData">inputData</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<ResultModel> Post(RequestData requestData)
+        public async Task<IActionResult> Post(InputData inputData)
         {
-            RegisterRespone result = await this.memberService.Register(requestData.Email, requestData.Password);
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
+            try
+            {
+                ResponseResultDto responseResultDto = await this.memberService.Register(inputData.Email, inputData.Password);
+                if (responseResultDto.Ok)
+                {
+                    return Ok(responseResultDto.Data);
+                }
+
+                return BadRequest(responseResultDto.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Register Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                return BadRequest("會員註冊發生錯誤.");
+            }
         }
 
         /// <summary>
-        /// 請求參數
+        /// 請求資料
         /// </summary>
-        public class RequestData
+        public class InputData
         {
             /// <summary>
             /// Gets or sets Email

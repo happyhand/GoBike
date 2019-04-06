@@ -6,6 +6,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>D:\GoBike\GoBike.Member\GoBike.Member.API\bin\Debug\netcoreapp2.1\publish\</_PublishTargetUrl>
+    <_PublishTargetUrl>D:\GoBike\member.gobike.com</_PublishTargetUrl>
   </PropertyGroup>
 </Project>

@@ -30,6 +30,7 @@ namespace GoBike.Member.Repository.Models
         /// <summary>
         /// Gets or sets MemberID
         /// </summary>
+        [BsonElement("MemberID")]
         public string MemberID { get; set; }
 
         /// <summary>

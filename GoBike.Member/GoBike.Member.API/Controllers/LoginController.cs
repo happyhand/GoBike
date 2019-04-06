@@ -1,11 +1,10 @@
 ﻿using GoBike.Member.Service.Interface;
-using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GoBike.API.App.Controllers.Member
+namespace GoBike.Member.API.Controllers
 {
     /// <summary>
     /// 會員登入
@@ -42,34 +41,39 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="password">password</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/[controller]")]
-        public async Task<IActionResult> Post(string email, string password)
+        public async Task<IActionResult> Post(InputData inputData)
         {
-            Tuple<LoginInfoDto, string> result = await this.memberService.Login(email, password);
-            if (string.IsNullOrEmpty(result.Item2))
+            try
             {
-                return Ok(result.Item1);
-            }
+                Tuple<string, string> result = await this.memberService.Login(inputData.Email, inputData.Password);
+                if (string.IsNullOrEmpty(result.Item2))
+                {
+                    return Ok(result.Item1);
+                }
 
-            return BadRequest(result.Item2);
+                return BadRequest(result.Item2);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Login Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                return BadRequest("會員登入發生錯誤.");
+            }
         }
 
         /// <summary>
-        /// POST
+        /// 請求資料
         /// </summary>
-        /// <param name="token">token</param>
-        /// <returns>IActionResult</returns>
-        [HttpPost]
-        [Route("api/[controller]/token")]
-        public async Task<IActionResult> Post(string token)
+        public class InputData
         {
-            Tuple<LoginInfoDto, string> result = await this.memberService.Login(token);
-            if (string.IsNullOrEmpty(result.Item2))
-            {
-                return Ok(result.Item1);
-            }
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
 
-            return BadRequest(result.Item2);
+            /// <summary>
+            /// Gets or sets Password
+            /// </summary>
+            public string Password { get; set; }
         }
     }
 }

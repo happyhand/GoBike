@@ -1,13 +1,11 @@
-﻿using ClosedXML.Excel;
-using GoBike.API.Core.Models;
+﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Data;
 using System.IO;
-using System.Net;
-using System.Net.Mail;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace GoBike.API.Core.Resource
 {
@@ -16,20 +14,6 @@ namespace GoBike.API.Core.Resource
     /// </summary>
     public class Utility
     {
-        #region 通用標誌
-
-        /// <summary>
-        /// 分隔符號
-        /// </summary>
-        public static string SeparateFlag = "$@#";
-
-        /// <summary>
-        /// Session:MemberID
-        /// </summary>
-        public static string Session_MemberID = "MemberID";
-
-        #endregion 通用標誌
-
         #region AES 加解密功能
 
         /// <summary>
@@ -114,96 +98,53 @@ namespace GoBike.API.Core.Resource
 
         #endregion AES 加解密功能
 
-        #region Excel 匯入:匯出
+        #region API 串接
 
         /// <summary>
-        /// 匯出 Excel
+        /// POST API
         /// </summary>
-        /// <param name="dataTable">dataTable</param>
-        /// <param name="sheetName">sheetName</param>
-        /// <returns>FileStreamResult</returns>
-        public static MemoryStream ExportExcel(DataTable dataTable, string sheetName)
+        /// <param name="domain">domain</param>
+        /// <param name="apiUrl">apiUrl</param>
+        /// <param name="postData">postData</param>
+        /// <returns>HttpResponseMessage</returns>
+        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, string postData)
         {
-            #region 建立 Excel 資料串流
-
-            MemoryStream memoryStream = new MemoryStream();
-
-            #region 建立 Excel 檔案
-
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.Worksheets.Add(dataTable, sheetName);
-                workbook.SaveAs(memoryStream);
-            }
-
-            #endregion 建立 Excel 檔案
-
-            #endregion 建立 Excel 資料串流
-
-            #region 回傳資料串流
-
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            return memoryStream;
-            //return new FileStreamResult(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-            #endregion 回傳資料串流
-        }
-
-        #endregion Excel 匯入:匯出
-
-        #region Email
-
-        /// <summary>
-        /// Email 格式驗證
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>bool</returns>
-        public static bool IsValidEmail(string email)
-        {
-            return Regex.IsMatch(email,
-                @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
-                @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
-                RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri($"http://{domain}/");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            StringContent content = new StringContent(postData, Encoding.UTF8, "application/json");
+            return await client.PostAsync(apiUrl, content);
         }
 
         /// <summary>
-        /// 寄送 Email
+        /// POST API
         /// </summary>
-        /// <param name="mailContext">mailContext</param>
-        public static void SendMail(MailContext mailContext)
+        /// <param name="domain">domain</param>
+        /// <param name="apiUrl">apiUrl</param>
+        /// <param name="files">files</param>
+        /// <returns>HttpResponseMessage</returns>
+        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, IFormFileCollection files)
         {
-            using (var message = new MailMessage())
+            //// 建立 HttpClient
+            HttpClient client = new HttpClient();
+            //// 設定站台 url (api url)
+            client.BaseAddress = new Uri($"http://{domain}/");
+            //// 讀取 Request 中的檔案，並轉換成 byte 型式
+            byte[] dataBytes;
+            MultipartFormDataContent multiContent = new MultipartFormDataContent();
+            foreach (var file in files)
             {
-                message.To.Add(new MailAddress(mailContext.ToEmail, mailContext.ToUserName));
-                message.From = new MailAddress(mailContext.FromEmail, mailContext.FromUserName);
-                message.Subject = mailContext.Subject;
-                message.Body = mailContext.Body;
-                message.IsBodyHtml = true;
-
-                using (var client = new SmtpClient(mailContext.SmtpServer))
+                using (BinaryReader binaryReader = new BinaryReader(file.OpenReadStream()))
                 {
-                    client.Port = 587;
-                    client.Credentials = new NetworkCredential(mailContext.SmtpMail, mailContext.SmtpPassword);
-                    client.EnableSsl = true;
-                    client.Send(message);
+                    dataBytes = binaryReader.ReadBytes((int)file.OpenReadStream().Length);
+                    ByteArrayContent bytes = new ByteArrayContent(dataBytes);
+                    multiContent.Add(bytes, "file", file.FileName);
                 }
             }
+            //// 呼叫 api 並接收回應
+            return await client.PostAsync(apiUrl, multiContent);
         }
 
-        #endregion Email
-
-        #region 手機驗證
-
-        /// <summary>
-        /// 手機格式驗證
-        /// </summary>
-        /// <param name="mobile">mobile</param>
-        /// <returns>bool</returns>
-        public static bool IsValidMobile(string mobile)
-        {
-            return Regex.IsMatch(mobile, @"^(09|8869|\+8869)\d{8}$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-        }
-
-        #endregion 手機驗證
+        #endregion API 串接
     }
 }

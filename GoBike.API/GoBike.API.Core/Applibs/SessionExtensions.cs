@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace GoBike.API.App.Applibs
+namespace GoBike.API.Core.Applibs
 {
     /// <summary>
     /// Session 擴充方法

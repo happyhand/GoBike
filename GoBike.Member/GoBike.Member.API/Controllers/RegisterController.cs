@@ -1,14 +1,15 @@
 ﻿using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
-namespace GoBike.API.App.Controllers.Member
+namespace GoBike.Member.API.Controllers
 {
     /// <summary>
     /// 會員註冊
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class RegisterController : ControllerBase
     {
@@ -36,18 +37,42 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="requestData">requestData</param>
-        /// <returns>ResultModel</returns>
+        /// <param name="inputData">inputData</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(string email, string password)
+        public async Task<IActionResult> Post(InputData inputData)
         {
-            string result = await this.memberService.Register(email, password);
-            if (string.IsNullOrEmpty(result))
+            try
             {
-                return Ok("Register success.");
-            }
+                string result = await this.memberService.Register(inputData.Email, inputData.Password);
+                if (string.IsNullOrEmpty(result))
+                {
+                    return Ok("會員註冊成功.");
+                }
 
-            return BadRequest(result);
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Register Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                return BadRequest("會員註冊發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 請求資料
+        /// </summary>
+        public class InputData
+        {
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Gets or sets Password
+            /// </summary>
+            public string Password { get; set; }
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GoBike.API.App.Controllers.Member
+namespace GoBike.Member.API.Controllers
 {
     /// <summary>
     /// 會員編輯

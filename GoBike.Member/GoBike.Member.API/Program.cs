@@ -9,7 +9,8 @@ namespace GoBike.Member.API
     {
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseNLog();
 
         public static void Main(string[] args)
         {

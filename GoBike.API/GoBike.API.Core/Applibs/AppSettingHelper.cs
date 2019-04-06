@@ -1,7 +1,4 @@
-﻿using GoBike.Member.Core.Resource;
-using GoBike.Member.Repository.Models.Core;
-
-namespace GoBike.Member.App.Applibs
+﻿namespace GoBike.API.Core.Applibs
 {
     /// <summary>
     /// APP 設定資料
@@ -14,18 +11,21 @@ namespace GoBike.Member.App.Applibs
         public static AppSettingHelper Appsetting;
 
         /// <summary>
-        /// Gets or sets MongoDBConfig
-        /// </summary>
-        public MongoDBSetting MongoDBConfig { get; set; }
-
-        /// <summary>
         /// Gets or sets RedisConnection
         /// </summary>
         public string RedisConnection { get; set; }
 
         /// <summary>
-        /// Gets or sets SmtpConfig
+        /// Gets or sets ServiceDomain
         /// </summary>
-        public SmtpSetting SmtpConfig { get; set; }
+        public ServiceDomainSetting ServiceDomain { get; set; }
+
+        public class ServiceDomainSetting
+        {
+            /// <summary>
+            /// Gets or sets MemberService
+            /// </summary>
+            public string MemberService { get; set; }
+        }
     }
 }

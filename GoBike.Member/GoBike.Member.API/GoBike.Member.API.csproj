@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Applibs\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -13,6 +12,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.1" />
   </ItemGroup>
 
@@ -20,6 +20,12 @@
     <ProjectReference Include="..\GoBike.Member.Repository\GoBike.Member.Repository.csproj" />
     <ProjectReference Include="..\GoBike.Member.Service\GoBike.Member.Service.csproj" />
     <ProjectReference Include="..\GoBike.Member.Core\GoBike.Member.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

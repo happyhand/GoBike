@@ -1,8 +1,9 @@
-﻿using GoBike.API.App.Applibs;
-using GoBike.API.App.Models.Response;
+﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
+using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,9 +14,8 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 會員登入
     /// </summary>
-    [Route("api/member/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class LoginController : ApiController
     {
         /// <summary>
         /// logger
@@ -39,43 +39,68 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// POST - Normal Login
         /// </summary>
-        /// <param name="requestData">requestData</param>
-        /// <returns>ResultModel</returns>
+        /// <param name="inputData">inputData</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<ResultModel> Post(RequestData requestData)
+        [Route("api/member/[controller]")]
+        public async Task<IActionResult> NormalLogin(InputData inputData)
         {
             try
             {
-                LoginRespone result;
-                if (string.IsNullOrEmpty(requestData.Token))
-                {
-                    result = await this.memberService.Login(requestData.Email, requestData.Password);
-                }
-                else
-                {
-                    result = await this.memberService.Login(requestData.Token);
-                }
-
-                if (result.ResultCode == 1)
-                {
-                    this.HttpContext.Session.SetObject(Utility.Session_MemberID, result.MemberID);
-                }
-
-                return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage, ResultData = result.Token };
+                ResponseResultDto responseResultDto = await this.memberService.Login(inputData.Email, inputData.Password);
+                return this.ResponseResultHandler(responseResultDto);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Login Error >>> Email:{requestData.Email} Password:{requestData.Password} Token:{requestData.Token} \n{ex}");
-                return new ResultModel() { ResultCode = -999, ResultMessage = "Login Error" };
+                this.logger.LogError($"Normal Login Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                return BadRequest("會員登入發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 請求參數
+        /// POST - Token Login
         /// </summary>
-        public class RequestData
+        /// <param name="inputData">inputData</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [Route("api/member/[controller]/token")]
+        public async Task<IActionResult> TokenLogin(InputData inputData)
+        {
+            try
+            {
+                ResponseResultDto responseResultDto = await this.memberService.Login(inputData.Token);
+                return this.ResponseResultHandler(responseResultDto);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Token Login Error >>> Token:{inputData.Token}\n{ex}");
+                return BadRequest("會員登入發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 處理回應資料
+        /// </summary>
+        /// <param name="responseResultDto">responseResultDto</param>
+        /// <returns>IActionResult</returns>
+        private IActionResult ResponseResultHandler(ResponseResultDto responseResultDto)
+        {
+            if (responseResultDto.Ok)
+            {
+                LoginInfoDto loginInfoDto = responseResultDto.Data as LoginInfoDto;
+                this.HttpContext.Session.SetObject(CommonFlag.Session_MemberID, loginInfoDto.MemberID);
+                return Ok(loginInfoDto.Token);
+            }
+
+            return BadRequest(responseResultDto.Data);
+        }
+
+        /// <summary>
+        /// 請求資料
+        /// </summary>
+        public class InputData
         {
             /// <summary>
             /// Gets or sets Email

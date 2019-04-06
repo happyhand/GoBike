@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
-using GoBike.API.App.Applibs;
-using GoBike.API.Core.Resource;
-using GoBike.API.Repository.Interface;
-using GoBike.API.Repository.Managers;
+using GoBike.API.Core.Applibs;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Managers.Member;
 using Microsoft.AspNetCore.Builder;
@@ -65,23 +62,11 @@ namespace GoBike.API.App
         private void ConfigurationHandler(IServiceCollection services)
         {
             AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
-            services.Configure<MongoDBSetting>(options =>
-            {
-                options.ConnectionString = AppSettingHelper.Appsetting.MongoDBConfig.ConnectionString;
-                options.MemberDatabase = AppSettingHelper.Appsetting.MongoDBConfig.MemberDatabase;
-            });
-            services.Configure<SmtpSetting>(options =>
-            {
-                options.SmtpServer = AppSettingHelper.Appsetting.SmtpConfig.SmtpServer;
-                options.SmtpMail = AppSettingHelper.Appsetting.SmtpConfig.SmtpMail;
-                options.SmtpPassword = AppSettingHelper.Appsetting.SmtpConfig.SmtpPassword;
-            });
         }
 
         private void DependencyInjectionHandler(IServiceCollection services)
         {
             services.AddSingleton<IMemberService, MemberService>();
-            services.AddSingleton<IMemberRepository, MemberRepository>();
         }
 
         private void SessionHandler(IServiceCollection services)

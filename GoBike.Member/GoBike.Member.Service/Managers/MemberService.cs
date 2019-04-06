@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GoBike.Member.Core.Applibs;
 using GoBike.Member.Core.Models;
 using GoBike.Member.Core.Resource;
 using GoBike.Member.Repository.Interface;
@@ -6,7 +7,6 @@ using GoBike.Member.Repository.Models;
 using GoBike.Member.Service.Interface;
 using GoBike.Member.Service.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -34,21 +34,17 @@ namespace GoBike.Member.Service.Managers
         private readonly IMemberRepository memberRepository;
 
         /// <summary>
-        /// smtpSetting
-        /// </summary>
-        private readonly IOptions<SmtpSetting> smtpSetting;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
+        /// <param name="mapper">mapper</param>
         /// <param name="memberRepository">memberRepository</param>
-        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IOptions<SmtpSetting> smtpSetting)
+        /// <param name="smtpSetting">smtpSetting</param>
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.memberRepository = memberRepository;
-            this.smtpSetting = smtpSetting;
         }
 
         /// <summary>
@@ -105,12 +101,12 @@ namespace GoBike.Member.Service.Managers
 
                 MailContext mailContext = new MailContext()
                 {
-                    SmtpServer = smtpSetting.Value.SmtpServer,
-                    SmtpMail = smtpSetting.Value.SmtpMail,
-                    SmtpPassword = smtpSetting.Value.SmtpPassword,
+                    SmtpServer = AppSettingHelper.Appsetting.SmtpConfig.SmtpServer,
+                    SmtpMail = AppSettingHelper.Appsetting.SmtpConfig.SmtpMail,
+                    SmtpPassword = AppSettingHelper.Appsetting.SmtpConfig.SmtpPassword,
                     ToEmail = email,
                     ToUserName = member.Nickname,
-                    FromEmail = smtpSetting.Value.SmtpMail,
+                    FromEmail = AppSettingHelper.Appsetting.SmtpConfig.SmtpMail,
                     FromUserName = "GoBike",
                     Subject = "【忘記密碼】系統通知信",
                     Body = $"<p>親愛的 {member.Nickname} 用戶您好</p><p>您於 <span style='font-weight:bold; color:blue;'>{DateTime.Now:yyyy/MM/dd HH:mm:ss}</span> 查詢密碼</p><p>此帳號密碼為：<span style='font-weight:bold; color:blue;'>{Utility.DecryptAES(member.Password)}</span></p><br><br><br><p>※本電子郵件係由系統自動發送，請勿直接回覆本郵件。</p>"
@@ -146,62 +142,43 @@ namespace GoBike.Member.Service.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Info Error >>> ID:{memberID}\n{ex}");
-                return Tuple.Create<MemberInfoDto, string>(null, "取得會員資料發生錯誤.");
+                return Tuple.Create<MemberInfoDto, string>(null, "取得會員資訊發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 會員登入 (normal)
+        /// 會員登入
         /// </summary>
         /// <param name="email">email</param>
         /// <param name="password">password</param>
-        /// <returns>Tuple(LoginInfoDto, string)</returns>
-        public async Task<Tuple<LoginInfoDto, string>> Login(string email, string password)
+        /// <returns>Tuple(string, string)</returns>
+        public async Task<Tuple<string, string>> Login(string email, string password)
         {
             try
             {
                 if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    return Tuple.Create<LoginInfoDto, string>(null, "信箱或密碼無效.");
+                    return Tuple.Create<string, string>(string.Empty, "信箱或密碼無效.");
                 }
 
                 MemberData member = await this.memberRepository.GetMemebrDataByEmail(email);
                 if (member == null)
                 {
-                    return Tuple.Create<LoginInfoDto, string>(null, "無法根據信箱查詢到相關會員.");
+                    return Tuple.Create<string, string>(string.Empty, "無法根據信箱查詢到相關會員.");
                 }
 
                 if (!Utility.DecryptAES(member.Password).Equals(password))
                 {
-                    return Tuple.Create<LoginInfoDto, string>(null, "密碼驗證失敗.");
+                    return Tuple.Create<string, string>(string.Empty, "密碼驗證失敗.");
                 }
 
-                string token = $"{Utility.EncryptAES(email)}{Utility.SeparateFlag}{Utility.EncryptAES(password)}";
-                return Tuple.Create(new LoginInfoDto() { MemberID = member.MemberID, Token = token }, string.Empty);
+                return Tuple.Create(member.MemberID, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Login Error >>> Email:{email} Password:{password}\n{ex}");
-                return Tuple.Create<LoginInfoDto, string>(null, "登入發生錯誤.");
+                return Tuple.Create<string, string>(string.Empty, "會員登入發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 會員登入 (token)
-        /// </summary>
-        /// <param name="token">token</param>
-        /// <returns>Tuple(LoginInfoDto, string)</returns>
-        public async Task<Tuple<LoginInfoDto, string>> Login(string token)
-        {
-            if (string.IsNullOrEmpty(token))
-            {
-                return Tuple.Create<LoginInfoDto, string>(null, "自動登入驗證碼無效.");
-            }
-
-            string[] dataArr = token.Split(Utility.SeparateFlag);
-            string account = Utility.DecryptAES(dataArr[0]);
-            string password = Utility.DecryptAES(dataArr[1]);
-            return await this.Login(account, password);
         }
 
         /// <summary>
@@ -239,7 +216,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.CreateMember(member);
                 if (!isSuccess)
                 {
-                    return "會員註冊失敗";
+                    return "會員註冊失敗.";
                 }
 
                 return string.Empty;
@@ -247,8 +224,27 @@ namespace GoBike.Member.Service.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Register Member Error >>> Email:{email} Password:{password}\n{ex}");
-                return "會員註冊發生錯誤";
+                return "會員註冊發生錯誤.";
             }
+        }
+
+        /// <summary>
+        /// 創建新會員資料
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <returns>MemberData</returns>
+        private MemberData CreateNewMemberData(string email, string password)
+        {
+            DateTime createDate = DateTime.Now;
+            string memberID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
+            return new MemberData()
+            {
+                MemberID = memberID,
+                Email = email,
+                Password = Utility.EncryptAES(password),
+                CreateDate = createDate.ToString("yyyy/MM/dd HH:mm:ss"),
+            };
         }
 
         /// <summary>
@@ -322,25 +318,6 @@ namespace GoBike.Member.Service.Managers
             }
 
             return string.Empty;
-        }
-
-        /// <summary>
-        /// 創建新會員資料
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <param name="password">password</param>
-        /// <returns>MemberData</returns>
-        private MemberData CreateNewMemberData(string email, string password)
-        {
-            DateTime createDate = DateTime.Now;
-            string memberID = $"{Guid.NewGuid().ToString().Substring(0, 4)}-{createDate:yyyy}-{createDate:MMdd}";
-            return new MemberData()
-            {
-                MemberID = memberID,
-                Email = email,
-                Password = Utility.EncryptAES(password),
-                CreateDate = createDate.ToString("yyyy/MM/dd HH:mm:ss"),
-            };
         }
     }
 }

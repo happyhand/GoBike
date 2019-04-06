@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using GoBike.API.App.Applibs;
-using GoBike.API.App.Applibs.Filters;
-using GoBike.API.App.Models.Response;
+using GoBike.API.App.Filters;
+using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Models.Member;
+using GoBikeAPI.App.Controllers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
@@ -17,7 +18,7 @@ namespace GoBike.API.App.Controllers.Member
     /// </summary>
     [Route("api/member/[controller]")]
     [ApiController]
-    public class GetMemberInfoController : ControllerBase
+    public class GetMemberInfoController : ApiController
     {
         /// <summary>
         /// logger
@@ -38,6 +39,7 @@ namespace GoBike.API.App.Controllers.Member
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
+        /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
         public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMapper mapper, IMemberService memberService)
         {
@@ -49,14 +51,27 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// GET
         /// </summary>
-        /// <returns>ResultModel</returns>
+        /// <returns>IActionResult</returns>
         [HttpGet]
         [CheckLoginActionFilter(true)]
-        public async Task<ResultModel> Get()
+        public async Task<IActionResult> Get()
         {
-            string memberID = HttpContext.Session.GetObject<string>(Utility.Session_MemberID);
-            GetMemberInfoRespone result = await this.memberService.GetMemberInfo(memberID);
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage, ResultData = this.mapper.Map<MemberInfo>(result.MemberData) };
+            string memberID = HttpContext.Session.GetObject<string>(CommonFlag.Session_MemberID);
+            try
+            {
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberID);
+                if (responseResultDto.Ok)
+                {
+                    return Ok(responseResultDto.Data);
+                }
+
+                return BadRequest(responseResultDto.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID}\n{ex}");
+                return BadRequest("取得會員資訊發生錯誤.");
+            }
         }
     }
 }

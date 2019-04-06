@@ -1,6 +1,4 @@
-﻿using GoBike.API.App.Models.Response;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Response;
+﻿using GoBike.API.Service.Interface.Member;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -40,21 +38,9 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <returns>ResultModel</returns>
         [HttpPost]
-        public async Task<ResultModel> Post(RequestData requestData)
+        public async Task<IActionResult> Post()
         {
-            ForgetPasswordRespone result = await this.memberService.ForgetPassword(requestData.Email);
-            return new ResultModel() { ResultCode = result.ResultCode, ResultMessage = result.ResultMessage };
-        }
-
-        /// <summary>
-        /// 請求參數
-        /// </summary>
-        public class RequestData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
+            return Ok("OK");
         }
     }
 }

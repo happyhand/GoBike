@@ -1,14 +1,15 @@
-﻿using GoBike.API.App.Models.Response;
+﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Threading.Tasks;
 
-namespace GoBike.API.App.Applibs.Filters
+namespace GoBike.API.App.Filters
 {
     /// <summary>
     /// 登入狀態檢測
     /// </summary>
-    public class CheckLoginActionFilter : ActionFilterAttribute, IActionFilter
+    public class CheckLoginActionFilter : ActionFilterAttribute, IAsyncActionFilter
     {
         /// <summary>
         /// loginFlag
@@ -36,28 +37,28 @@ namespace GoBike.API.App.Applibs.Filters
         /// 檢測篩檢
         /// </summary>
         /// <param name="context">context</param>
-        public override void OnActionExecuting(ActionExecutingContext context)
+        /// <param name="next">next</param>
+        /// <returns>Task</returns>
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            string memberID = context.HttpContext.Session.GetObject<string>(Utility.Session_MemberID);
-            bool isSuccess = true;
+            string memberID = context.HttpContext.Session.GetObject<string>(CommonFlag.Session_MemberID);
+            BadRequestObjectResult badRequestObjectResult = null;
             if (this.loginFlag && string.IsNullOrEmpty(memberID))
             {
-                isSuccess = false;
+                badRequestObjectResult = new BadRequestObjectResult("會員尚未登入.");
             }
             else if (!this.loginFlag && !string.IsNullOrEmpty(memberID))
             {
-                isSuccess = false;
+                badRequestObjectResult = new BadRequestObjectResult("會員登入狀態發生錯誤.");
             }
 
-            if (!isSuccess)
+            if (badRequestObjectResult != null)
             {
-                ResultModel resultModel = new ResultModel()
-                {
-                    ResultCode = -666,
-                    ResultMessage = "Login status error"
-                };
-                context.Result = new JsonResult(resultModel);
+                await badRequestObjectResult.ExecuteResultAsync(context);
+                return;
             }
+
+            await base.OnActionExecutionAsync(context, next);
         }
     }
 }
