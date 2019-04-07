@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.Smtp.API", "GoBike.Smtp.API\GoBike.Smtp.API.csproj", "{42CA9C34-889D-4B52-A88A-5F5FF3374C7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.Smtp.Service", "GoBike.Smtp.Service\GoBike.Smtp.Service.csproj", "{C0909531-CACD-46BB-B543-8A0C8DE817F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.Smtp.Core", "GoBike.Smtp.Core\GoBike.Smtp.Core.csproj", "{58E796BA-EB04-4FC1-A43B-F3FB25EA45AD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CA9C34-889D-4B52-A88A-5F5FF3374C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42CA9C34-889D-4B52-A88A-5F5FF3374C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42CA9C34-889D-4B52-A88A-5F5FF3374C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42CA9C34-889D-4B52-A88A-5F5FF3374C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0909531-CACD-46BB-B543-8A0C8DE817F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0909531-CACD-46BB-B543-8A0C8DE817F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0909531-CACD-46BB-B543-8A0C8DE817F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0909531-CACD-46BB-B543-8A0C8DE817F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58E796BA-EB04-4FC1-A43B-F3FB25EA45AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58E796BA-EB04-4FC1-A43B-F3FB25EA45AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58E796BA-EB04-4FC1-A43B-F3FB25EA45AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58E796BA-EB04-4FC1-A43B-F3FB25EA45AD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF767102-13DD-478F-B6E7-40C9EEFBD894}
+	EndGlobalSection
+EndGlobal

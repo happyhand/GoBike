@@ -28,3 +28,11 @@
 /GoBike.UploadFiles/GoBike.UploadFiles/obj
 /GoBike.UploadFiles/GoBike.UploadFiles/bin
 /member.gobike.com
+/GoBike.Smtp/GoBike.Smtp.API/obj
+/GoBike.Smtp/GoBike.Smtp.API/bin
+/smtp.gobike.com
+/GoBike.Smtp/GoBike.Smtp.Core/obj
+/GoBike.Smtp/GoBike.Smtp.Core/bin
+/GoBike.Smtp/GoBike.Smtp.Service/obj
+/GoBike.Smtp/GoBike.Smtp.Service/bin
+/GoBike.Smtp/.vs
