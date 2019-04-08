@@ -17,18 +17,11 @@ namespace GoBike.Member.Service.Interface
         Task<Tuple<MemberInfoDto, string>> EditData(MemberInfoDto memberInfo);
 
         /// <summary>
-        /// 忘記密碼
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>string</returns>
-        Task<string> ForgetPassword(string email);
-
-        /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberID">memberID</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>Tuple(MemberInfoDto, string)</returns>
-        Task<Tuple<MemberInfoDto, string>> GetMemberInfo(string memberID);
+        Task<Tuple<MemberInfoDto, string>> GetMemberInfo(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 會員登入
@@ -45,5 +38,12 @@ namespace GoBike.Member.Service.Interface
         /// <param name="password">password</param>
         /// <returns>string</returns>
         Task<string> Register(string email, string password);
+
+        /// <summary>
+        /// 忘記密碼
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns>Tuple(string, string)</returns>
+        Task<Tuple<string, string>> ResetPassword(string email);
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
 {
@@ -32,7 +31,7 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
             try
             {

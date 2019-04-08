@@ -1,7 +1,11 @@
-﻿using AutoMapper;
-using GoBike.API.Core.Applibs;
+﻿using GoBike.API.Core.Applibs;
+using GoBike.API.Core.Resource;
+using GoBike.API.Repository.Interface;
+using GoBike.API.Repository.Managers;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Managers.Member;
+using GoBike.API.Service.Managers.Verifier;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +46,6 @@ namespace GoBike.API.App
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddAutoMapper();
             this.ConfigurationHandler(services);
             this.SessionHandler(services);
             this.DependencyInjectionHandler(services);
@@ -62,11 +65,14 @@ namespace GoBike.API.App
         private void ConfigurationHandler(IServiceCollection services)
         {
             AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
+            CommonFlagHelper.CommonFlag = Configuration.Get<CommonFlagHelper>();
         }
 
         private void DependencyInjectionHandler(IServiceCollection services)
         {
             services.AddSingleton<IMemberService, MemberService>();
+            services.AddSingleton<IVerifierService, VerifierService>();
+            services.AddSingleton<IRedisRepository, RedisRepository>();
         }
 
         private void SessionHandler(IServiceCollection services)

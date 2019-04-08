@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GoBike.API.App.Filters;
+﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
@@ -26,11 +25,6 @@ namespace GoBike.API.App.Controllers.Member
         private readonly ILogger logger;
 
         /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
-
-        /// <summary>
         /// memberService
         /// </summary>
         private readonly IMemberService memberService;
@@ -41,10 +35,9 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
-        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMapper mapper, IMemberService memberService)
+        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.memberService = memberService;
         }
 
@@ -56,7 +49,7 @@ namespace GoBike.API.App.Controllers.Member
         [CheckLoginActionFilter(true)]
         public async Task<IActionResult> Get()
         {
-            string memberID = HttpContext.Session.GetObject<string>(CommonFlag.Session_MemberID);
+            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
                 ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberID);

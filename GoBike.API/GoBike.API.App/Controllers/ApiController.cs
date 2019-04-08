@@ -1,5 +1,4 @@
-﻿using GoBike.API.Core.Resource;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace GoBikeAPI.App.Controllers
 {
@@ -13,10 +12,10 @@ namespace GoBikeAPI.App.Controllers
         /// <returns>BadRequestObjectResult</returns>
         public override BadRequestObjectResult BadRequest(object error)
         {
-            if (error is string)
-            {
-                return base.BadRequest(Utility.EncryptAES(error as string));
-            }
+            //if (error is string)
+            //{
+            //    return base.BadRequest(Utility.EncryptAES(error as string));
+            //}
 
             return base.BadRequest(error);
         }
@@ -28,10 +27,10 @@ namespace GoBikeAPI.App.Controllers
         /// <returns>OkObjectResult</returns>
         public override OkObjectResult Ok(object value)
         {
-            if (value is string)
-            {
-                return base.Ok(Utility.EncryptAES(value as string));
-            }
+            //if (value is string)
+            //{
+            //    return base.Ok(Utility.EncryptAES(value as string));
+            //}
 
             return base.Ok(value);
         }

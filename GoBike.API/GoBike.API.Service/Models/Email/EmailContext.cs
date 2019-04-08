@@ -1,21 +1,19 @@
-﻿namespace GoBike.Smtp.Service.Models
+﻿namespace GoBike.API.Service.Email
 {
-    public class MailContext
+    /// <summary>
+    /// 郵件資料
+    /// </summary>
+    public class EmailContext
     {
         /// <summary>
-        /// Gets or sets Addressee
+        /// Gets or sets Address
         /// </summary>
-        public string Addressee { get; set; }
+        public string Address { get; set; }
 
         /// <summary>
         /// Gets or sets Body
         /// </summary>
         public string Body { get; set; }
-
-        /// <summary>
-        /// Gets or sets EmailAddress
-        /// </summary>
-        public string EmailAddress { get; set; }
 
         /// <summary>
         /// Gets or sets Subject

@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace GoBike.Smtp.Service.Managers
 {
+    /// <summary>
+    /// 郵件管理微服務
+    /// </summary>
     public class SmtpService : ISmtpService
     {
         /// <summary>
@@ -25,36 +28,32 @@ namespace GoBike.Smtp.Service.Managers
         /// <summary>
         /// 發送郵件
         /// </summary>
-        /// <param name="mailContext">mailContext</param>
+        /// <param name="emailContext">emailContext</param>
         /// <returns>string</returns>
-        public async Task<string> SendEmail(MailContext mailContext)
+        public async Task<string> SendEmail(EmailContext emailContext)
         {
             try
             {
-                if (string.IsNullOrEmpty(mailContext.Addressee))
-                {
-                    return "收信人無效.";
-                }
-                if (string.IsNullOrEmpty(mailContext.EmailAddress))
+                if (string.IsNullOrEmpty(emailContext.Address))
                 {
                     return "郵件網址無效.";
                 }
-                if (string.IsNullOrEmpty(mailContext.Subject))
+                if (string.IsNullOrEmpty(emailContext.Subject))
                 {
                     return "空白郵件主旨.";
                 }
 
-                if (string.IsNullOrEmpty(mailContext.Body))
+                if (string.IsNullOrEmpty(emailContext.Body))
                 {
                     return "空白郵件內容.";
                 }
 
                 using (var message = new MailMessage())
                 {
-                    message.To.Add(new MailAddress(mailContext.EmailAddress, mailContext.Addressee));
+                    message.To.Add(new MailAddress(emailContext.Address));
                     message.From = new MailAddress(AppSettingHelper.Appsetting.SmtpConfig.SmtpMail, AppSettingHelper.Appsetting.SmtpConfig.SmtpUser);
-                    message.Subject = mailContext.Subject;
-                    message.Body = mailContext.Body;
+                    message.Subject = emailContext.Subject;
+                    message.Body = emailContext.Body;
                     message.IsBodyHtml = true;
 
                     using (var client = new SmtpClient(AppSettingHelper.Appsetting.SmtpConfig.SmtpServer))
@@ -70,7 +69,7 @@ namespace GoBike.Smtp.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Email Error >>> Data:{Utility.GetPropertiesData(mailContext)}\n{ex}");
+                this.logger.LogError($"Send Email Error >>> Data:{Utility.GetPropertiesData(emailContext)}\n{ex}");
                 return "發送郵件發生錯誤.";
             }
         }

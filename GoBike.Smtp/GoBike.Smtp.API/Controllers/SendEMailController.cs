@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace GoBike.Smtp.API.Controllers
 {
+    /// <summary>
+    /// 發送郵件 API
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class SendEmailController : ControllerBase
@@ -22,6 +25,11 @@ namespace GoBike.Smtp.API.Controllers
         /// </summary>
         private readonly ISmtpService smtpService;
 
+        /// <summary>
+        /// 建構式
+        /// </summary>
+        /// <param name="logger">logger</param>
+        /// <param name="smtpService">smtpService</param>
         public SendEmailController(ILogger<SendEmailController> logger, ISmtpService smtpService)
         {
             this.logger = logger;
@@ -31,14 +39,14 @@ namespace GoBike.Smtp.API.Controllers
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="mailContext">mailContext</param>
+        /// <param name="emailContext">emailContext</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(MailContext mailContext)
+        public async Task<IActionResult> Post(EmailContext emailContext)
         {
             try
             {
-                string result = await this.smtpService.SendEmail(mailContext);
+                string result = await this.smtpService.SendEmail(emailContext);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("發送郵件成功.");
@@ -48,7 +56,7 @@ namespace GoBike.Smtp.API.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Email Error Error >>> Data:{Utility.GetPropertiesData(mailContext)}\n{ex}");
+                this.logger.LogError($"Send Email Error Error >>> Data:{Utility.GetPropertiesData(emailContext)}\n{ex}");
                 return BadRequest("發送郵件發生錯誤");
             }
         }

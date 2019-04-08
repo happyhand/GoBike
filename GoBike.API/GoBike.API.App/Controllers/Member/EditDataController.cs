@@ -1,8 +1,13 @@
-﻿using AutoMapper;
-using GoBike.API.App.Filters;
+﻿using GoBike.API.App.Filters;
+using GoBike.API.Core.Applibs;
+using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Response;
+using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Member
@@ -12,17 +17,12 @@ namespace GoBike.API.App.Controllers.Member
     /// </summary>
     [Route("api/member/[controller]")]
     [ApiController]
-    public class EditDataController : ControllerBase
+    public class EditDataController : ApiController
     {
         /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<EditDataController> logger;
-
-        /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
 
         /// <summary>
         /// memberService
@@ -41,14 +41,31 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// Post
+        /// POST
         /// </summary>
-        /// <returns>ResultModel</returns>
+        /// <param name="memberInfo">memberInfo</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
-            return Ok("OK");
+            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            memberInfo.MemberID = memberID;
+            try
+            {
+                ResponseResultDto responseResultDto = await this.memberService.EditData(memberInfo);
+                if (responseResultDto.Ok)
+                {
+                    return Ok(responseResultDto.Data);
+                }
+
+                return BadRequest(responseResultDto.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Edit Data Error >>> MemberID:{memberID} EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                return BadRequest("會員更新資料發生錯誤.");
+            }
         }
     }
 }

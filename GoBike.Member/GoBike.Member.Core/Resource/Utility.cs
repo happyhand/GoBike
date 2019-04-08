@@ -1,7 +1,6 @@
-﻿using GoBike.Member.Core.Models;
-using System;
-using System.Net;
-using System.Net.Mail;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -126,30 +125,6 @@ namespace GoBike.Member.Core.Resource
                 RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
 
-        /// <summary>
-        /// 寄送 Email
-        /// </summary>
-        /// <param name="mailContext">mailContext</param>
-        public static void SendMail(MailContext mailContext)
-        {
-            using (var message = new MailMessage())
-            {
-                message.To.Add(new MailAddress(mailContext.ToEmail, mailContext.ToUserName));
-                message.From = new MailAddress(mailContext.FromEmail, mailContext.FromUserName);
-                message.Subject = mailContext.Subject;
-                message.Body = mailContext.Body;
-                message.IsBodyHtml = true;
-
-                using (var client = new SmtpClient(mailContext.SmtpServer))
-                {
-                    client.Port = 587;
-                    client.Credentials = new NetworkCredential(mailContext.SmtpMail, mailContext.SmtpPassword);
-                    client.EnableSsl = true;
-                    client.Send(message);
-                }
-            }
-        }
-
         #endregion Email
 
         #region 手機驗證
@@ -165,5 +140,19 @@ namespace GoBike.Member.Core.Resource
         }
 
         #endregion 手機驗證
+
+        #region 取得類別屬性資料
+
+        /// <summary>
+        /// 取得類別屬性資料
+        /// </summary>
+        /// <param name="data">data</param>
+        /// <returns>IEnumerable(string)</returns>
+        public static IEnumerable<string> GetPropertiesData(object data)
+        {
+            return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}");
+        }
+
+        #endregion 取得類別屬性資料
     }
 }

@@ -26,6 +26,11 @@
             /// Gets or sets MemberService
             /// </summary>
             public string MemberService { get; set; }
+
+            /// <summary>
+            /// Gets or sets SmtpService
+            /// </summary>
+            public string SmtpService { get; set; }
         }
     }
 }

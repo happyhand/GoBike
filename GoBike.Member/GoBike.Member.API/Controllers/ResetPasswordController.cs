@@ -1,6 +1,4 @@
-﻿using GoBike.Member.Core.Resource;
-using GoBike.Member.Service.Interface;
-using GoBike.Member.Service.Models;
+﻿using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,16 +7,16 @@ using System.Threading.Tasks;
 namespace GoBike.Member.API.Controllers
 {
     /// <summary>
-    /// 取得會員資訊
+    /// 重設密碼
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class GetMemberInfoController : ControllerBase
+    public class ResetPasswordController : ControllerBase
     {
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<ResetPasswordController> logger;
 
         /// <summary>
         /// memberService
@@ -30,7 +28,7 @@ namespace GoBike.Member.API.Controllers
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="memberService">memberService</param>
-        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
+        public ResetPasswordController(ILogger<ResetPasswordController> logger, IMemberService memberService)
         {
             this.logger = logger;
             this.memberService = memberService;
@@ -39,14 +37,14 @@ namespace GoBike.Member.API.Controllers
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="inputData">inputData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(InputData inputData)
         {
             try
             {
-                Tuple<MemberInfoDto, string> result = await this.memberService.GetMemberInfo(memberInfo);
+                Tuple<string, string> result = await this.memberService.ResetPassword(inputData.Email);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,9 +54,20 @@ namespace GoBike.Member.API.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
-                return BadRequest("取得會員資訊發生錯誤");
+                this.logger.LogError($"Reset Password Error >>> Email:{inputData.Email}\n{ex}");
+                return BadRequest("會員重設密碼發生錯誤.");
             }
+        }
+
+        /// <summary>
+        /// 請求資料
+        /// </summary>
+        public class InputData
+        {
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
         }
     }
 }

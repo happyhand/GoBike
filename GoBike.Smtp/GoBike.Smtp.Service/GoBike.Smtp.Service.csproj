@@ -9,10 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GoBike.Smtp.Core\GoBike.Smtp.Core.csproj" />
   </ItemGroup>
 

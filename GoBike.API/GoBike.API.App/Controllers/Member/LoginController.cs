@@ -90,7 +90,7 @@ namespace GoBike.API.App.Controllers.Member
             if (responseResultDto.Ok)
             {
                 LoginInfoDto loginInfoDto = responseResultDto.Data as LoginInfoDto;
-                this.HttpContext.Session.SetObject(CommonFlag.Session_MemberID, loginInfoDto.MemberID);
+                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, loginInfoDto.MemberID);
                 return Ok(loginInfoDto.Token);
             }
 

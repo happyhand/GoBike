@@ -1,6 +1,5 @@
 ﻿using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace GoBike.API.Service.Interface.Member
@@ -13,16 +12,9 @@ namespace GoBike.API.Service.Interface.Member
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfoDto">memberInfoDto</param>
-        /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> EditData(MemberInfoDto memberInfoDto);
-
-        /// <summary>
-        /// 忘記密碼
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>HttpResponseMessage</returns>
-        Task<HttpResponseMessage> ForgetPassword(string email);
+        /// <param name="memberInfo">memberInfo</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditData(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 取得會員資訊
@@ -53,5 +45,12 @@ namespace GoBike.API.Service.Interface.Member
         /// <param name="password">password</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> Register(string email, string password);
+
+        /// <summary>
+        /// 忘記密碼
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> ResetPassword(string email);
     }
 }

@@ -41,7 +41,7 @@ namespace GoBike.API.App.Filters
         /// <returns>Task</returns>
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            string memberID = context.HttpContext.Session.GetObject<string>(CommonFlag.Session_MemberID);
+            string memberID = context.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             BadRequestObjectResult badRequestObjectResult = null;
             if (this.loginFlag && string.IsNullOrEmpty(memberID))
             {

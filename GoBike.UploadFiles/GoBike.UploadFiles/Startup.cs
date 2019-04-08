@@ -29,7 +29,6 @@ namespace GoBike.UploadFiles
             }
 
             app.UseHttpsRedirection();
-            //app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
             app.UseMvc();
         }
 
@@ -38,17 +37,6 @@ namespace GoBike.UploadFiles
         {
             AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            //services.AddCors(options =>
-            //{
-            //    // CorsPolicy 是自訂的 Policy 名稱
-            //    options.AddPolicy("ProductNoPolicy", policy =>
-            //    {
-            //        policy.WithOrigins("http://apigobike.hopto.org:18592", "https://apigobike.hopto.org")
-            //              .AllowAnyHeader()
-            //              .AllowAnyMethod()
-            //              .AllowCredentials();
-            //    });
-            //});
         }
     }
 }

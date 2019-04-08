@@ -1,0 +1,91 @@
+﻿using GoBike.API.Core.Applibs;
+using GoBike.API.Repository.Interface;
+using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace GoBike.API.Repository.Managers
+{
+    /// <summary>
+    /// Redis 資料庫
+    /// </summary>
+    public class RedisRepository : IRedisRepository
+    {
+        /// <summary>
+        /// connectionMultiplexer
+        /// </summary>
+        private readonly IDatabase database;
+
+        /// <summary>
+        /// logger
+        /// </summary>
+        private readonly ILogger<RedisRepository> logger;
+
+        /// <summary>
+        /// connectionMultiplexer
+        /// </summary>
+        private readonly IServer redisServer;
+
+        /// <summary>
+        /// 建構式
+        /// </summary>
+        /// <param name="logger">logger</param>
+        public RedisRepository(ILogger<RedisRepository> logger)
+        {
+            this.logger = logger;
+            ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(AppSettingHelper.Appsetting.RedisConnection);
+            this.database = connectionMultiplexer.GetDatabase(1);
+            this.redisServer = connectionMultiplexer.GetServer(AppSettingHelper.Appsetting.RedisConnection);
+        }
+
+        /// <summary>
+        /// 讀取快取資料
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <returns>string</returns>
+        public async Task<string> GetCache(string cacheKey)
+        {
+            try
+            {
+                return await this.database.StringGetAsync(cacheKey);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Cache Error >>> CacheKey:{cacheKey}\n{ex}");
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 取得 RedisKeys
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <returns>RedisKeys</returns>
+        public IEnumerable<RedisKey> GetRedisKeys(string cacheKey)
+        {
+            return this.redisServer.Keys(1, pattern: cacheKey);
+        }
+
+        /// <summary>
+        /// 寫入快取資料
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <param name="dataJSON">dataJSON</param>
+        /// <param name="cacheTimes">cacheTimes</param>
+        /// <returns>bool</returns>
+        public async Task<bool> SetCache(string cacheKey, string dataJSON, TimeSpan cacheTimes)
+        {
+            try
+            {
+                return await this.database.StringSetAsync(cacheKey, dataJSON, cacheTimes);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Set Cache Error >>> CacheKey:{cacheKey} DataJSON:{dataJSON}\n{ex}");
+                return false;
+            }
+        }
+    }
+}

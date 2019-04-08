@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using GoBike.Member.Core.Applibs;
-using GoBike.Member.Core.Models;
 using GoBike.Member.Core.Resource;
 using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
@@ -56,10 +54,15 @@ namespace GoBike.Member.Service.Managers
         {
             try
             {
+                if (string.IsNullOrEmpty(memberInfo.MemberID))
+                {
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員編號無效.");
+                }
+
                 MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
                 if (memberData == null)
                 {
-                    this.logger.LogError($"Edit Data Error >>> ID:{memberInfo.MemberID}\nThe member is not exist.");
+                    this.logger.LogError($"Edit Data Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\nThe member is not exist.");
                     return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
                 }
 
@@ -72,66 +75,45 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
-                    return Tuple.Create<MemberInfoDto, string>(null, "會員資料更新失敗.");
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員更新資料失敗.");
                 }
 
                 return Tuple.Create(this.mapper.Map<MemberInfoDto>(memberData), string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> ID:{memberInfo.MemberID} Data:{memberInfo.GetData}\n{ex}");
-                return Tuple.Create<MemberInfoDto, string>(null, "會員資料更新發生錯誤.");
-            }
-        }
-
-        /// <summary>
-        /// 忘記密碼
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>string</returns>
-        public async Task<string> ForgetPassword(string email)
-        {
-            try
-            {
-                MemberData member = await this.memberRepository.GetMemebrDataByEmail(email);
-                if (member == null)
-                {
-                    return "會員不存在.";
-                }
-
-                MailContext mailContext = new MailContext()
-                {
-                    SmtpServer = AppSettingHelper.Appsetting.SmtpConfig.SmtpServer,
-                    SmtpMail = AppSettingHelper.Appsetting.SmtpConfig.SmtpMail,
-                    SmtpPassword = AppSettingHelper.Appsetting.SmtpConfig.SmtpPassword,
-                    ToEmail = email,
-                    ToUserName = member.Nickname,
-                    FromEmail = AppSettingHelper.Appsetting.SmtpConfig.SmtpMail,
-                    FromUserName = "GoBike",
-                    Subject = "【忘記密碼】系統通知信",
-                    Body = $"<p>親愛的 {member.Nickname} 用戶您好</p><p>您於 <span style='font-weight:bold; color:blue;'>{DateTime.Now:yyyy/MM/dd HH:mm:ss}</span> 查詢密碼</p><p>此帳號密碼為：<span style='font-weight:bold; color:blue;'>{Utility.DecryptAES(member.Password)}</span></p><br><br><br><p>※本電子郵件係由系統自動發送，請勿直接回覆本郵件。</p>"
-                };
-
-                Utility.SendMail(mailContext);
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Forget Password Error >>> Email:{email}\n{ex}");
-                return "發送郵件發生錯誤.";
+                this.logger.LogError($"Edit Data Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                return Tuple.Create<MemberInfoDto, string>(null, "會員更新資料發生錯誤.");
             }
         }
 
         /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberID">memberID</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>Tuple(MemberInfoDto, string)</returns>
-        public async Task<Tuple<MemberInfoDto, string>> GetMemberInfo(string memberID)
+        public async Task<Tuple<MemberInfoDto, string>> GetMemberInfo(MemberInfoDto memberInfo)
         {
             try
             {
-                MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberID);
+                MemberData memberData = null;
+                if (!string.IsNullOrEmpty(memberInfo.MemberID))
+                {
+                    memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
+                }
+                else if (!string.IsNullOrEmpty(memberInfo.Email))
+                {
+                    memberData = await this.memberRepository.GetMemebrDataByEmail(memberInfo.Email);
+                }
+                else if (!string.IsNullOrEmpty(memberInfo.Mobile))
+                {
+                    memberData = await this.memberRepository.GetMemebrDataByMobile(memberInfo.Mobile);
+                }
+                else
+                {
+                    return Tuple.Create<MemberInfoDto, string>(null, "無效的查詢參數.");
+                }
+
                 if (memberData == null)
                 {
                     return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
@@ -141,7 +123,7 @@ namespace GoBike.Member.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> ID:{memberID}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
                 return Tuple.Create<MemberInfoDto, string>(null, "取得會員資訊發生錯誤.");
             }
         }
@@ -229,6 +211,42 @@ namespace GoBike.Member.Service.Managers
         }
 
         /// <summary>
+        /// 重設密碼
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns>string</returns>
+        public async Task<Tuple<string, string>> ResetPassword(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Tuple.Create<string, string>(string.Empty, "信箱無效.");
+                }
+
+                MemberData memberData = await this.memberRepository.GetMemebrDataByEmail(email);
+                if (memberData == null)
+                {
+                    return Tuple.Create<string, string>(string.Empty, "會員不存在.");
+                }
+
+                string password = Guid.NewGuid().ToString().Substring(0, 8);
+                memberData.Password = Utility.EncryptAES(password);
+                bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
+                if (!isSuccess)
+                {
+                    return Tuple.Create(string.Empty, "會員重設密碼失敗.");
+                }
+                return Tuple.Create(password, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reset Password Error >>> Email:{email}\n{ex}");
+                return Tuple.Create(string.Empty, "會員重設密碼發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 創建新會員資料
         /// </summary>
         /// <param name="email">email</param>
@@ -305,7 +323,7 @@ namespace GoBike.Member.Service.Managers
             {
                 if (!Utility.IsValidMobile(memberInfo.Mobile))
                 {
-                    this.logger.LogError($"Update Member Data Handler Error >>> id:{memberData.Id} Data:{memberInfo.GetData}\nMobile valid fail.");
+                    this.logger.LogError($"Update Member Data Handler Error >>> id:{memberData.Id} Data:{Utility.GetPropertiesData(memberInfo)}\nMobile valid fail.");
                     return "手機格式驗證失敗.";
                 }
 

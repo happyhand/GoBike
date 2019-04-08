@@ -1,5 +1,6 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
+using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
@@ -34,21 +35,35 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfoDto">memberInfoDto</param>
-        /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> EditData(MemberInfoDto memberInfoDto)
+        /// <param name="memberInfo">memberInfo</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> EditData(MemberInfoDto memberInfo)
         {
-            return null;
-        }
+            if (string.IsNullOrEmpty(memberInfo.MemberID))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員編號無效."
+                };
+            }
 
-        /// <summary>
-        /// 忘記密碼
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>HttpResponseMessage</returns>
-        public async Task<HttpResponseMessage> ForgetPassword(string email)
-        {
-            return null;
+            string postData = JsonConvert.SerializeObject(memberInfo);
+            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
+            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = true,
+                    Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                };
+            }
+
+            return new ResponseResultDto()
+            {
+                Ok = false,
+                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+            };
         }
 
         /// <summary>
@@ -58,6 +73,15 @@ namespace GoBike.API.Service.Managers.Member
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> GetMemberInfo(string memberID)
         {
+            if (string.IsNullOrEmpty(memberID))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員編號無效."
+                };
+            }
+
             string postData = JsonConvert.SerializeObject(new { MemberID = memberID });
             HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
             if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
@@ -84,6 +108,15 @@ namespace GoBike.API.Service.Managers.Member
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> Login(string email, string password)
         {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "信箱或密碼無效."
+                };
+            }
+
             string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
             HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
             string result = httpResponseMessage.Content.ReadAsAsync<string>().Result;
@@ -95,7 +128,7 @@ namespace GoBike.API.Service.Managers.Member
                     Data = new LoginInfoDto()
                     {
                         MemberID = result,
-                        Token = $"{Utility.EncryptAES(email)}{CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
+                        Token = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
                     }
                 };
             }
@@ -127,7 +160,7 @@ namespace GoBike.API.Service.Managers.Member
             string password = string.Empty;
             try
             {
-                string[] dataArr = token.Split(CommonFlag.SeparateFlag);
+                string[] dataArr = token.Split(CommonFlagHelper.CommonFlag.SeparateFlag);
                 email = Utility.DecryptAES(dataArr[0]);
                 password = Utility.DecryptAES(dataArr[1]);
             }
@@ -152,12 +185,85 @@ namespace GoBike.API.Service.Managers.Member
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> Register(string email, string password)
         {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "信箱或密碼無效."
+                };
+            }
+
             string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
             HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
             return new ResponseResultDto()
             {
                 Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
                 Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+            };
+        }
+
+        /// <summary>
+        /// 重設密碼
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns>HttpResponseMessage</returns>
+        public async Task<ResponseResultDto> ResetPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "信箱無效."
+                };
+            }
+
+            string postData = JsonConvert.SerializeObject(new { Email = email });
+            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
+            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            {
+                string password = httpResponseMessage.Content.ReadAsAsync<string>().Result;
+                EmailContext emailContext = this.GetResetPasswordEmailContext(email, password);
+                postData = JsonConvert.SerializeObject(emailContext);
+                httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
+
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                        Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    };
+                }
+            }
+
+            return new ResponseResultDto()
+            {
+                Ok = false,
+                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+            };
+        }
+
+        /// <summary>
+        /// 取得重設密碼郵件內容
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <returns>EmailContext</returns>
+        private EmailContext GetResetPasswordEmailContext(string email, string password)
+        {
+            return new EmailContext()
+            {
+                Address = email,
+                Body = $"<p>親愛的用戶您好</p>" +
+                       $"<p>您於 <span style='font-weight:bold; color:blue;'>{DateTime.Now:yyyy/MM/dd HH:mm:ss}</span> 重設密碼</p>" +
+                       $"<p>您的密碼更新為</p>" +
+                       $"<p><span style='font-weight:bold; color:blue;'>{password}</span></p>" +
+                       $"<p>請於重新登入後，於設定個人檔案重新設定密碼</p>" +
+                       $"<br><br><br>" +
+                       $"<p>※本電子郵件係由系統自動發送，請勿直接回覆本郵件。</p>",
+                Subject = "GoBike 查詢密碼"
             };
         }
     }

@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.API.Service", "GoBik
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.API.Core", "GoBike.API.Core\GoBike.API.Core.csproj", "{783742B1-B1AC-406F-966C-E37E143C9E17}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.API.Repository", "GoBike.API.Repository\GoBike.API.Repository.csproj", "{B1F32BA3-7553-43E2-9879-C39676AD4AD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{783742B1-B1AC-406F-966C-E37E143C9E17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{783742B1-B1AC-406F-966C-E37E143C9E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{783742B1-B1AC-406F-966C-E37E143C9E17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1F32BA3-7553-43E2-9879-C39676AD4AD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1F32BA3-7553-43E2-9879-C39676AD4AD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1F32BA3-7553-43E2-9879-C39676AD4AD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1F32BA3-7553-43E2-9879-C39676AD4AD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

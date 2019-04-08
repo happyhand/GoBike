@@ -28,24 +28,6 @@
         public int? Gender { get; set; }
 
         /// <summary>
-        /// Gets GetData
-        /// </summary>
-        public string GetData
-        {
-            get
-            {
-                return $"BirthDayDate:{this.BirthDayDate} " +
-                 $"BodyHeight:{this.BodyHeight} " +
-                 $"BodyWeight:{this.BodyWeight}" +
-                 $"Email:{this.Email}" +
-                 $"Password:{this.Password}" +
-                 $"Gender:{this.Gender}" +
-                 $"Mobile:{this.Mobile}" +
-                 $"Nickname:{this.Nickname}";
-            }
-        }
-
-        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
