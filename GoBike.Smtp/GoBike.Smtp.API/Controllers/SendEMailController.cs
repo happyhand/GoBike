@@ -57,7 +57,7 @@ namespace GoBike.Smtp.API.Controllers
             catch (Exception ex)
             {
                 this.logger.LogError($"Send Email Error Error >>> Data:{Utility.GetPropertiesData(emailContext)}\n{ex}");
-                return BadRequest("發送郵件發生錯誤");
+                return BadRequest("發送郵件發生錯誤.");
             }
         }
     }

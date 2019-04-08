@@ -140,18 +140,18 @@ namespace GoBike.Member.Service.Managers
             {
                 if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    return Tuple.Create<string, string>(string.Empty, "信箱或密碼無效.");
+                    return Tuple.Create(string.Empty, "信箱或密碼無效.");
                 }
 
                 MemberData member = await this.memberRepository.GetMemebrDataByEmail(email);
                 if (member == null)
                 {
-                    return Tuple.Create<string, string>(string.Empty, "無法根據信箱查詢到相關會員.");
+                    return Tuple.Create(string.Empty, "無法根據信箱查詢到相關會員.");
                 }
 
                 if (!Utility.DecryptAES(member.Password).Equals(password))
                 {
-                    return Tuple.Create<string, string>(string.Empty, "密碼驗證失敗.");
+                    return Tuple.Create(string.Empty, "密碼驗證失敗.");
                 }
 
                 return Tuple.Create(member.MemberID, string.Empty);
@@ -159,7 +159,7 @@ namespace GoBike.Member.Service.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Login Error >>> Email:{email} Password:{password}\n{ex}");
-                return Tuple.Create<string, string>(string.Empty, "會員登入發生錯誤.");
+                return Tuple.Create(string.Empty, "會員登入發生錯誤.");
             }
         }
 
@@ -221,13 +221,13 @@ namespace GoBike.Member.Service.Managers
             {
                 if (string.IsNullOrEmpty(email))
                 {
-                    return Tuple.Create<string, string>(string.Empty, "信箱無效.");
+                    return Tuple.Create(string.Empty, "信箱無效.");
                 }
 
                 MemberData memberData = await this.memberRepository.GetMemebrDataByEmail(email);
                 if (memberData == null)
                 {
-                    return Tuple.Create<string, string>(string.Empty, "會員不存在.");
+                    return Tuple.Create(string.Empty, "會員不存在.");
                 }
 
                 string password = Guid.NewGuid().ToString().Substring(0, 8);

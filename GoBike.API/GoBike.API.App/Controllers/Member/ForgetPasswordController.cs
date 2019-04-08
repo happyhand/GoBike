@@ -98,7 +98,7 @@ namespace GoBike.API.App.Controllers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Verifier Code Error >>> Email:{inputData.Email} VerifierCode:{inputData.VerifierCode}\n{ex}");
-                return BadRequest("查詢密碼驗證發生錯誤.");
+                return BadRequest("重設密碼驗證發生錯誤.");
             }
         }
 

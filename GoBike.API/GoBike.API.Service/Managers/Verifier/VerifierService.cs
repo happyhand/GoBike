@@ -48,14 +48,22 @@ namespace GoBike.API.Service.Managers.Verifier
         /// <returns>bool</returns>
         public async Task<bool> IsValidVerifierCode(string email, string verifierCode)
         {
-            string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-{verifierCode}";
-            string data = await this.redisRepository.GetCache(cacheKey);
-            if (string.IsNullOrEmpty(data))
+            try
             {
+                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-{verifierCode}";
+                string data = await this.redisRepository.GetCache(cacheKey);
+                if (string.IsNullOrEmpty(data))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Is Valid Verifier Code Error >>> Email:{email} VerifierCode:{verifierCode}\n{ex}");
                 return false;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -74,35 +82,47 @@ namespace GoBike.API.Service.Managers.Verifier
                 };
             }
 
-            string verifierCode = await this.GetVerifierCode(email);
-            EmailContext emailContext = this.GetVerifierCodetEmailContext(email, verifierCode);
-            string postData = JsonConvert.SerializeObject(emailContext);
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
-            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            try
             {
-                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-{verifierCode}";
-                bool isSetCache = await this.redisRepository.SetCache(cacheKey, verifierCode, new TimeSpan(0, 10, 0));
-                if (isSetCache)
+                string verifierCode = await this.GetVerifierCode(email);
+                EmailContext emailContext = this.GetVerifierCodetEmailContext(email, verifierCode);
+                string postData = JsonConvert.SerializeObject(emailContext);
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
                 {
+                    string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-{verifierCode}";
+                    bool isSetCache = await this.redisRepository.SetCache(cacheKey, verifierCode, new TimeSpan(0, 10, 0));
+                    if (isSetCache)
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = true,
+                            Data = verifierCode
+                        };
+                    }
+
                     return new ResponseResultDto()
                     {
-                        Ok = true,
-                        Data = verifierCode
+                        Ok = false,
+                        Data = "存取驗證碼失敗."
                     };
                 }
 
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "存取驗證碼失敗."
+                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
                 };
             }
-
-            return new ResponseResultDto()
+            catch (Exception ex)
             {
-                Ok = false,
-                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-            };
+                this.logger.LogError($"Send Verifier Code Error >>> Email:{email}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "發送驗證碼發生錯誤."
+                };
+            }
         }
 
         /// <summary>
@@ -112,14 +132,22 @@ namespace GoBike.API.Service.Managers.Verifier
         /// <returns>string</returns>
         private async Task<string> GetVerifierCode(string email)
         {
-            string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-*";
-            string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
-            if (string.IsNullOrEmpty(cacheKey))
+            try
             {
-                return Guid.NewGuid().ToString().Substring(0, 6);
+                string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{email}-*";
+                string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
+                if (!string.IsNullOrEmpty(cacheKey))
+                {
+                    return await this.redisRepository.GetCache(cacheKey);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Verifier Code Error >>> Email:{email}\n{ex}");
+                return string.Empty;
             }
 
-            return await this.redisRepository.GetCache(cacheKey);
+            return Guid.NewGuid().ToString().Substring(0, 6);
         }
 
         /// <summary>

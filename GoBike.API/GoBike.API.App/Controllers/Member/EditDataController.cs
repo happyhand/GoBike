@@ -63,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> MemberID:{memberID} EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
                 return BadRequest("會員更新資料發生錯誤.");
             }
         }

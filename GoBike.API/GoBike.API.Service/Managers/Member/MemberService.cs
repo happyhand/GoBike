@@ -48,22 +48,34 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            string postData = JsonConvert.SerializeObject(memberInfo);
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
-            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            try
             {
+                string postData = JsonConvert.SerializeObject(memberInfo);
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                    };
+                }
+
                 return new ResponseResultDto()
                 {
-                    Ok = true,
-                    Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                    Ok = false,
+                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
                 };
             }
-
-            return new ResponseResultDto()
+            catch (Exception ex)
             {
-                Ok = false,
-                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-            };
+                this.logger.LogError($"Edit Data Error >>> EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員更新資料發生錯誤."
+                };
+            }
         }
 
         /// <summary>
@@ -82,22 +94,34 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            string postData = JsonConvert.SerializeObject(new { MemberID = memberID });
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
-            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            try
             {
+                string postData = JsonConvert.SerializeObject(new { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                    };
+                }
+
                 return new ResponseResultDto()
                 {
-                    Ok = true,
-                    Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                    Ok = false,
+                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
                 };
             }
-
-            return new ResponseResultDto()
+            catch (Exception ex)
             {
-                Ok = false,
-                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-            };
+                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得會員資訊發生錯誤."
+                };
+            }
         }
 
         /// <summary>
@@ -117,27 +141,39 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
-            string result = httpResponseMessage.Content.ReadAsAsync<string>().Result;
-            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            try
             {
+                string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
+                string result = httpResponseMessage.Content.ReadAsAsync<string>().Result;
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = new LoginInfoDto()
+                        {
+                            MemberID = result,
+                            Token = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
+                        }
+                    };
+                }
+
                 return new ResponseResultDto()
                 {
-                    Ok = true,
-                    Data = new LoginInfoDto()
-                    {
-                        MemberID = result,
-                        Token = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
-                    }
+                    Ok = false,
+                    Data = result
                 };
             }
-
-            return new ResponseResultDto()
+            catch (Exception ex)
             {
-                Ok = false,
-                Data = result
-            };
+                this.logger.LogError($"Login Error >>> Email:{email} Password:{password}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員登入發生錯誤."
+                };
+            }
         }
 
         /// <summary>
@@ -194,13 +230,25 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
-            return new ResponseResultDto()
+            try
             {
-                Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
-                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-            };
+                string postData = JsonConvert.SerializeObject(new { Email = email, Password = password });
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Register Error >>> Email:{email} Password:{password}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員註冊發生錯誤."
+                };
+            }
         }
 
         /// <summary>
@@ -219,30 +267,42 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            string postData = JsonConvert.SerializeObject(new { Email = email });
-            HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
-            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+            try
             {
-                string password = httpResponseMessage.Content.ReadAsAsync<string>().Result;
-                EmailContext emailContext = this.GetResetPasswordEmailContext(email, password);
-                postData = JsonConvert.SerializeObject(emailContext);
-                httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
-
+                string postData = JsonConvert.SerializeObject(new { Email = email });
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
                 if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
                 {
-                    return new ResponseResultDto()
-                    {
-                        Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
-                        Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-                    };
-                }
-            }
+                    string password = httpResponseMessage.Content.ReadAsAsync<string>().Result;
+                    EmailContext emailContext = this.GetResetPasswordEmailContext(email, password);
+                    postData = JsonConvert.SerializeObject(emailContext);
+                    httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
 
-            return new ResponseResultDto()
+                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                            Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                        };
+                    }
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                };
+            }
+            catch (Exception ex)
             {
-                Ok = false,
-                Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
-            };
+                this.logger.LogError($"Reset Password Error >>> Email:{email}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "重設密碼驗證發生錯誤."
+                };
+            }
         }
 
         /// <summary>
