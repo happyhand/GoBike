@@ -43,7 +43,7 @@ namespace GoBike.Member.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
-            Tuple<MemberInfoDto, string> result = await this.memberService.EditData(memberInfo);
+            Tuple<MemberInfoDto, string> result = await this.memberService.EditData(memberInfo, true);
             if (string.IsNullOrEmpty(result.Item2))
             {
                 return Ok(result.Item1);

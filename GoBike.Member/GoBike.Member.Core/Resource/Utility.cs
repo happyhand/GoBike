@@ -150,7 +150,7 @@ namespace GoBike.Member.Core.Resource
         /// <returns>IEnumerable(string)</returns>
         public static IEnumerable<string> GetPropertiesData(object data)
         {
-            return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}");
+            return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}\n");
         }
 
         #endregion 取得類別屬性資料

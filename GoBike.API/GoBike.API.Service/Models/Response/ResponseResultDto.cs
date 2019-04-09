@@ -1,5 +1,8 @@
 ﻿namespace GoBike.API.Service.Models.Response
 {
+    /// <summary>
+    /// 回應資料
+    /// </summary>
     public class ResponseResultDto
     {
         /// <summary>

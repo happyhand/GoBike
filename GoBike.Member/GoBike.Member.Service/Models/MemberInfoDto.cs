@@ -1,5 +1,8 @@
 ﻿namespace GoBike.Member.Service.Models
 {
+    /// <summary>
+    /// 會員資料
+    /// </summary>
     public class MemberInfoDto
     {
         /// <summary>

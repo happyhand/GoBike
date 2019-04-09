@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace GoBikeAPI.App.Controllers
+namespace GoBike.API.App.Controllers
 {
     [ApiController]
     public class ApiController : ControllerBase

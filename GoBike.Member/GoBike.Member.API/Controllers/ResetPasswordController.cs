@@ -1,4 +1,6 @@
-﻿using GoBike.Member.Service.Interface;
+﻿using GoBike.Member.Core.Resource;
+using GoBike.Member.Service.Interface;
+using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -37,14 +39,20 @@ namespace GoBike.Member.API.Controllers
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InputData inputData)
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
             try
             {
-                Tuple<string, string> result = await this.memberService.ResetPassword(inputData.Email);
+                Tuple<MemberInfoDto, string> searchResult = await this.memberService.GetMemberInfo(memberInfo);
+                if (searchResult.Item1 == null)
+                {
+                    return BadRequest(searchResult.Item2);
+                }
+
+                Tuple<MemberInfoDto, string> result = await this.memberService.EditData(new MemberInfoDto() { MemberID = searchResult.Item1.MemberID, Password = memberInfo.Password }, false);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -54,20 +62,9 @@ namespace GoBike.Member.API.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Email:{inputData.Email}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
                 return BadRequest("會員重設密碼發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 請求資料
-        /// </summary>
-        public class InputData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
         }
     }
 }

@@ -3,7 +3,6 @@ using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,28 +38,28 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST - Normal Login
+        /// POST - 一般登入
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]")]
-        public async Task<IActionResult> NormalLogin(InputData inputData)
+        public async Task<IActionResult> NormalLogin(MemberInfoDto memberInfo)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Login(inputData.Email, inputData.Password);
+                ResponseResultDto responseResultDto = await this.memberService.Login(memberInfo);
                 return this.ResponseResultHandler(responseResultDto);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Normal Login Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                this.logger.LogError($"Normal Login Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
 
         /// <summary>
-        /// POST - Token Login
+        /// POST - Token 登入
         /// </summary>
         /// <param name="inputData">inputData</param>
         /// <returns>IActionResult</returns>
@@ -102,16 +101,6 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         public class InputData
         {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
-
-            /// <summary>
-            /// Gets or sets Password
-            /// </summary>
-            public string Password { get; set; }
-
             /// <summary>
             /// Gets or sets Token
             /// </summary>

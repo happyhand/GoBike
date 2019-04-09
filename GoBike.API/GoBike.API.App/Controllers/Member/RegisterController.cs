@@ -1,6 +1,6 @@
 ﻿using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +39,14 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InputData inputData)
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Register(inputData.Email, inputData.Password);
+                ResponseResultDto responseResultDto = await this.memberService.Register(memberInfo);
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -56,25 +56,9 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Email:{inputData.Email} Password:{inputData.Password}\n{ex}");
+                this.logger.LogError($"Register Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
                 return BadRequest("會員註冊發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 請求資料
-        /// </summary>
-        public class InputData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
-
-            /// <summary>
-            /// Gets or sets Password
-            /// </summary>
-            public string Password { get; set; }
         }
     }
 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBikeAPI.App", "GoBike.API.App\GoBikeAPI.App.csproj", "{FD7D4AA7-AED8-4EFF-885E-CB8F03614ED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.API.App", "GoBike.API.App\GoBike.API.App.csproj", "{FD7D4AA7-AED8-4EFF-885E-CB8F03614ED8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.API.Service", "GoBike.API.Service\GoBike.API.Service.csproj", "{A0FA39D9-F1AC-43C8-B029-6A1848E5F192}"
 EndProject

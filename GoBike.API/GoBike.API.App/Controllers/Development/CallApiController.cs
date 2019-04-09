@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GoBikeAPI.App.Controllers.Development
+namespace GoBike.API.App.Controllers.Development
 {
     [Route("api/[controller]")]
     [ApiController]

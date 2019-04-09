@@ -1,9 +1,11 @@
-﻿using GoBike.API.App.Filters;
+﻿using AutoMapper;
+using GoBike.API.App.Filters;
+using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,11 @@ namespace GoBike.API.App.Controllers.Member
         private readonly ILogger logger;
 
         /// <summary>
+        /// mapper
+        /// </summary>
+        private readonly IMapper mapper;
+
+        /// <summary>
         /// memberService
         /// </summary>
         private readonly IMemberService memberService;
@@ -35,9 +42,10 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
-        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
+        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMapper mapper, IMemberService memberService)
         {
             this.logger = logger;
+            this.mapper = mapper;
             this.memberService = memberService;
         }
 
@@ -52,10 +60,10 @@ namespace GoBike.API.App.Controllers.Member
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberID);
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(new MemberInfoDto() { MemberID = memberID });
                 if (responseResultDto.Ok)
                 {
-                    return Ok(responseResultDto.Data);
+                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
                 }
 
                 return BadRequest(responseResultDto.Data);
@@ -63,6 +71,32 @@ namespace GoBike.API.App.Controllers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID}\n{ex}");
+                return BadRequest("取得會員資訊發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// POST
+        /// </summary>
+        /// <param name="memberInfo">memberInfo</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [CheckLoginActionFilter(true)]
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        {
+            try
+            {
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberInfo);
+                if (responseResultDto.Ok)
+                {
+                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
+                }
+
+                return BadRequest(responseResultDto.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Member Info Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
         }

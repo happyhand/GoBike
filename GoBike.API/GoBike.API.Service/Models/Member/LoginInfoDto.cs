@@ -1,5 +1,8 @@
 ﻿namespace GoBike.API.Service.Models.Member
 {
+    /// <summary>
+    /// 登入資料
+    /// </summary>
     public class LoginInfoDto
     {
         /// <summary>

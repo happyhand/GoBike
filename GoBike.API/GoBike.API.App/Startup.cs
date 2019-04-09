@@ -1,4 +1,5 @@
-﻿using GoBike.API.Core.Applibs;
+﻿using AutoMapper;
+using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Repository.Interface;
 using GoBike.API.Repository.Managers;
@@ -46,6 +47,7 @@ namespace GoBike.API.App
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAutoMapper();
             this.ConfigurationHandler(services);
             this.SessionHandler(services);
             this.DependencyInjectionHandler(services);

@@ -1,15 +1,16 @@
 ﻿using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Response;
+using GoBike.API.Service.Models.Verifier;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GoBikeAPI.App.Controllers.Verifier
+namespace GoBike.API.App.Controllers.Verifier
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SendTokenVerifierController : ControllerBase
+    public class SendTokenVerifierController : ApiController
     {
         /// <summary>
         /// logger
@@ -28,11 +29,11 @@ namespace GoBikeAPI.App.Controllers.Verifier
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(InputData inputData)
+        public async Task<IActionResult> Post(VerifierInfoDto verifierInfoDto)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(inputData.Email);
+                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(verifierInfoDto, null);
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -42,20 +43,9 @@ namespace GoBikeAPI.App.Controllers.Verifier
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Token Verifier Error >>> Email:{inputData.Email}\n{ex}");
+                this.logger.LogError($"Send Token Verifier Error >>> Email:{verifierInfoDto.Email}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 請求資料
-        /// </summary>
-        public class InputData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
         }
     }
 }

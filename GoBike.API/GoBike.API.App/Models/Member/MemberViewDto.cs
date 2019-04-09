@@ -1,9 +1,6 @@
-﻿namespace GoBike.API.Service.Models.Member
+﻿namespace GoBike.API.App.Models.Member
 {
-    /// <summary>
-    /// 會員資料
-    /// </summary>
-    public class MemberInfoDto
+    public class MemberViewDto
     {
         /// <summary>
         /// Gets or sets BirthDayDate
@@ -44,10 +41,5 @@
         /// Gets or sets Nickname
         /// </summary>
         public string Nickname { get; set; }
-
-        /// <summary>
-        /// Gets or sets Password
-        /// </summary>
-        public string Password { get; set; }
     }
 }

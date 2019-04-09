@@ -12,24 +12,23 @@ namespace GoBike.API.Service.Interface.Member
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="MemberInfoDto">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> EditData(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberID">memberID</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> GetMemberInfo(string memberID);
+        Task<ResponseResultDto> GetMemberInfo(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 會員登入 (normal)
         /// </summary>
-        /// <param name="email">email</param>
-        /// <param name="password">password</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> Login(string email, string password);
+        Task<ResponseResultDto> Login(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 會員登入 (token)
@@ -41,16 +40,15 @@ namespace GoBike.API.Service.Interface.Member
         /// <summary>
         /// 會員註冊
         /// </summary>
-        /// <param name="email">email</param>
-        /// <param name="password">password</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> Register(string email, string password);
+        Task<ResponseResultDto> Register(MemberInfoDto memberInfo);
 
         /// <summary>
         /// 忘記密碼
         /// </summary>
-        /// <param name="email">email</param>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> ResetPassword(string email);
+        Task<ResponseResultDto> ResetPassword(MemberInfoDto memberInfo);
     }
 }

@@ -1,6 +1,10 @@
-﻿using GoBike.API.Service.Interface.Member;
+﻿using GoBike.API.Core.Resource;
+using GoBike.API.Service.Email;
+using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Interface.Verifier;
+using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
+using GoBike.API.Service.Models.Verifier;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,17 +47,20 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST - Request Get Verifier Code
+        /// POST - 請求產生驗證碼
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="verifierInfo">verifierInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]")]
-        public async Task<IActionResult> GetVerifierCode(InputData inputData)
+        public async Task<IActionResult> GetVerifierCode(VerifierInfoDto verifierInfo)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(inputData.Email);
+                verifierInfo.Type = "Password";
+                verifierInfo.VerifierCode = await this.verifierService.GetVerifierCode(verifierInfo);
+                EmailContext emailContext = EmailContext.GetVerifierCodetEmailContext(verifierInfo.Email, verifierInfo.VerifierCode);
+                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(verifierInfo, emailContext);
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -63,30 +70,31 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Verifier Code Error >>> Email:{inputData.Email}\n{ex}");
+                this.logger.LogError($"Get Verifier Code Error >>> Data:{Utility.GetPropertiesData(verifierInfo)}\n{ex}");
                 return BadRequest("取得查詢密碼驗證碼發生錯誤.");
             }
         }
 
         /// <summary>
-        /// Post - Valid Verifier Code and Get New Password
+        /// Post - 驗證驗證碼並重設密碼
         /// </summary>
         /// <param name="inputData">inputData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]/valid")]
-        public async Task<IActionResult> ValidVerifierCode(InputData inputData)
+        public async Task<IActionResult> ValidVerifierCode(VerifierInfoDto verifierInfo)
         {
             try
             {
-                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(inputData.Email, inputData.VerifierCode);
+                verifierInfo.Type = "Password";
+                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(verifierInfo);
                 if (!isValidVerifierCode)
                 {
                     return BadRequest("驗證碼驗證失敗.");
                 }
                 else
                 {
-                    ResponseResultDto responseResultDto = await this.memberService.ResetPassword(inputData.Email);
+                    ResponseResultDto responseResultDto = await this.memberService.ResetPassword(new MemberInfoDto() { Email = verifierInfo.Email });
                     if (responseResultDto.Ok)
                     {
                         return Ok(responseResultDto.Data);
@@ -97,25 +105,9 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Verifier Code Error >>> Email:{inputData.Email} VerifierCode:{inputData.VerifierCode}\n{ex}");
+                this.logger.LogError($"Get Verifier Code Error >>> Email:{verifierInfo.Email} VerifierCode:{verifierInfo.VerifierCode}\n{ex}");
                 return BadRequest("重設密碼驗證發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 請求資料
-        /// </summary>
-        public class InputData
-        {
-            /// <summary>
-            /// Gets or sets Email
-            /// </summary>
-            public string Email { get; set; }
-
-            /// <summary>
-            /// Gets or sets VerifierCode
-            /// </summary>
-            public string VerifierCode { get; set; }
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using GoBike.API.App.Filters;
+﻿using AutoMapper;
+using GoBike.API.App.Filters;
+using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
-using GoBikeAPI.App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,6 +26,11 @@ namespace GoBike.API.App.Controllers.Member
         private readonly ILogger<EditDataController> logger;
 
         /// <summary>
+        /// mapper
+        /// </summary>
+        private readonly IMapper mapper;
+
+        /// <summary>
         /// memberService
         /// </summary>
         private readonly IMemberService memberService;
@@ -34,9 +40,10 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="memberService">memberService</param>
-        public EditDataController(ILogger<EditDataController> logger, IMemberService memberService)
+        public EditDataController(ILogger<EditDataController> logger, IMapper mapper, IMemberService memberService)
         {
             this.logger = logger;
+            this.mapper = mapper;
             this.memberService = memberService;
         }
 
@@ -56,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
                 ResponseResultDto responseResultDto = await this.memberService.EditData(memberInfo);
                 if (responseResultDto.Ok)
                 {
-                    return Ok(responseResultDto.Data);
+                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
                 }
 
                 return BadRequest(responseResultDto.Data);
@@ -64,7 +71,7 @@ namespace GoBike.API.App.Controllers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Edit Data Error >>> EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
-                return BadRequest("會員更新資料發生錯誤.");
+                return BadRequest("會員更新資訊發生錯誤.");
             }
         }
     }
