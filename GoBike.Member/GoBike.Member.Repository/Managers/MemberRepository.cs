@@ -2,7 +2,6 @@
 using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Threading.Tasks;
@@ -14,11 +13,6 @@ namespace GoBike.Member.Repository.Managers
     /// </summary>
     public class MemberRepository : IMemberRepository
     {
-        /// <summary>
-        /// MemberCollectionFlag
-        /// </summary>
-        private const string MemberCollectionFlag = "Member";
-
         /// <summary>
         /// logger
         /// </summary>
@@ -39,7 +33,7 @@ namespace GoBike.Member.Repository.Managers
             this.logger = logger;
             IMongoClient client = new MongoClient(AppSettingHelper.Appsetting.MongoDBConfig.ConnectionString);
             IMongoDatabase db = client.GetDatabase(AppSettingHelper.Appsetting.MongoDBConfig.MemberDatabase);
-            this.memberDatas = db.GetCollection<MemberData>(MemberCollectionFlag);
+            this.memberDatas = db.GetCollection<MemberData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Member);
         }
 
         /// <summary>
@@ -47,7 +41,7 @@ namespace GoBike.Member.Repository.Managers
         /// </summary>
         /// <param name="memberData">memberData</param>
         /// <returns>bool</returns>
-        public async Task<bool> CreateMember(MemberData memberData)
+        public async Task<bool> CreateMemberData(MemberData memberData)
         {
             try
             {
@@ -64,19 +58,19 @@ namespace GoBike.Member.Repository.Managers
         /// <summary>
         /// 刪除會員資料
         /// </summary>
-        /// <param name="id">id</param>
+        /// <param name="memberID">memberID</param>
         /// <returns>bool</returns>
-        public async Task<bool> DeleteMemebrData(string id)
+        public async Task<bool> DeleteMemebrData(string memberID)
         {
             try
             {
-                var filter = Builders<MemberData>.Filter.Eq("_id", ObjectId.Parse(id));
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
                 DeleteResult result = await this.memberDatas.DeleteManyAsync(filter);
                 return result.IsAcknowledged && result.DeletedCount > 0;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Memebr Data Error >>> ID:{id}\n{ex}");
+                this.logger.LogError($"Delete Memebr Data Error >>> MemberID:{memberID}\n{ex}");
                 return false;
             }
         }
@@ -90,7 +84,7 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                var filter = Builders<MemberData>.Filter.Eq("Email", email);
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("Email", email);
                 return await this.memberDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -109,9 +103,8 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                var filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
-                MemberData memberData = await this.memberDatas.Find(filter).FirstOrDefaultAsync();
-                return memberData;
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
+                return await this.memberDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -129,9 +122,8 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                var filter = Builders<MemberData>.Filter.Eq("Mobile", mobile);
-                MemberData memberData = await this.memberDatas.Find(filter).FirstOrDefaultAsync();
-                return memberData;
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("Mobile", mobile);
+                return await this.memberDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -149,7 +141,7 @@ namespace GoBike.Member.Repository.Managers
         {
             try
             {
-                var filter = Builders<MemberData>.Filter.Eq("_id", memberData.Id);
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("_id", memberData.Id);
                 ReplaceOneResult result = await this.memberDatas.ReplaceOneAsync(filter, memberData);
                 return result.IsAcknowledged && result.ModifiedCount > 0;
             }

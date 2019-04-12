@@ -135,7 +135,7 @@ namespace GoBike.API.Service.Managers.Verifier
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)

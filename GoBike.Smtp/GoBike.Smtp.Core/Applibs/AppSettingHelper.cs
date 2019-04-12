@@ -10,6 +10,8 @@
         /// </summary>
         public static AppSettingHelper Appsetting;
 
+        #region Smtp 設定資料
+
         /// <summary>
         /// Gets or sets SmtpConfig
         /// </summary>
@@ -40,5 +42,7 @@
             /// </summary>
             public string SmtpUser { get; set; }
         }
+
+        #endregion Smtp 設定資料
     }
 }

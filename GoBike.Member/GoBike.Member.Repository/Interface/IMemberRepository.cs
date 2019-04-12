@@ -13,14 +13,14 @@ namespace GoBike.Member.Repository.Interface
         /// </summary>
         /// <param name="memberData">memberData</param>
         /// <returns>bool</returns>
-        Task<bool> CreateMember(MemberData memberData);
+        Task<bool> CreateMemberData(MemberData memberData);
 
         /// <summary>
         /// 刪除會員資料
         /// </summary>
-        /// <param name="id">id</param>
+        /// <param name="memberID">memberID</param>
         /// <returns>bool</returns>
-        Task<bool> DeleteMemebrData(string id);
+        Task<bool> DeleteMemebrData(string memberID);
 
         /// <summary>
         /// 取得會員資料 (By Email)

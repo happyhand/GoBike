@@ -1,5 +1,8 @@
 ﻿namespace GoBike.API.App.Models.Member
 {
+    /// <summary>
+    /// 會員可視資料
+    /// </summary>
     public class MemberViewDto
     {
         /// <summary>

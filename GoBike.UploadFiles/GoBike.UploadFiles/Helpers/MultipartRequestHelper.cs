@@ -1,4 +1,5 @@
-﻿using Microsoft.Net.Http.Headers;
+﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.IO;
 
@@ -10,7 +11,7 @@ namespace GoBike.UploadFiles.Helpers
         // The spec says 70 characters is a reasonable limit.
         public static string GetBoundary(MediaTypeHeaderValue contentType, int lengthLimit)
         {
-            var boundary = HeaderUtilities.RemoveQuotes(contentType.Boundary);
+            StringSegment boundary = HeaderUtilities.RemoveQuotes(contentType.Boundary);
             if (string.IsNullOrWhiteSpace(boundary.Value))
             {
                 throw new InvalidDataException("Missing content-type boundary.");

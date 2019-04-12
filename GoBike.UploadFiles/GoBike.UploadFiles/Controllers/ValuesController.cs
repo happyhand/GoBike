@@ -40,9 +40,9 @@ namespace GoBike.UploadFiles.Controllers
         {
             long size = files.Sum(f => f.Length);
             List<string> filePathResultList = new List<string>();
-            foreach (var file in files)
+            foreach (IFormFile file in files)
             {
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                string fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                 this.logger.LogInformation($"fileName:{fileName}");
                 string filePath = $@"D:\CDN\Html\UploadFiles\Event\";
                 if (!Directory.Exists(filePath))

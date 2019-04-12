@@ -10,10 +10,16 @@
         /// </summary>
         public static AppSettingHelper Appsetting;
 
+        #region Redis 設定資料
+
         /// <summary>
         /// Gets or sets RedisConnection
         /// </summary>
         public string RedisConnection { get; set; }
+
+        #endregion Redis 設定資料
+
+        #region Service Domain 設定資料
 
         /// <summary>
         /// Gets or sets ServiceDomain
@@ -32,5 +38,7 @@
             /// </summary>
             public string SmtpService { get; set; }
         }
+
+        #endregion Service Domain 設定資料
     }
 }

@@ -2,6 +2,7 @@
 using GoBike.UploadFiles.Filters;
 using GoBike.UploadFiles.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace GoBike.UploadFiles.Controllers
             try
             {
                 List<string> filePaths = new List<string>();
-                var formValueProvider = await Request.StreamFile((file) =>
+                FormValueProvider formValueProvider = await Request.StreamFile((file) =>
                 {
                     this.logger.LogInformation($"Start Upload Image >>> file:{file.FileName}");
                     string fileExtensionName = Path.GetExtension(file.FileName);

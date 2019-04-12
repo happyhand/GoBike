@@ -57,14 +57,14 @@ namespace GoBike.API.Service.Managers.Member
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>()
                     };
                 }
 
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)
@@ -103,14 +103,14 @@ namespace GoBike.API.Service.Managers.Member
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>().Result
+                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>()
                     };
                 }
 
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)
@@ -144,7 +144,7 @@ namespace GoBike.API.Service.Managers.Member
             {
                 string postData = JsonConvert.SerializeObject(memberInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
-                string result = httpResponseMessage.Content.ReadAsAsync<string>().Result;
+                string result = await httpResponseMessage.Content.ReadAsAsync<string>();
                 if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     return new ResponseResultDto()
@@ -235,7 +235,7 @@ namespace GoBike.API.Service.Managers.Member
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
-                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)
@@ -288,7 +288,7 @@ namespace GoBike.API.Service.Managers.Member
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = httpResponseMessage.Content.ReadAsAsync<string>().Result
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)

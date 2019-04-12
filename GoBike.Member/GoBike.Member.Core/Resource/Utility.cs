@@ -12,20 +12,6 @@ namespace GoBike.Member.Core.Resource
     /// </summary>
     public class Utility
     {
-        #region 通用標誌
-
-        /// <summary>
-        /// 分隔符號
-        /// </summary>
-        public static string SeparateFlag = "$@#";
-
-        /// <summary>
-        /// Session:MemberID
-        /// </summary>
-        public static string Session_MemberID = "MemberID";
-
-        #endregion 通用標誌
-
         #region AES 加解密功能
 
         /// <summary>
@@ -150,6 +136,11 @@ namespace GoBike.Member.Core.Resource
         /// <returns>IEnumerable(string)</returns>
         public static IEnumerable<string> GetPropertiesData(object data)
         {
+            if (data == null)
+            {
+                return new string[] { };
+            }
+
             return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}\n");
         }
 

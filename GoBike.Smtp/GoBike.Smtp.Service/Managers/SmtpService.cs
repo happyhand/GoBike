@@ -48,7 +48,7 @@ namespace GoBike.Smtp.Service.Managers
                     return "空白郵件內容.";
                 }
 
-                using (var message = new MailMessage())
+                using (MailMessage message = new MailMessage())
                 {
                     message.To.Add(new MailAddress(emailContext.Address));
                     message.From = new MailAddress(AppSettingHelper.Appsetting.SmtpConfig.SmtpMail, AppSettingHelper.Appsetting.SmtpConfig.SmtpUser);
@@ -56,7 +56,7 @@ namespace GoBike.Smtp.Service.Managers
                     message.Body = emailContext.Body;
                     message.IsBodyHtml = true;
 
-                    using (var client = new SmtpClient(AppSettingHelper.Appsetting.SmtpConfig.SmtpServer))
+                    using (SmtpClient client = new SmtpClient(AppSettingHelper.Appsetting.SmtpConfig.SmtpServer))
                     {
                         client.Port = 587;//// Google Port 587
                         client.Credentials = new NetworkCredential(AppSettingHelper.Appsetting.SmtpConfig.SmtpMail, AppSettingHelper.Appsetting.SmtpConfig.SmtpPassword);

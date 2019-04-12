@@ -134,7 +134,7 @@ namespace GoBike.API.Core.Resource
             //// 讀取 Request 中的檔案，並轉換成 byte 型式
             byte[] dataBytes;
             MultipartFormDataContent multiContent = new MultipartFormDataContent();
-            foreach (var file in files)
+            foreach (IFormFile file in files)
             {
                 using (BinaryReader binaryReader = new BinaryReader(file.OpenReadStream()))
                 {
@@ -158,6 +158,11 @@ namespace GoBike.API.Core.Resource
         /// <returns>IEnumerable(string)</returns>
         public static IEnumerable<string> GetPropertiesData(object data)
         {
+            if (data == null)
+            {
+                return new string[] { };
+            }
+
             return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}\n");
         }
 

@@ -62,7 +62,6 @@ namespace GoBike.Member.Service.Managers
                 MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
                 if (memberData == null)
                 {
-                    this.logger.LogError($"Edit Data Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\nThe member is not exist.");
                     return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
                 }
 
@@ -75,6 +74,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
+                    this.logger.LogError($"Edit Data Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
                     return Tuple.Create<MemberInfoDto, string>(null, "會員更新資訊失敗.");
                 }
 
@@ -186,16 +186,17 @@ namespace GoBike.Member.Service.Managers
                     return "密碼格式錯誤.";
                 }
 
-                bool emailIsRegister = await this.memberRepository.GetMemebrDataByEmail(memberInfo.Email) != null;
-                if (emailIsRegister)
+                bool emailHasRegister = await this.memberRepository.GetMemebrDataByEmail(memberInfo.Email) != null;
+                if (emailHasRegister)
                 {
                     return "此信箱已經被註冊.";
                 }
 
-                MemberData member = this.CreateNewMemberData(memberInfo.Email, memberInfo.Password);
-                bool isSuccess = await this.memberRepository.CreateMember(member);
+                MemberData memberData = this.CreateMemberData(memberInfo.Email, memberInfo.Password);
+                bool isSuccess = await this.memberRepository.CreateMemberData(memberData);
                 if (!isSuccess)
                 {
+                    this.logger.LogError($"Register Member Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
                     return "會員註冊失敗.";
                 }
 
@@ -233,6 +234,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
+                    this.logger.LogError($"Reset Password Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
                     return Tuple.Create(string.Empty, "會員重設密碼失敗.");
                 }
                 return Tuple.Create(password, string.Empty);
@@ -250,7 +252,7 @@ namespace GoBike.Member.Service.Managers
         /// <param name="email">email</param>
         /// <param name="password">password</param>
         /// <returns>MemberData</returns>
-        private MemberData CreateNewMemberData(string email, string password)
+        private MemberData CreateMemberData(string email, string password)
         {
             DateTime createDate = DateTime.Now;
             string memberID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
@@ -322,7 +324,6 @@ namespace GoBike.Member.Service.Managers
             {
                 if (!Utility.IsValidMobile(memberInfo.Mobile))
                 {
-                    this.logger.LogError($"Update Member Data Handler Error >>> id:{memberData.Id} Data:{Utility.GetPropertiesData(memberInfo)}\nMobile valid fail.");
                     return "手機格式驗證失敗.";
                 }
 
@@ -338,7 +339,6 @@ namespace GoBike.Member.Service.Managers
             {
                 if (IsStrictPassword && !this.IsValidPassword(memberInfo.Password))
                 {
-                    this.logger.LogError($"Update Member Data Handler Error >>> Password:{memberData.Password} Data:{Utility.GetPropertiesData(memberInfo)}\nPassword valid fail.");
                     return "密碼格式錯誤.";
                 }
 

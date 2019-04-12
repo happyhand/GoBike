@@ -17,6 +17,11 @@ namespace GoBike.Smtp.Core.Resource
         /// <returns>IEnumerable(string)</returns>
         public static IEnumerable<string> GetPropertiesData(object data)
         {
+            if (data == null)
+            {
+                return new string[] { };
+            }
+
             return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}");
         }
 
