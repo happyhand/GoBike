@@ -37,3 +37,13 @@
 /GoBike.Smtp/GoBike.Smtp.Service/bin
 /GoBike.Smtp/.vs
 /GoBike.UploadFiles/.vs
+/friend.gobike.com
+/GoBike.Friend/.vs
+/GoBike.Friend/GoBike.Friend.API/obj
+/GoBike.Friend/GoBike.Friend.API/bin
+/GoBike.Friend/GoBike.Friend.Core/obj
+/GoBike.Friend/GoBike.Friend.Core/bin
+/GoBike.Friend/GoBike.Friend.Repository/obj
+/GoBike.Friend/GoBike.Friend.Repository/bin
+/GoBike.Friend/GoBike.Friend.Service/obj
+/GoBike.Friend/GoBike.Friend.Service/bin
