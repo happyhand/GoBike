@@ -29,6 +29,11 @@
         public class ServiceDomainSetting
         {
             /// <summary>
+            /// Gets or sets InteractiveService
+            /// </summary>
+            public string InteractiveService { get; set; }
+
+            /// <summary>
             /// Gets or sets MemberService
             /// </summary>
             public string MemberService { get; set; }

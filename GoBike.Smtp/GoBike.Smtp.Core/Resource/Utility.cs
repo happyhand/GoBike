@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Reflection;
 
 namespace GoBike.Smtp.Core.Resource
 {
@@ -14,15 +13,20 @@ namespace GoBike.Smtp.Core.Resource
         /// 取得類別屬性資料
         /// </summary>
         /// <param name="data">data</param>
-        /// <returns>IEnumerable(string)</returns>
-        public static IEnumerable<string> GetPropertiesData(object data)
+        /// <returns>string</returns>
+        public static string GetPropertiesData(object data)
         {
-            if (data == null)
+            string propertiesData = string.Empty;
+            if (data != null)
             {
-                return new string[] { };
+                PropertyInfo[] properties = data.GetType().GetProperties();
+                foreach (PropertyInfo propertie in properties)
+                {
+                    propertiesData += $"{(propertiesData.Length > 0 ? ", " : string.Empty)}{propertie.Name}:{propertie.GetValue(data)}";
+                }
             }
 
-            return data.GetType().GetProperties().Select(x => $"{x.Name}:{x.GetValue(data)}");
+            return propertiesData;
         }
 
         #endregion 取得類別屬性資料

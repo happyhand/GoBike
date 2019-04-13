@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace GoBike.API.Core.Resource
+namespace GoBike.Interactive.Core.Resource
 {
     /// <summary>
     /// 共用方法
@@ -98,55 +93,6 @@ namespace GoBike.API.Core.Resource
         }
 
         #endregion AES 加解密功能
-
-        #region API 串接
-
-        /// <summary>
-        /// POST API
-        /// </summary>
-        /// <param name="domain">domain</param>
-        /// <param name="apiUrl">apiUrl</param>
-        /// <param name="postData">postData</param>
-        /// <returns>HttpResponseMessage</returns>
-        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, string postData)
-        {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri($"http://{domain}/");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            StringContent content = new StringContent(postData, Encoding.UTF8, "application/json");
-            return await client.PostAsync(apiUrl, content);
-        }
-
-        /// <summary>
-        /// POST API
-        /// </summary>
-        /// <param name="domain">domain</param>
-        /// <param name="apiUrl">apiUrl</param>
-        /// <param name="files">files</param>
-        /// <returns>HttpResponseMessage</returns>
-        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, IFormFileCollection files)
-        {
-            //// 建立 HttpClient
-            HttpClient client = new HttpClient();
-            //// 設定站台 url (api url)
-            client.BaseAddress = new Uri($"http://{domain}/");
-            //// 讀取 Request 中的檔案，並轉換成 byte 型式
-            byte[] dataBytes;
-            MultipartFormDataContent multiContent = new MultipartFormDataContent();
-            foreach (IFormFile file in files)
-            {
-                using (BinaryReader binaryReader = new BinaryReader(file.OpenReadStream()))
-                {
-                    dataBytes = binaryReader.ReadBytes((int)file.OpenReadStream().Length);
-                    ByteArrayContent bytes = new ByteArrayContent(dataBytes);
-                    multiContent.Add(bytes, "file", file.FileName);
-                }
-            }
-            //// 呼叫 api 並接收回應
-            return await client.PostAsync(apiUrl, multiContent);
-        }
-
-        #endregion API 串接
 
         #region 取得類別屬性資料
 

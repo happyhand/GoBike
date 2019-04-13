@@ -1,4 +1,4 @@
-﻿namespace GoBike.API.Service.Models.Member
+﻿namespace GoBike.Interactive.Service.Models
 {
     /// <summary>
     /// 會員資料
@@ -44,11 +44,6 @@
         /// Gets or sets Nickname
         /// </summary>
         public string Nickname { get; set; }
-
-        /// <summary>
-        /// Gets or sets Password
-        /// </summary>
-        public string Password { get; set; }
 
         /// <summary>
         /// Gets or sets Status (0:等待確認，1:好友，-1:黑名單，-2:無互動資料)
