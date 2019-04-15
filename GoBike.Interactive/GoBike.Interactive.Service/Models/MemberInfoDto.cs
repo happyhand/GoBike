@@ -46,7 +46,7 @@
         public string Nickname { get; set; }
 
         /// <summary>
-        /// Gets or sets Status (0:等待確認，1:好友，-1:黑名單，-2:無互動資料)
+        /// Gets or sets Status (0:等待加入好友請求確認,1:處理加入好友請求，2:好友，-1:黑名單，-2:無互動資料)
         /// </summary>
         public int Status { get; set; }
     }

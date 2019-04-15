@@ -13,13 +13,18 @@
         Black = -1,
 
         /// <summary>
-        /// 請求、等待確認
+        /// 請求 - 等待確認
         /// </summary>
         Request = 0,
 
         /// <summary>
+        /// 請求 - 處理確認
+        /// </summary>
+        RequestHandler = 1,
+
+        /// <summary>
         /// 好友
         /// </summary>
-        Friend = 1
+        Friend = 2
     }
 }

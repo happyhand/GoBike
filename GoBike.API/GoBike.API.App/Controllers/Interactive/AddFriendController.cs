@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GoBike.API.App.Filters;
+﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interactive;
@@ -31,18 +30,12 @@ namespace GoBike.API.App.Controllers.Interactive
         private readonly ILogger logger;
 
         /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        public AddFriendController(ILogger<GetFriendListController> logger, IMapper mapper, IInteractiveService interactiveService)
+        public AddFriendController(ILogger<GetFriendListController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.interactiveService = interactiveService;
         }
 

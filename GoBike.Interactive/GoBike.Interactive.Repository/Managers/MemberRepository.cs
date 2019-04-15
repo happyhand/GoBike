@@ -1,4 +1,5 @@
 ﻿using GoBike.Interactive.Core.Applibs;
+using GoBike.Interactive.Core.Resource;
 using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using Microsoft.Extensions.Logging;
@@ -65,14 +66,12 @@ namespace GoBike.Interactive.Repository.Managers
         {
             try
             {
-                this.logger.LogInformation($"Get Memebr Data List >>> MemberIDs:{memberIDs}");
-
                 FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.In("MemberID", memberIDs);
                 return await this.memberDatas.Find(filter).ToListAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Memebr Data List Error >>> MemberIDs:{memberIDs}\n{ex}");
+                this.logger.LogError($"Get Memebr Data List Error >>> MemberIDs:{Utility.GetPropertiesData(memberIDs)}\n{ex}");
                 return null;
             }
         }

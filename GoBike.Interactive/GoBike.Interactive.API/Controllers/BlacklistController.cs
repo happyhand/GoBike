@@ -49,7 +49,7 @@ namespace GoBike.Interactive.API.Controllers
                 string result = await this.interactiveService.AddBlacklist(interactiveInfo);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("已加入黑名單.");
+                    return Ok("加入黑名單成功.");
                 }
 
                 return BadRequest(result);
@@ -75,7 +75,7 @@ namespace GoBike.Interactive.API.Controllers
                 string result = await this.interactiveService.DeleteBlacklist(interactiveInfo);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("已刪除黑名單.");
+                    return Ok("刪除黑名單成功.");
                 }
 
                 return BadRequest(result);

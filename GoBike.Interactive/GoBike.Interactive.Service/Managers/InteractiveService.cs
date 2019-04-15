@@ -397,7 +397,7 @@ namespace GoBike.Interactive.Service.Managers
                 IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetAddFriendRequestList(interactiveInfo.InitiatorID);
                 if (interactiveDatas.Count() == 0)
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無加入好友請求名單");
+                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無加入好友請求名單.");
                 }
 
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.InitiatorID));
@@ -427,7 +427,7 @@ namespace GoBike.Interactive.Service.Managers
                 IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetBlacklist(interactiveInfo.InitiatorID);
                 if (interactiveDatas.Count() == 0)
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無黑名單");
+                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無黑名單.");
                 }
 
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.PassiveID));
@@ -487,7 +487,7 @@ namespace GoBike.Interactive.Service.Managers
                 InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
                 if (passiveInteractiveData == null)
                 {
-                    return "無互動資料.";
+                    return "無請求者的互動資料.";
                 }
 
                 if (passiveInteractiveData.Status != (int)FriendStatusType.Request)
@@ -522,21 +522,37 @@ namespace GoBike.Interactive.Service.Managers
             {
                 if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
                 {
-                    return Tuple.Create<MemberInfoDto, string>(null, "會員編號無效");
+                    return Tuple.Create<MemberInfoDto, string>(null, "會員編號無效.");
                 }
 
-                InteractiveData interactiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (interactiveData != null)
+                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
+                if (passiveInteractiveData != null)
                 {
-                    if (interactiveData.Status == (int)FriendStatusType.Black)
+                    if (passiveInteractiveData.Status == (int)FriendStatusType.Black)
                     {
-                        return Tuple.Create<MemberInfoDto, string>(null, this.GetInteractiveStatusMemo(interactiveData, true));
+                        return Tuple.Create<MemberInfoDto, string>(null, this.GetInteractiveStatusMemo(passiveInteractiveData, true));
                     }
                 }
 
+                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
                 MemberData memberData = await this.memberRepository.GetMemebrData(interactiveInfo.PassiveID);
                 MemberInfoDto memberInfo = this.mapper.Map<MemberInfoDto>(memberData);
-                memberInfo.Status = interactiveData == null ? -2 : interactiveData.Status;
+                if (initiatorInteractiveData == null)
+                {
+                    if (passiveInteractiveData != null && passiveInteractiveData.Status == (int)FriendStatusType.Request)
+                    {
+                        memberInfo.Status = (int)FriendStatusType.RequestHandler;
+                    }
+                    else
+                    {
+                        memberInfo.Status = (int)FriendStatusType.None;
+                    }
+                }
+                else
+                {
+                    memberInfo.Status = initiatorInteractiveData.Status;
+                }
+
                 return Tuple.Create(memberInfo, string.Empty);
             }
             catch (Exception ex)

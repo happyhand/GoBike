@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Interactive
 {
     /// <summary>
-    /// 取得好友名單
+    /// 取得加入好友請求名單
     /// </summary>
     [Route("api/friend/[controller]")]
     [ApiController]
-    public class GetFriendListController : ApiController
+    public class GetAddFriendRequestListController : ApiController
     {
         /// <summary>
         /// memberService
@@ -40,7 +40,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        public GetFriendListController(ILogger<GetFriendListController> logger, IMapper mapper, IInteractiveService interactiveService)
+        public GetAddFriendRequestListController(ILogger<GetFriendListController> logger, IMapper mapper, IInteractiveService interactiveService)
         {
             this.logger = logger;
             this.mapper = mapper;
@@ -58,7 +58,7 @@ namespace GoBike.API.App.Controllers.Interactive
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.GetFriendList(new InteractiveInfoDto() { InitiatorID = memberID });
+                ResponseResultDto responseResultDto = await this.interactiveService.GetAddFriendRequestList(new InteractiveInfoDto() { InitiatorID = memberID });
                 if (responseResultDto.Ok)
                 {
                     return Ok(this.mapper.Map<IEnumerable<MemberViewDto>>(responseResultDto.Data));
@@ -68,8 +68,8 @@ namespace GoBike.API.App.Controllers.Interactive
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
-                return BadRequest("取得好友名單發生錯誤.");
+                this.logger.LogError($"Get Add Friend Request List Error >>> MemberID:{memberID}\n{ex}");
+                return BadRequest("取得加入好友請求名單發生錯誤.");
             }
         }
     }

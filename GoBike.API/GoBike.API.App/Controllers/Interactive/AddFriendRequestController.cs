@@ -1,25 +1,23 @@
-﻿using AutoMapper;
-using GoBike.API.App.Filters;
-using GoBike.API.App.Models.Member;
+﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interactive;
 using GoBike.API.Service.Interface.Interactive;
+using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Interactive
 {
     /// <summary>
-    /// 取得好友名單
+    /// 加入好友請求
     /// </summary>
     [Route("api/friend/[controller]")]
     [ApiController]
-    public class GetFriendListController : ApiController
+    public class AddFriendRequestController : ApiController
     {
         /// <summary>
         /// memberService
@@ -32,44 +30,39 @@ namespace GoBike.API.App.Controllers.Interactive
         private readonly ILogger logger;
 
         /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        public GetFriendListController(ILogger<GetFriendListController> logger, IMapper mapper, IInteractiveService interactiveService)
+        public AddFriendRequestController(ILogger<GetFriendListController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.interactiveService = interactiveService;
         }
 
         /// <summary>
-        /// GET
+        /// POST
         /// </summary>
+        /// <param name="memberInfo">memberInfo</param>
         /// <returns>IActionResult</returns>
-        [HttpGet]
+        [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.GetFriendList(new InteractiveInfoDto() { InitiatorID = memberID });
+                ResponseResultDto responseResultDto = await this.interactiveService.AddFriendRequest(new InteractiveInfoDto() { InitiatorID = memberID, PassiveID = memberInfo.MemberID });
                 if (responseResultDto.Ok)
                 {
-                    return Ok(this.mapper.Map<IEnumerable<MemberViewDto>>(responseResultDto.Data));
+                    return Ok(responseResultDto.Data);
                 }
 
                 return BadRequest(responseResultDto.Data);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
-                return BadRequest("取得好友名單發生錯誤.");
+                this.logger.LogError($"Add Friend Request Error >>> InitiatorID:{memberID} PassiveID:{memberInfo.MemberID}\n{ex}");
+                return BadRequest("加入好友請求發生錯誤.");
             }
         }
     }
