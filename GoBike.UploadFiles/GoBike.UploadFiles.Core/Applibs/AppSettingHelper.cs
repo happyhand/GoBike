@@ -1,4 +1,4 @@
-﻿namespace GoBike.UploadFiles.Applibs
+﻿namespace GoBike.UploadFiles.Core.Applibs
 {
     /// <summary>
     /// APP 設定資料

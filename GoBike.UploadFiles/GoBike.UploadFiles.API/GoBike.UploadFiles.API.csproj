@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Applibs\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -14,6 +13,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GoBike.UploadFiles.Core\GoBike.UploadFiles.Core.csproj" />
+    <ProjectReference Include="..\GoBike.UploadFiles.Service\GoBike.UploadFiles.Service.csproj" />
   </ItemGroup>
 
   <ItemGroup>

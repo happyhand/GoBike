@@ -1,4 +1,6 @@
-﻿using GoBike.UploadFiles.Applibs;
+﻿using GoBike.UploadFiles.Core.Applibs;
+using GoBike.UploadFiles.Service.Interface;
+using GoBike.UploadFiles.Service.Managers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,8 +37,19 @@ namespace GoBike.UploadFiles
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            this.ConfigurationHandler(services);
+            this.DependencyInjectionHandler(services);
+        }
+
+        private void ConfigurationHandler(IServiceCollection services)
+        {
+            AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
+        }
+
+        private void DependencyInjectionHandler(IServiceCollection services)
+        {
+            services.AddSingleton<IUploadFilesService, UploadFilesService>();
         }
     }
 }

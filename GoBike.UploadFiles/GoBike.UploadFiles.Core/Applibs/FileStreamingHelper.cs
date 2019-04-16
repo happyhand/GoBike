@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoBike.UploadFiles.Helpers
+namespace GoBike.UploadFiles.Core.Applibs
 {
     public static class FileStreamingHelper
     {

@@ -47,3 +47,9 @@
 /GoBike.Interactive/GoBike.Interactive.Service/obj
 /GoBike.Interactive/GoBike.Interactive.Service/bin
 /GoBike.Interactive/.vs
+/GoBike.UploadFiles/GoBike.UploadFiles.API/obj
+/GoBike.UploadFiles/GoBike.UploadFiles.API/bin
+/GoBike.UploadFiles/GoBike.UploadFiles.Core/obj
+/GoBike.UploadFiles/GoBike.UploadFiles.Core/bin
+/GoBike.UploadFiles/GoBike.UploadFiles.Service/obj
+/GoBike.UploadFiles/GoBike.UploadFiles.Service/bin

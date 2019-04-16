@@ -3,7 +3,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.IO;
 
-namespace GoBike.UploadFiles.Helpers
+namespace GoBike.UploadFiles.Core.Applibs
 {
     public static class MultipartRequestHelper
     {

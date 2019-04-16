@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 
-namespace GoBike.UploadFiles.Controllers
+namespace GoBike.UploadFiles.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
