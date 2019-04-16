@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -112,7 +111,7 @@ namespace GoBike.API.Service.Managers.Verifier
             {
                 string postData = JsonConvert.SerializeObject(emailContext);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierInfo.Type}-{verifierInfo.Email}-{verifierInfo.VerifierCode}";
                     bool isSetCache = await this.redisRepository.SetCache(cacheKey, verifierInfo.VerifierCode, new TimeSpan(0, 10, 0));

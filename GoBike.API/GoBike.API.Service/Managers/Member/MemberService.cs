@@ -7,7 +7,6 @@ using GoBike.API.Service.Models.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -52,7 +51,7 @@ namespace GoBike.API.Service.Managers.Member
             {
                 string postData = JsonConvert.SerializeObject(memberInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -69,7 +68,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> EditData:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -98,7 +97,7 @@ namespace GoBike.API.Service.Managers.Member
 
                 string postData = JsonConvert.SerializeObject(memberInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -115,7 +114,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -145,7 +144,7 @@ namespace GoBike.API.Service.Managers.Member
                 string postData = JsonConvert.SerializeObject(memberInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
                 string result = await httpResponseMessage.Content.ReadAsAsync<string>();
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -234,7 +233,7 @@ namespace GoBike.API.Service.Managers.Member
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -270,16 +269,16 @@ namespace GoBike.API.Service.Managers.Member
                 memberInfo.Password = Guid.NewGuid().ToString().Substring(0, 8);
                 string postData = JsonConvert.SerializeObject(memberInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberInfo.Email, memberInfo.Password);
                     postData = JsonConvert.SerializeObject(emailContext);
                     httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
-                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                    if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         return new ResponseResultDto()
                         {
-                            Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                            Ok = httpResponseMessage.IsSuccessStatusCode,
                             Data = "已重設密碼，並發送郵件成功."
                         };
                     }
@@ -293,7 +292,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,

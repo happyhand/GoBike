@@ -33,6 +33,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
+        /// <param name="interactiveService">interactiveService</param>
         public DeleteBlacklistController(ILogger<GetFriendListController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;

@@ -1,8 +1,8 @@
-﻿using GoBike.Member.Core.Resource;
-using GoBike.Member.Service.Interface;
+﻿using GoBike.Member.Service.Interface;
 using GoBike.Member.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -62,7 +62,7 @@ namespace GoBike.Member.API.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return BadRequest("會員重設密碼發生錯誤.");
             }
         }

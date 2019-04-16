@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -64,7 +63,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/add", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -110,7 +109,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/add", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -156,7 +155,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/request", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -193,7 +192,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/delete", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -230,7 +229,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/delete", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -267,7 +266,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/deleteRequest", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -302,7 +301,7 @@ namespace GoBike.API.Service.Managers.Interactive
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/requestList", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -348,7 +347,7 @@ namespace GoBike.API.Service.Managers.Interactive
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/get", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -394,7 +393,7 @@ namespace GoBike.API.Service.Managers.Interactive
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/list", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {
@@ -442,7 +441,7 @@ namespace GoBike.API.Service.Managers.Interactive
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/reject", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = httpResponseMessage.StatusCode == HttpStatusCode.OK,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
@@ -477,7 +476,7 @@ namespace GoBike.API.Service.Managers.Interactive
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
                 HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/search", postData);
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
                     {

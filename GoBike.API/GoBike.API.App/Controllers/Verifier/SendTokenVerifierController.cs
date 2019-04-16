@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace GoBike.API.App.Controllers.Verifier
 {
+    /// <summary>
+    /// 發送驗證碼
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class SendTokenVerifierController : ApiController
@@ -22,12 +25,22 @@ namespace GoBike.API.App.Controllers.Verifier
         /// </summary>
         private readonly IVerifierService verifierService;
 
+        /// <summary>
+        /// 建構式
+        /// </summary>
+        /// <param name="logger">logger</param>
+        /// <param name="verifierService">verifierService</param>
         public SendTokenVerifierController(ILogger<SendTokenVerifierController> logger, IVerifierService verifierService)
         {
             this.logger = logger;
             this.verifierService = verifierService;
         }
 
+        /// <summary>
+        /// POST
+        /// </summary>
+        /// <param name="verifierInfoDto">verifierInfoDto</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
         public async Task<IActionResult> Post(VerifierInfoDto verifierInfoDto)
         {

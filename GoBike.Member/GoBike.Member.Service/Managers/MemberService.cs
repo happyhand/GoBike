@@ -5,6 +5,7 @@ using GoBike.Member.Repository.Models;
 using GoBike.Member.Service.Interface;
 using GoBike.Member.Service.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -74,7 +75,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
-                    this.logger.LogError($"Edit Data Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
+                    this.logger.LogError($"Edit Data Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
                     return Tuple.Create<MemberInfoDto, string>(null, "會員更新資訊失敗.");
                 }
 
@@ -82,7 +83,7 @@ namespace GoBike.Member.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return Tuple.Create<MemberInfoDto, string>(null, "會員更新資訊發生錯誤.");
             }
         }
@@ -196,7 +197,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.CreateMemberData(memberData);
                 if (!isSuccess)
                 {
-                    this.logger.LogError($"Register Member Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
+                    this.logger.LogError($"Register Member Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
                     return "會員註冊失敗.";
                 }
 
@@ -204,7 +205,7 @@ namespace GoBike.Member.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Member Error >>> Data:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Register Member Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return "會員註冊發生錯誤.";
             }
         }
@@ -234,7 +235,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
                 if (!isSuccess)
                 {
-                    this.logger.LogError($"Reset Password Fail >>> Data:{Utility.GetPropertiesData(memberData)}");
+                    this.logger.LogError($"Reset Password Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
                     return Tuple.Create(string.Empty, "會員重設密碼失敗.");
                 }
                 return Tuple.Create(password, string.Empty);

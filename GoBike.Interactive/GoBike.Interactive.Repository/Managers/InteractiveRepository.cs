@@ -1,9 +1,9 @@
 ﻿using GoBike.Interactive.Core.Applibs;
-using GoBike.Interactive.Core.Resource;
 using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -52,7 +52,7 @@ namespace GoBike.Interactive.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Create Interactive Data Error >>> Data:{Utility.GetPropertiesData(interactiveData)}\n{ex}");
+                this.logger.LogError($"Create Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
                 return false;
             }
         }
@@ -200,7 +200,7 @@ namespace GoBike.Interactive.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Interactive Data Error >>> Data:{Utility.GetPropertiesData(interactiveData)}\n{ex}");
+                this.logger.LogError($"Update Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
                 return false;
             }
         }

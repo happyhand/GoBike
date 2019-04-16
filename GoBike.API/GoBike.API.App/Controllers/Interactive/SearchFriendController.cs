@@ -46,6 +46,9 @@ namespace GoBike.API.App.Controllers.Interactive
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
+        /// <param name="mapper">mapper</param>
+        /// <param name="memberService">memberService</param>
+        /// <param name="interactiveService">interactiveService</param>
         public SearchFriendController(ILogger<GetFriendListController> logger, IMapper mapper, IMemberService memberService, IInteractiveService interactiveService)
         {
             this.logger = logger;

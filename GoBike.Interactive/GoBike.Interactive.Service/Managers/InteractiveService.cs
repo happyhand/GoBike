@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using GoBike.Interactive.Core.Resource;
 using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using GoBike.Interactive.Service.Interface;
 using GoBike.Interactive.Service.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,7 +99,7 @@ namespace GoBike.Interactive.Service.Managers
                 //// 檢測結果
                 if (!isInitiatorSuccess || !isPassiveSuccess)
                 {
-                    this.logger.LogError($"Add Blacklist Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{Utility.GetPropertiesData(initiatorInteractiveData)}\nPassiveInteractiveData:{Utility.GetPropertiesData(passiveInteractiveData)}");
+                    this.logger.LogError($"Add Blacklist Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
                     return "加入黑名單失敗.";
                 }
 
@@ -179,7 +179,7 @@ namespace GoBike.Interactive.Service.Managers
                 //// 檢測結果
                 if (!isInitiatorSuccess || !isPassiveSuccess)
                 {
-                    this.logger.LogError($"Add Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{Utility.GetPropertiesData(initiatorInteractiveData)}\nPassiveInteractiveData:{Utility.GetPropertiesData(passiveInteractiveData)}");
+                    this.logger.LogError($"Add Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
                     return "加入好友失敗.";
                 }
 
@@ -225,7 +225,7 @@ namespace GoBike.Interactive.Service.Managers
                 bool isSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
                 if (!isSuccess)
                 {
-                    this.logger.LogError($"Add Friend Request Fail >>> InteractiveData:{Utility.GetPropertiesData(interactiveData)}");
+                    this.logger.LogError($"Add Friend Request Fail >>> InteractiveData:{JsonConvert.SerializeObject(interactiveData)}");
                     return "建立互動資料失敗.";
                 }
 
@@ -324,7 +324,7 @@ namespace GoBike.Interactive.Service.Managers
                 //// 檢測結果
                 if (!isInitiatorSuccess || !isPassiveSuccess)
                 {
-                    this.logger.LogError($"Delete Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{Utility.GetPropertiesData(initiatorInteractiveData)}\nPassiveInteractiveData:{Utility.GetPropertiesData(passiveInteractiveData)}");
+                    this.logger.LogError($"Delete Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
                     return "刪除好友失敗.";
                 }
 

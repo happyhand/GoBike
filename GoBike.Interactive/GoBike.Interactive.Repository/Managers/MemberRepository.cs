@@ -1,9 +1,9 @@
 ﻿using GoBike.Interactive.Core.Applibs;
-using GoBike.Interactive.Core.Resource;
 using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -71,7 +71,7 @@ namespace GoBike.Interactive.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Memebr Data List Error >>> MemberIDs:{Utility.GetPropertiesData(memberIDs)}\n{ex}");
+                this.logger.LogError($"Get Memebr Data List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return null;
             }
         }

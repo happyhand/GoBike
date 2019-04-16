@@ -1,8 +1,8 @@
 ﻿using GoBike.Member.Core.Applibs;
-using GoBike.Smtp.Core.Resource;
 using GoBike.Smtp.Service.Interface;
 using GoBike.Smtp.Service.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Mail;
@@ -69,7 +69,7 @@ namespace GoBike.Smtp.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Email Error >>> Data:{Utility.GetPropertiesData(emailContext)}\n{ex}");
+                this.logger.LogError($"Send Email Error >>> Data:{JsonConvert.SerializeObject(emailContext)}\n{ex}");
                 return "發送郵件發生錯誤.";
             }
         }

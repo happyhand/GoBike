@@ -2,6 +2,9 @@
 
 namespace GoBike.API.App.Controllers
 {
+    /// <summary>
+    /// Base API
+    /// </summary>
     [ApiController]
     public class ApiController : ControllerBase
     {

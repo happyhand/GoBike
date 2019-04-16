@@ -8,6 +8,7 @@ using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -39,6 +40,7 @@ namespace GoBike.API.App.Controllers.Member
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
+        /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
         public EditDataController(ILogger<EditDataController> logger, IMapper mapper, IMemberService memberService)
         {
@@ -70,7 +72,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> EditData:{Utility.GetPropertiesData(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> EditData:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return BadRequest("會員更新資訊發生錯誤.");
             }
         }

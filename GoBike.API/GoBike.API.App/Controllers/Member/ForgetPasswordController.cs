@@ -1,5 +1,4 @@
-﻿using GoBike.API.Core.Resource;
-using GoBike.API.Service.Email;
+﻿using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Member;
@@ -7,6 +6,7 @@ using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Verifier;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -70,7 +70,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Verifier Code Error >>> Data:{Utility.GetPropertiesData(verifierInfo)}\n{ex}");
+                this.logger.LogError($"Get Verifier Code Error >>> Data:{JsonConvert.SerializeObject(verifierInfo)}\n{ex}");
                 return BadRequest("取得查詢密碼驗證碼發生錯誤.");
             }
         }
