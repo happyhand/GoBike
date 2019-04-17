@@ -1,5 +1,6 @@
 ﻿using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
+using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
 namespace GoBike.API.Service.Interface.Member
@@ -50,5 +51,13 @@ namespace GoBike.API.Service.Interface.Member
         /// <param name="memberInfo">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> ResetPassword(MemberInfoDto memberInfo);
+
+        /// <summary>
+        /// 上傳大頭貼
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="files">files</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> UploadPhoto(string memberID, IFormFile file);
     }
 }

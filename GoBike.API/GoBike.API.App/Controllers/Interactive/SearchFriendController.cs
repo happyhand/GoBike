@@ -49,7 +49,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
         /// <param name="interactiveService">interactiveService</param>
-        public SearchFriendController(ILogger<GetFriendListController> logger, IMapper mapper, IMemberService memberService, IInteractiveService interactiveService)
+        public SearchFriendController(ILogger<SearchFriendController> logger, IMapper mapper, IMemberService memberService, IInteractiveService interactiveService)
         {
             this.logger = logger;
             this.mapper = mapper;

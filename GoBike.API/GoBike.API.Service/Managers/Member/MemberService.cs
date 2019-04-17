@@ -4,9 +4,13 @@ using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -297,6 +301,61 @@ namespace GoBike.API.Service.Managers.Member
                 {
                     Ok = false,
                     Data = "重設密碼驗證發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 上傳大頭貼
+        /// </summary>
+        /// <param name="files">files</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> UploadPhoto(string memberID, IFormFile file)
+        {
+            if (string.IsNullOrEmpty(memberID))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員編號無效."
+                };
+            }
+
+            if (file == null)
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "無檔案上傳."
+                };
+            }
+
+            try
+            {
+                //this.logger.LogInformation($"UploadPhoto >>> {file.Length}");
+                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.UploadFilesService, "api/UploadFiles/Images", new FormFileCollection() { file });
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string photoUrl = (await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>()).FirstOrDefault();
+
+                    ResponseResultDto responseResult = await this.EditData(new MemberInfoDto() { MemberID = memberID, Photo = photoUrl });
+                    responseResult.Data = responseResult.Ok ? photoUrl : responseResult.Data;
+                    return responseResult;
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Upload Photo Error >>> MemberID:{memberID} File:{file}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "上傳大頭貼發生錯誤."
                 };
             }
         }

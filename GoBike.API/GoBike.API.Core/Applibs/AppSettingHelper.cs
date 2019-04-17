@@ -42,6 +42,11 @@
             /// Gets or sets SmtpService
             /// </summary>
             public string SmtpService { get; set; }
+
+            /// <summary>
+            /// Gets or sets UploadFilesService
+            /// </summary>
+            public string UploadFilesService { get; set; }
         }
 
         #endregion Service Domain 設定資料

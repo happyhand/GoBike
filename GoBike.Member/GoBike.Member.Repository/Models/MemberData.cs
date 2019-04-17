@@ -79,6 +79,12 @@ namespace GoBike.Member.Repository.Models
         [BsonElement("Nickname")]
         public string Nickname { get; set; }
 
+        /// <summary>
+        /// Gets or sets Photo
+        /// </summary>
+        [BsonElement("Photo")]
+        public string Photo { get; set; }
+
         #endregion Info Data
     }
 }

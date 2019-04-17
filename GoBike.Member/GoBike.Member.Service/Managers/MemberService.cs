@@ -346,6 +346,11 @@ namespace GoBike.Member.Service.Managers
                 memberData.Password = Utility.EncryptAES(memberInfo.Password);
             }
 
+            if (!string.IsNullOrEmpty(memberInfo.Photo))
+            {
+                memberData.Photo = memberInfo.Photo;
+            }
+
             return string.Empty;
         }
     }

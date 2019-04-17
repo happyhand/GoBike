@@ -49,5 +49,10 @@
         /// Gets or sets Password
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets Photo
+        /// </summary>
+        public string Photo { get; set; }
     }
 }
