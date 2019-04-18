@@ -3,6 +3,7 @@ using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -27,7 +28,6 @@ namespace GoBike.Member.Repository.Managers
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="options">options</param>
         public MemberRepository(ILogger<MemberRepository> logger)
         {
             this.logger = logger;
@@ -50,7 +50,7 @@ namespace GoBike.Member.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Create Member Error >>> MemberID:{memberData.MemberID} Email:{memberData.Email} Password:{memberData.Password}\n{ex}");
+                this.logger.LogError($"Create Member Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
                 return false;
             }
         }
@@ -147,7 +147,7 @@ namespace GoBike.Member.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Memebr Data Error >>> ID:{memberData.Id}\n{ex}");
+                this.logger.LogError($"Update Memebr Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
                 return false;
             }
         }

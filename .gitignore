@@ -53,3 +53,13 @@
 /GoBike.UploadFiles/GoBike.UploadFiles.Core/bin
 /GoBike.UploadFiles/GoBike.UploadFiles.Service/obj
 /GoBike.UploadFiles/GoBike.UploadFiles.Service/bin
+/Team.gobike.com
+/GoBike.Team/GoBike.Team.API/obj
+/GoBike.Team/GoBike.Team.API/bin
+/GoBike.Team/GoBike.Team.Core/obj
+/GoBike.Team/GoBike.Team.Core/bin
+/GoBike.Team/GoBike.Team.Repository/obj
+/GoBike.Team/GoBike.Team.Repository/bin
+/GoBike.Team/GoBike.Team.Service/obj
+/GoBike.Team/GoBike.Team.Service/bin
+/GoBike.Team/.vs

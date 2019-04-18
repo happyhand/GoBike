@@ -29,7 +29,6 @@ namespace GoBike.Interactive.Repository.Managers
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="options">options</param>
         public MemberRepository(ILogger<MemberRepository> logger)
         {
             this.logger = logger;
@@ -61,7 +60,7 @@ namespace GoBike.Interactive.Repository.Managers
         /// 取得會員資料列表
         /// </summary>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>GetMemebrDatas</returns>
+        /// <returns>MemberDatas</returns>
         public async Task<IEnumerable<MemberData>> GetMemebrDataList(IEnumerable<string> memberIDs)
         {
             try

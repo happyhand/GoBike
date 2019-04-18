@@ -8,7 +8,18 @@ namespace GoBike.Interactive.Repository.Models
     /// </summary>
     public class MemberData
     {
-        #region Base Data
+        private region Base Data
+
+        /// <summary>
+        /// Gets or sets Id
+        /// </summary>
+        public ObjectId Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        [BsonElement("MemberID")]
+        public string MemberID { get; set; }
 
         /// <summary>
         /// Gets or sets CreateDate
@@ -23,23 +34,12 @@ namespace GoBike.Interactive.Repository.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// Gets or sets Id
-        /// </summary>
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets MemberID
-        /// </summary>
-        [BsonElement("MemberID")]
-        public string MemberID { get; set; }
-
-        /// <summary>
         /// Gets or sets Password
         /// </summary>
         [BsonElement("Password")]
         public string Password { get; set; }
 
-        #endregion Base Data
+#endregion Base Data
 
         #region Info Data
 
@@ -78,6 +78,12 @@ namespace GoBike.Interactive.Repository.Models
         /// </summary>
         [BsonElement("Nickname")]
         public string Nickname { get; set; }
+
+        /// <summary>
+        /// Gets or sets Photo
+        /// </summary>
+        [BsonElement("Photo")]
+        public string Photo { get; set; }
 
         #endregion Info Data
     }

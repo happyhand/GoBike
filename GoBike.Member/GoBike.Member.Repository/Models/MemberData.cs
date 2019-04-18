@@ -11,6 +11,17 @@ namespace GoBike.Member.Repository.Models
         #region Base Data
 
         /// <summary>
+        /// Gets or sets Id
+        /// </summary>
+        public ObjectId Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        [BsonElement("MemberID")]
+        public string MemberID { get; set; }
+
+        /// <summary>
         /// Gets or sets CreateDate
         /// </summary>
         [BsonElement("CreateDate")]
@@ -21,17 +32,6 @@ namespace GoBike.Member.Repository.Models
         /// </summary>
         [BsonElement("Email")]
         public string Email { get; set; }
-
-        /// <summary>
-        /// Gets or sets Id
-        /// </summary>
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets MemberID
-        /// </summary>
-        [BsonElement("MemberID")]
-        public string MemberID { get; set; }
 
         /// <summary>
         /// Gets or sets Password

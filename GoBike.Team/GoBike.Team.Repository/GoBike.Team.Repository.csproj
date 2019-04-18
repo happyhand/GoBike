@@ -5,19 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Member\**" />
-    <EmbeddedResource Remove="Models\Member\**" />
-    <None Remove="Models\Member\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GoBike.Member.Core\GoBike.Member.Core.csproj" />
+    <ProjectReference Include="..\GoBike.Team.Core\GoBike.Team.Core.csproj" />
   </ItemGroup>
 
 </Project>
