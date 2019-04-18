@@ -60,7 +60,7 @@ namespace GoBike.Member.Service.Managers
                     return Tuple.Create<MemberInfoDto, string>(null, "會員編號無效.");
                 }
 
-                MemberData memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
+                MemberData memberData = await this.memberRepository.GetMemebrDataByMemberID(memberInfo.MemberID);
                 if (memberData == null)
                 {
                     return Tuple.Create<MemberInfoDto, string>(null, "會員不存在.");
@@ -100,7 +100,7 @@ namespace GoBike.Member.Service.Managers
                 MemberData memberData = null;
                 if (!string.IsNullOrEmpty(memberInfo.MemberID))
                 {
-                    memberData = await this.memberRepository.GetMemebrDataByID(memberInfo.MemberID);
+                    memberData = await this.memberRepository.GetMemebrDataByMemberID(memberInfo.MemberID);
                 }
                 else if (!string.IsNullOrEmpty(memberInfo.Email))
                 {
@@ -197,7 +197,7 @@ namespace GoBike.Member.Service.Managers
                 bool isSuccess = await this.memberRepository.CreateMemberData(memberData);
                 if (!isSuccess)
                 {
-                    this.logger.LogError($"Register Member Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
+                    this.logger.LogError($"Register Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
                     return "會員註冊失敗.";
                 }
 
@@ -205,7 +205,7 @@ namespace GoBike.Member.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Member Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Register Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
                 return "會員註冊發生錯誤.";
             }
         }
@@ -262,7 +262,7 @@ namespace GoBike.Member.Service.Managers
                 MemberID = memberID,
                 Email = email,
                 Password = Utility.EncryptAES(password),
-                CreateDate = createDate.ToString("yyyy/MM/dd HH:mm:ss"),
+                CreateDate = createDate,
             };
         }
 

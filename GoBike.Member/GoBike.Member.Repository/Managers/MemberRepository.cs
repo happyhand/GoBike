@@ -99,7 +99,7 @@ namespace GoBike.Member.Repository.Managers
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <returns>MemberData</returns>
-        public async Task<MemberData> GetMemebrDataByID(string memberID)
+        public async Task<MemberData> GetMemebrDataByMemberID(string memberID)
         {
             try
             {

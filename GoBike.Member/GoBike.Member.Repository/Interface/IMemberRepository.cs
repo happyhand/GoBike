@@ -34,7 +34,7 @@ namespace GoBike.Member.Repository.Interface
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <returns>MemberData</returns>
-        Task<MemberData> GetMemebrDataByID(string memberID);
+        Task<MemberData> GetMemebrDataByMemberID(string memberID);
 
         /// <summary>
         /// 取得會員資料 (By Mobile)

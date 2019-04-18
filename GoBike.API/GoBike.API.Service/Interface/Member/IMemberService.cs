@@ -53,7 +53,7 @@ namespace GoBike.API.Service.Interface.Member
         Task<ResponseResultDto> ResetPassword(MemberInfoDto memberInfo);
 
         /// <summary>
-        /// 上傳大頭貼
+        /// 上傳頭像
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="files">files</param>

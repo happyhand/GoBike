@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Member
 {
     /// <summary>
-    /// 上傳大頭貼
+    /// 上傳頭像
     /// </summary>
     [Route("api/member/[controller]")]
     [ApiController]
@@ -63,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Upload Photo Error >>> MemberID:{memberID} Files Count:{(files == null ? "None" : files.Count.ToString())}\n{ex}");
-                return BadRequest("上傳大頭貼發生錯誤.");
+                return BadRequest("上傳頭像發生錯誤.");
             }
         }
     }

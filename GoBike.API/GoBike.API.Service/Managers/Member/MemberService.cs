@@ -306,7 +306,7 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
-        /// 上傳大頭貼
+        /// 上傳頭像
         /// </summary>
         /// <param name="files">files</param>
         /// <returns>ResponseResultDto</returns>
@@ -355,7 +355,7 @@ namespace GoBike.API.Service.Managers.Member
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "上傳大頭貼發生錯誤."
+                    Data = "上傳頭像發生錯誤."
                 };
             }
         }

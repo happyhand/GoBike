@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace GoBike.Member.Repository.Models
 {
@@ -11,6 +12,18 @@ namespace GoBike.Member.Repository.Models
         #region Base Data
 
         /// <summary>
+        /// Gets or sets CreateDate
+        /// </summary>
+        [BsonElement("CreateDate")]
+        public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets Email
+        /// </summary>
+        [BsonElement("Email")]
+        public string Email { get; set; }
+
+        /// <summary>
         /// Gets or sets Id
         /// </summary>
         public ObjectId Id { get; set; }
@@ -20,18 +33,6 @@ namespace GoBike.Member.Repository.Models
         /// </summary>
         [BsonElement("MemberID")]
         public string MemberID { get; set; }
-
-        /// <summary>
-        /// Gets or sets CreateDate
-        /// </summary>
-        [BsonElement("CreateDate")]
-        public string CreateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets Email
-        /// </summary>
-        [BsonElement("Email")]
-        public string Email { get; set; }
 
         /// <summary>
         /// Gets or sets Password
