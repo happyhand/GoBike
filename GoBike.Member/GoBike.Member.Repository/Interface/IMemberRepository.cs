@@ -1,4 +1,5 @@
 ﻿using GoBike.Member.Repository.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace GoBike.Member.Repository.Interface
@@ -47,7 +48,7 @@ namespace GoBike.Member.Repository.Interface
         /// 更新會員資料
         /// </summary>
         /// <param name="memberData">memberData</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateMemebrData(MemberData memberData);
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateMemebrData(MemberData memberData);
     }
 }

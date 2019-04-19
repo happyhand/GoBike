@@ -1,4 +1,5 @@
 ﻿using GoBike.Interactive.Repository.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -57,7 +58,7 @@ namespace GoBike.Interactive.Repository.Interface
         /// 更新互動資料
         /// </summary>
         /// <param name="interactiveData">interactiveData</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateInteractiveData(InteractiveData interactiveData);
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData);
     }
 }

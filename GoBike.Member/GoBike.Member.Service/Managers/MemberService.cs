@@ -72,11 +72,13 @@ namespace GoBike.Member.Service.Managers
                     return Tuple.Create<MemberInfoDto, string>(null, updateMemberDataHandlerResult);
                 }
 
-                bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
-                if (!isSuccess)
+                Tuple<bool, string> result = await this.memberRepository.UpdateMemebrData(memberData);
+
+                this.logger.LogInformation($"Edit Data >>> result:{result.Item1}   {result.Item2}");
+                if (!result.Item1)
                 {
                     this.logger.LogError($"Edit Data Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
-                    return Tuple.Create<MemberInfoDto, string>(null, "會員更新資訊失敗.");
+                    return Tuple.Create<MemberInfoDto, string>(null, result.Item2);
                 }
 
                 return Tuple.Create(this.mapper.Map<MemberInfoDto>(memberData), string.Empty);
@@ -232,12 +234,13 @@ namespace GoBike.Member.Service.Managers
 
                 string password = Guid.NewGuid().ToString().Substring(0, 8);
                 memberData.Password = Utility.EncryptAES(password);
-                bool isSuccess = await this.memberRepository.UpdateMemebrData(memberData);
-                if (!isSuccess)
+                Tuple<bool, string> result = await this.memberRepository.UpdateMemebrData(memberData);
+                if (!result.Item1)
                 {
                     this.logger.LogError($"Reset Password Fail >>> Data:{JsonConvert.SerializeObject(memberData)}");
-                    return Tuple.Create(string.Empty, "會員重設密碼失敗.");
+                    return Tuple.Create(string.Empty, result.Item2);
                 }
+
                 return Tuple.Create(password, string.Empty);
             }
             catch (Exception ex)

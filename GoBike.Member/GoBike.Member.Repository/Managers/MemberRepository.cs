@@ -136,19 +136,29 @@ namespace GoBike.Member.Repository.Managers
         /// 更新會員資料
         /// </summary>
         /// <param name="memberData">memberData</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateMemebrData(MemberData memberData)
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateMemebrData(MemberData memberData)
         {
             try
             {
                 FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("_id", memberData.Id);
                 ReplaceOneResult result = await this.memberDatas.ReplaceOneAsync(filter, memberData);
-                return result.IsAcknowledged && result.ModifiedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新會員資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "會員資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Memebr Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
-                return false;
+                return Tuple.Create(false, "更新會員資料發生錯誤.");
             }
         }
 

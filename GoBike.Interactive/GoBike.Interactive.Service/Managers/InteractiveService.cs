@@ -82,7 +82,13 @@ namespace GoBike.Interactive.Service.Managers
                     }
 
                     initiatorInteractiveData.Status = (int)FriendStatusType.Black;
-                    isInitiatorSuccess = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
+                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
+                    isInitiatorSuccess = initiatorUpdateResult.Item1;
+                    if (!isInitiatorSuccess)
+                    {
+                        this.logger.LogError($"Add Blacklist Fail >>> Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
+                        return initiatorUpdateResult.Item2;
+                    }
                 }
 
                 //// 處理被動者互動資料
@@ -142,7 +148,13 @@ namespace GoBike.Interactive.Service.Managers
 
                     case (int)FriendStatusType.Request:
                         passiveInteractiveData.Status = (int)FriendStatusType.Friend;
-                        isPassiveSuccess = await this.interactiveRepository.UpdateInteractiveData(passiveInteractiveData);
+                        Tuple<bool, string> passiveUpdateResult = await this.interactiveRepository.UpdateInteractiveData(passiveInteractiveData);
+                        isPassiveSuccess = passiveUpdateResult.Item1;
+                        if (!isPassiveSuccess)
+                        {
+                            this.logger.LogError($"Add Friend Fail >>> Passive Data:{JsonConvert.SerializeObject(passiveInteractiveData)}");
+                            return passiveUpdateResult.Item2;
+                        }
                         break;
 
                     case (int)FriendStatusType.Friend:
@@ -166,8 +178,15 @@ namespace GoBike.Interactive.Service.Managers
                             return this.GetInteractiveStatusMemo(passiveInteractiveData, false);
 
                         case (int)FriendStatusType.Request:
-                            passiveInteractiveData.Status = (int)FriendStatusType.Friend;
-                            isPassiveSuccess = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
+                            initiatorInteractiveData.Status = (int)FriendStatusType.Friend;
+                            Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
+                            isInitiatorSuccess = initiatorUpdateResult.Item1;
+                            if (!isInitiatorSuccess)
+                            {
+                                this.logger.LogError($"Add Friend Fail >>> Initiator Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
+                                return initiatorUpdateResult.Item2;
+                            }
+
                             break;
 
                         case (int)FriendStatusType.Friend:

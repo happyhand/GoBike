@@ -184,8 +184,8 @@ namespace GoBike.Interactive.Repository.Managers
         /// 更新互動資料
         /// </summary>
         /// <param name="interactiveData">interactiveData</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateInteractiveData(InteractiveData interactiveData)
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData)
         {
             try
             {
@@ -196,12 +196,22 @@ namespace GoBike.Interactive.Repository.Managers
                     builder.Eq("PassiveID", interactiveData.PassiveID),
                 };
                 ReplaceOneResult result = await this.interactiveDatas.ReplaceOneAsync(builder.And(filters), interactiveData);
-                return result.IsAcknowledged && result.ModifiedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新互動資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "互動資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
-                return false;
+                return Tuple.Create(false, "更新互動資料發生錯誤.");
             }
         }
     }
