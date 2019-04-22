@@ -414,11 +414,6 @@ namespace GoBike.Interactive.Service.Managers
                 }
 
                 IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetAddFriendRequestList(interactiveInfo.InitiatorID);
-                if (interactiveDatas.Count() == 0)
-                {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無加入好友請求名單.");
-                }
-
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.InitiatorID));
                 return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Request), string.Empty);
             }
@@ -444,11 +439,6 @@ namespace GoBike.Interactive.Service.Managers
                 }
 
                 IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetBlacklist(interactiveInfo.InitiatorID);
-                if (interactiveDatas.Count() == 0)
-                {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無黑名單.");
-                }
-
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.PassiveID));
                 return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Black), string.Empty);
             }
@@ -474,11 +464,6 @@ namespace GoBike.Interactive.Service.Managers
                 }
 
                 IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetFriendList(interactiveInfo.InitiatorID);
-                if (interactiveDatas.Count() == 0)
-                {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "無好友名單.");
-                }
-
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.PassiveID));
                 return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Friend), string.Empty);
             }
