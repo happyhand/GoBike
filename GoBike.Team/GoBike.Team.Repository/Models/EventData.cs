@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace GoBike.Team.Repository.Models
 {
@@ -9,27 +11,28 @@ namespace GoBike.Team.Repository.Models
     public class EventData
     {
         /// <summary>
-        /// Gets or sets Id
-        /// </summary>
-        public ObjectId Id { get; set; }
-
-        /// <summary>
         /// Gets or sets EventID
         /// </summary>
         [BsonElement("EventID")]
         public string EventID { get; set; }
 
         /// <summary>
-        /// Gets or sets EventTitle
-        /// </summary>
-        [BsonElement("EventTitle")]
-        public string EventTitle { get; set; }
-
-        /// <summary>
         /// Gets or sets EventInfo
         /// </summary>
         [BsonElement("EventInfo")]
         public string EventInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets EventRegisterDeadline
+        /// </summary>
+        [BsonElement("EventRegisterDeadline")]
+        public DateTime EventRegisterDeadline { get; set; }
+
+        /// <summary>
+        /// Gets or sets EventRoutePoints
+        /// </summary>
+        [BsonElement("EventRoutePoints")]
+        public IEnumerable<string> EventRoutePoints { get; set; }
 
         /// <summary>
         /// Gets or sets EventSite
@@ -41,18 +44,23 @@ namespace GoBike.Team.Repository.Models
         /// Gets or sets EventTime
         /// </summary>
         [BsonElement("EventTime")]
-        public string EventTime { get; set; }
+        public DateTime EventTime { get; set; }
 
         /// <summary>
-        /// Gets or sets EventRegisterDeadline
+        /// Gets or sets EventTitle
         /// </summary>
-        [BsonElement("EventRegisterDeadline")]
-        public string EventRegisterDeadline { get; set; }
+        [BsonElement("EventTitle")]
+        public string EventTitle { get; set; }
 
         /// <summary>
-        /// Gets or sets EventRoutePoints
+        /// Gets or sets Id
         /// </summary>
-        [BsonElement("EventRoutePoints")]
-        public string EventRoutePoints { get; set; }
+        public ObjectId Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamID
+        /// </summary>
+        [BsonElement("TeamID")]
+        public string TeamID { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace GoBike.Team.Repository.Models
 {
@@ -14,28 +16,52 @@ namespace GoBike.Team.Repository.Models
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamID
+        /// Gets or sets TeamBlacklistedIDs
         /// </summary>
-        [BsonElement("TeamID")]
-        public string TeamID { get; set; }
+        [BsonElement("TeamBlacklistedIDs")]
+        public IEnumerable<string> TeamBlacklistedIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamBlacklistIDs
+        /// </summary>
+        [BsonElement("TeamBlacklistIDs")]
+        public IEnumerable<string> TeamBlacklistIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamCoverPhoto
+        /// </summary>
+        [BsonElement("TeamCoverPhoto")]
+        public string TeamCoverPhoto { get; set; }
 
         /// <summary>
         /// Gets or sets TeamCreateDate
         /// </summary>
         [BsonElement("TeamCreateDate")]
-        public string TeamCreateDate { get; set; }
+        public DateTime TeamCreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamName
+        /// Gets or sets TeamCreatorID
         /// </summary>
-        [BsonElement("TeamName")]
-        public string TeamName { get; set; }
+        [BsonElement("TeamCreatorID")]
+        public string TeamCreatorID { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamLocation
+        /// Gets or sets TeamEventIDs
         /// </summary>
-        [BsonElement("TeamLocation")]
-        public string TeamLocation { get; set; }
+        [BsonElement("TeamEventIDs")]
+        public IEnumerable<string> TeamEventIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamExamineStatus (0:close, 1:open)
+        /// </summary>
+        [BsonElement("TeamExamineStatus")]
+        public int TeamExamineStatus { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamID
+        /// </summary>
+        [BsonElement("TeamID")]
+        public string TeamID { get; set; }
 
         /// <summary>
         /// Gets or sets TeamInfo
@@ -44,16 +70,16 @@ namespace GoBike.Team.Repository.Models
         public string TeamInfo { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamSearchStatus
+        /// Gets or sets TeamLocation
         /// </summary>
-        [BsonElement("TeamSearchStatus")]
-        public string TeamSearchStatus { get; set; }
+        [BsonElement("TeamLocation")]
+        public string TeamLocation { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamExamineStatus
+        /// Gets or sets TeamName
         /// </summary>
-        [BsonElement("TeamExamineStatus")]
-        public string TeamExamineStatus { get; set; }
+        [BsonElement("TeamName")]
+        public string TeamName { get; set; }
 
         /// <summary>
         /// Gets or sets TeamPhoto
@@ -62,9 +88,27 @@ namespace GoBike.Team.Repository.Models
         public string TeamPhoto { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamCoverPhoto
+        /// Gets or sets TeamPlayerIDs
         /// </summary>
-        [BsonElement("TeamCoverPhoto")]
-        public string TeamCoverPhoto { get; set; }
+        [BsonElement("TeamPlayerIDs")]
+        public IEnumerable<string> TeamPlayerIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamSaveDeadline
+        /// </summary>
+        [BsonElement("TeamSaveDeadline")]
+        public DateTime TeamSaveDeadline { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamSearchStatus (0:close, 1:open)
+        /// </summary>
+        [BsonElement("TeamSearchStatus")]
+        public int TeamSearchStatus { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamViceLeaderID
+        /// </summary>
+        [BsonElement("TeamViceLeaderID")]
+        public string TeamViceLeaderID { get; set; }
     }
 }

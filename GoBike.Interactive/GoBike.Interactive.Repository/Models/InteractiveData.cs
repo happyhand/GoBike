@@ -16,7 +16,7 @@ namespace GoBike.Interactive.Repository.Models
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Gets or sets MemberID
+        /// Gets or sets InitiatorID
         /// </summary>
         [BsonElement("InitiatorID")]
         public string InitiatorID { get; set; }

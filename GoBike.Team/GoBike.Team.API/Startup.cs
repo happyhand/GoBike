@@ -1,4 +1,5 @@
-﻿using GoBike.Team.Core.Applibs;
+﻿using AutoMapper;
+using GoBike.Team.Core.Applibs;
 using GoBike.Team.Repository.Interface;
 using GoBike.Team.Repository.Managers;
 using GoBike.Team.Service.Interface;
@@ -40,6 +41,7 @@ namespace GoBike.Team
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAutoMapper();
             this.ConfigurationHandler(services);
             this.DependencyInjectionHandler(services);
         }
@@ -54,6 +56,7 @@ namespace GoBike.Team
             services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<ITeamRepository, TeamRepository>();
             services.AddSingleton<IEventRepository, EventRepository>();
+            services.AddSingleton<IMemberRepository, MemberRepository>();
         }
     }
 }

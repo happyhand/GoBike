@@ -33,6 +33,11 @@
             public string ConnectionString { get; set; }
 
             /// <summary>
+            /// Gets or sets MemberDatabase
+            /// </summary>
+            public string MemberDatabase { get; set; }
+
+            /// <summary>
             /// Gets or sets TeamDatabase
             /// </summary>
             public string TeamDatabase { get; set; }
@@ -43,14 +48,24 @@
             public class CollectionSetting
             {
                 /// <summary>
-                /// Gets or sets Member
+                /// Gets or sets Event
                 /// </summary>
-                public string Team { get; set; }
+                public string Event { get; set; }
+
+                /// <summary>
+                /// Gets or sets Interactive
+                /// </summary>
+                public string Interactive { get; set; }
 
                 /// <summary>
                 /// Gets or sets Member
                 /// </summary>
-                public string Event { get; set; }
+                public string Member { get; set; }
+
+                /// <summary>
+                /// Gets or sets Team
+                /// </summary>
+                public string Team { get; set; }
             }
         }
 
