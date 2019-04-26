@@ -254,6 +254,38 @@ namespace GoBike.Team.Repository.Managers
             }
         }
 
+        /// <summary>
+        /// 更新車隊副隊長
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="viceLeaderID">viceLeaderID</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateTeamViceLeader(string teamID, string viceLeaderID)
+        {
+            try
+            {
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderID, viceLeaderID);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新車隊副隊長.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "車隊副隊長未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamID} ViceLeaderID:{viceLeaderID}\n{ex}");
+                return Tuple.Create(false, "更新車隊副隊長發生錯誤.");
+            }
+        }
+
         #endregion 車隊資料
 
         #region 車隊互動資料

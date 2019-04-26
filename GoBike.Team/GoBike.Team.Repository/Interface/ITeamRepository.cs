@@ -77,6 +77,14 @@ namespace GoBike.Team.Repository.Interface
         /// <returns>Tuple(bool, string)</returns>
         Task<Tuple<bool, string>> UpdateTeamData(TeamData teamData);
 
+        /// <summary>
+        /// 更新車隊副隊長
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="viceLeaderID">viceLeaderID</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateTeamViceLeader(string teamID, string viceLeaderID);
+
         #endregion 車隊資料
 
         #region 車隊互動資料

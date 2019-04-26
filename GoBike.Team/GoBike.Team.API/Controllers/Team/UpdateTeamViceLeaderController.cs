@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace GoBike.Team.API.Controllers.Team
 {
     /// <summary>
-    /// 強制離開車隊
+    /// 更新車隊副隊長
     /// </summary>
     [Route("api/team/[controller]")]
     [ApiController]
-    public class ForceLeaveTeamController : ControllerBase
+    public class UpdateTeamViceLeaderController : ControllerBase
     {
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<ForceLeaveTeamController> logger;
+        private readonly ILogger<UpdateTeamViceLeaderController> logger;
 
         /// <summary>
         /// teamService
@@ -29,7 +29,7 @@ namespace GoBike.Team.API.Controllers.Team
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="teamService">teamService</param>
-        public ForceLeaveTeamController(ILogger<ForceLeaveTeamController> logger, ITeamService teamService)
+        public UpdateTeamViceLeaderController(ILogger<UpdateTeamViceLeaderController> logger, ITeamService teamService)
         {
             this.logger = logger;
             this.teamService = teamService;
@@ -45,18 +45,18 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.ForceLeaveTeam(teamAction);
+                string result = await this.teamService.UpdateTeamViceLeader(teamAction);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("強制離開車隊成功");
+                    return Ok("更新車隊副隊長成功");
                 }
 
                 return BadRequest(result);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Force Leave Team Error >>> TeamID:{teamAction.TeamID} MemberID:{teamAction.MemberID} ActionID:{teamAction.ActionID}\n{ex}");
-                return BadRequest("強制離開車隊發生錯誤.");
+                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamAction.TeamID} MemberID:{teamAction.MemberID} ActionID:{teamAction.ActionID}\n{ex}");
+                return BadRequest("更新車隊副隊長發生錯誤.");
             }
         }
     }

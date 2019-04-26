@@ -1,10 +1,15 @@
 ﻿namespace GoBike.Team.Service.Models
 {
     /// <summary>
-    /// 車隊互動資料
+    /// 車隊命令資料
     /// </summary>
-    public class InteractiveInfoDto
+    public class TeamActionDto
     {
+        /// <summary>
+        /// Gets or sets ActionID
+        /// </summary>
+        public string ActionID { get; set; }
+
         /// <summary>
         /// Gets or sets MemberID
         /// </summary>

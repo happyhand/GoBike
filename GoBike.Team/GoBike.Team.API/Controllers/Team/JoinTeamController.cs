@@ -38,14 +38,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="teamAction">teamAction</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(TeamActionDto teamAction)
         {
             try
             {
-                string result = await this.teamService.JoinTeam(interactiveInfo);
+                string result = await this.teamService.JoinTeam(teamAction);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("加入車隊成功");
@@ -55,7 +55,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Join Team Error >>> TemaID:{interactiveInfo.TeamID} MemberID:{interactiveInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Join Team Error >>> TemaID:{teamAction.TeamID} MemberID:{teamAction.MemberID}\n{ex}");
                 return BadRequest("加入車隊發生錯誤.");
             }
         }

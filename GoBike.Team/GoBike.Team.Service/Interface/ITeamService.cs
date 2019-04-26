@@ -20,6 +20,13 @@ namespace GoBike.Team.Service.Interface
         Task<Tuple<TeamInfoDto, string>> EditData(TeamInfoDto teamInfo);
 
         /// <summary>
+        /// 強制離開車隊
+        /// </summary>
+        /// <param name="teamAction">teamAction</param>
+        /// <returns>string</returns>
+        Task<string> ForceLeaveTeam(TeamActionDto teamAction);
+
+        /// <summary>
         /// 取得我的車隊資訊列表
         /// </summary>
         /// <param name="memberID">memberID</param>
@@ -27,11 +34,32 @@ namespace GoBike.Team.Service.Interface
         Task<Tuple<TeamInfoDto, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(string memberID);
 
         /// <summary>
+        /// 加入車隊
+        /// </summary>
+        /// <param name="teamAction">teamAction</param>
+        /// <returns>string</returns>
+        Task<string> JoinTeam(TeamActionDto teamAction);
+
+        /// <summary>
+        /// 離開車隊
+        /// </summary>
+        /// <param name="teamAction">teamAction</param>
+        /// <returns>string</returns>
+        Task<string> LeaveTeam(TeamActionDto teamAction);
+
+        /// <summary>
         /// 建立車隊
         /// </summary>
         /// <param name="teamInfo">teamInfo</param>
         /// <returns>string</returns>
         Task<string> Register(TeamInfoDto teamInfo);
+
+        /// <summary>
+        /// 更新車隊副隊長
+        /// </summary>
+        /// <param name="teamAction">teamAction</param>
+        /// <returns>string</returns>
+        Task<string> UpdateTeamViceLeader(TeamActionDto teamAction);
 
         #endregion 車隊資料
 
@@ -43,13 +71,6 @@ namespace GoBike.Team.Service.Interface
         /// <param name="interactiveInfo">interactiveInfo</param>
         /// <returns>string</returns>
         Task<string> ApplyForJoinTeam(InteractiveInfoDto interactiveInfo);
-
-        /// <summary>
-        /// 強制離開車隊
-        /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>string</returns>
-        Task<string> ForceLeaveTeam(InteractiveInfoDto interactiveInfo);
 
         /// <summary>
         /// 取得申請請求列表
@@ -71,20 +92,6 @@ namespace GoBike.Team.Service.Interface
         /// <param name="interactiveInfo">interactiveInfo</param>
         /// <returns>string</returns>
         Task<string> InviteJoinTeam(InteractiveInfoDto interactiveInfo);
-
-        /// <summary>
-        /// 加入車隊
-        /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>string</returns>
-        Task<string> JoinTeam(InteractiveInfoDto interactiveInfo);
-
-        /// <summary>
-        /// 離開車隊
-        /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>string</returns>
-        Task<string> LeaveTeam(InteractiveInfoDto interactiveInfo);
 
         #endregion 車隊互動資料
     }
