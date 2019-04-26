@@ -15,37 +15,38 @@ namespace GoBike.Team.Service.Interface
         /// <summary>
         /// 車隊編輯
         /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(TeamInfoDto, string)</returns>
-        Task<Tuple<TeamInfoDto, string>> EditData(TeamInfoDto teamInfo);
+        Task<Tuple<TeamInfoDto, string>> EditData(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 強制離開車隊
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
-        Task<string> ForceLeaveTeam(TeamActionDto teamAction);
+        Task<string> ForceLeaveTeam(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 取得我的車隊資訊列表
         /// </summary>
         /// <param name="memberID">memberID</param>
-        /// <returns>Tuple(TeamInfoDto, TeamInfoDtos, string)</returns>
-        Task<Tuple<TeamInfoDto, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(string memberID);
+        /// <returns>Tuple(TeamInfoDtos, TeamInfoDtos, string)</returns>
+        Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(string memberID);
 
         /// <summary>
         /// 加入車隊
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="isExamine">isExamine</param>
         /// <returns>string</returns>
-        Task<string> JoinTeam(TeamActionDto teamAction);
+        Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine);
 
         /// <summary>
         /// 離開車隊
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
-        Task<string> LeaveTeam(TeamActionDto teamAction);
+        Task<string> LeaveTeam(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 建立車隊
@@ -55,11 +56,18 @@ namespace GoBike.Team.Service.Interface
         Task<string> Register(TeamInfoDto teamInfo);
 
         /// <summary>
+        /// 更新車隊隊長
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> UpdateTeamLeader(TeamCommandDto teamCommand);
+
+        /// <summary>
         /// 更新車隊副隊長
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
-        Task<string> UpdateTeamViceLeader(TeamActionDto teamAction);
+        Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand);
 
         #endregion 車隊資料
 

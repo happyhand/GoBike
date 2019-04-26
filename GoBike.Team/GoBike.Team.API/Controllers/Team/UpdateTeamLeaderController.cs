@@ -2,23 +2,22 @@
 using GoBike.Team.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
 namespace GoBike.Team.API.Controllers.Team
 {
     /// <summary>
-    /// 車隊編輯
+    /// 更新車隊隊長
     /// </summary>
     [Route("api/team/[controller]")]
     [ApiController]
-    public class EditDataController : ControllerBase
+    public class UpdateTeamLeaderController : ControllerBase
     {
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<EditDataController> logger;
+        private readonly ILogger<UpdateTeamLeaderController> logger;
 
         /// <summary>
         /// teamService
@@ -30,7 +29,7 @@ namespace GoBike.Team.API.Controllers.Team
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="teamService">teamService</param>
-        public EditDataController(ILogger<EditDataController> logger, ITeamService teamService)
+        public UpdateTeamLeaderController(ILogger<UpdateTeamLeaderController> logger, ITeamService teamService)
         {
             this.logger = logger;
             this.teamService = teamService;
@@ -46,18 +45,18 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                Tuple<TeamInfoDto, string> result = await this.teamService.EditData(teamCommand);
-                if (string.IsNullOrEmpty(result.Item2))
+                string result = await this.teamService.UpdateTeamLeader(teamCommand);
+                if (string.IsNullOrEmpty(result))
                 {
-                    return Ok(result.Item1);
+                    return Ok("更新車隊隊長成功");
                 }
 
-                return BadRequest(result.Item2);
+                return BadRequest(result);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(teamCommand)}\n{ex}");
-                return BadRequest("車隊編輯發生錯誤");
+                this.logger.LogError($"Update Team Leader Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return BadRequest("更新車隊隊長發生錯誤.");
             }
         }
     }

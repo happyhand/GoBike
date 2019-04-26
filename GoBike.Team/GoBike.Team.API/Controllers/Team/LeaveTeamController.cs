@@ -38,14 +38,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamActionDto teamAction)
+        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.LeaveTeam(teamAction);
+                string result = await this.teamService.LeaveTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("離開車隊成功");
@@ -55,7 +55,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Leave Team Error >>> TemaID:{teamAction.TeamID} MemberID:{teamAction.MemberID}\n{ex}");
+                this.logger.LogError($"Leave Team Error >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
                 return BadRequest("離開車隊發生錯誤.");
             }
         }

@@ -86,30 +86,30 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得車隊資料 (By TeamCreatorID)
+        /// 取得車隊資料列表 (By TeamName)
         /// </summary>
-        /// <param name="teamCreatorID">teamCreatorID</param>
-        /// <returns>TeamData</returns>
-        public async Task<TeamData> GetTeamDataByTeamCreatorID(string teamCreatorID)
+        /// <param name="teamName">teamName</param>
+        /// <param name="isStrict">isStrict</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict)
         {
             try
             {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamCreatorID", teamCreatorID);
-                return await this.teamDatas.Find(filter).FirstOrDefaultAsync();
+                return await this.teamDatas.Find(data => isStrict ? data.TeamName.Equals(teamName) : data.TeamName.Contains(teamName)).ToListAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Data Error >>> TeamCreatorID:{teamCreatorID}\n{ex}");
+                this.logger.LogError($"Get Team Data List By TeamName Error >>> TeamName:{teamName} IsStrict:{isStrict}\n{ex}");
                 return null;
             }
         }
 
         /// <summary>
-        /// 取得車隊資料 (By TeamID)
+        /// 取得車隊資料
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <returns>TeamData</returns>
-        public async Task<TeamData> GetTeamDataByTeamID(string teamID)
+        public async Task<TeamData> GetTeamData(string teamID)
         {
             try
             {
@@ -124,11 +124,11 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得車隊列表資料
+        /// 取得車隊列表資料 (By TeamID)
         /// </summary>
         /// <param name="teamIDs">teamIDs</param>
         /// <returns>TeamDatas</returns>
-        public async Task<IEnumerable<TeamData>> GetTeamDataList(IEnumerable<string> teamIDs)
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByTeamID(IEnumerable<string> teamIDs)
         {
             try
             {
@@ -137,7 +137,7 @@ namespace GoBike.Team.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Data List Error >>> TeamIDs:{JsonConvert.SerializeObject(teamIDs)}\n{ex}");
+                this.logger.LogError($"Get Team Data List By TeamID Error >>> TeamIDs:{JsonConvert.SerializeObject(teamIDs)}\n{ex}");
                 return null;
             }
         }
@@ -151,7 +151,7 @@ namespace GoBike.Team.Repository.Managers
         {
             try
             {
-                return await this.teamDatas.Find(data => data.TeamCreatorID.Equals(memberID) || data.TeamPlayerIDs.Contains(memberID)).ToListAsync();
+                return await this.teamDatas.Find(data => data.TeamLeaderID.Equals(memberID) || data.TeamPlayerIDs.Contains(memberID)).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -255,34 +255,34 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 更新車隊副隊長
+        /// 更新車隊副隊長群
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="viceLeaderID">viceLeaderID</param>
+        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
         /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamViceLeader(string teamID, string viceLeaderID)
+        public async Task<Tuple<bool, string>> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
         {
             try
             {
                 FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderID, viceLeaderID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderIDs, teamViceLeaderIDs);
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新車隊副隊長.");
+                    return Tuple.Create(false, "無法更新車隊副隊長群.");
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "車隊副隊長未更改.");
+                    return Tuple.Create(false, "車隊副隊長群未更改.");
                 }
 
                 return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamID} ViceLeaderID:{viceLeaderID}\n{ex}");
-                return Tuple.Create(false, "更新車隊副隊長發生錯誤.");
+                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} ViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
+                return Tuple.Create(false, "更新車隊副隊長群發生錯誤.");
             }
         }
 

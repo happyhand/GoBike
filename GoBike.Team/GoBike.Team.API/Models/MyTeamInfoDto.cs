@@ -9,12 +9,12 @@ namespace GoBike.Team.API.Models
     public class MyTeamInfoDto
     {
         /// <summary>
-        /// Gets or sets TeamCoverPhoto
+        /// Gets or sets LeaderTeamDatas
         /// </summary>
-        public TeamInfoDto CreatorTeamData { get; set; }
+        public IEnumerable<TeamInfoDto> LeaderTeamDatas { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamCreatorID
+        /// Gets or sets JoinTeamDatas
         /// </summary>
         public IEnumerable<TeamInfoDto> JoinTeamDatas { get; set; }
     }

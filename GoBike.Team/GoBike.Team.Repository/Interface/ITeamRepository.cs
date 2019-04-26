@@ -27,25 +27,26 @@ namespace GoBike.Team.Repository.Interface
         Task<bool> DeleteTeamData(string teamID);
 
         /// <summary>
-        /// 取得車隊資料 (By TeamCreatorID)
+        /// 取得車隊資料列表 (By TeamName)
         /// </summary>
-        /// <param name="teamCreatorID">teamCreatorID</param>
-        /// <returns>TeamData</returns>
-        Task<TeamData> GetTeamDataByTeamCreatorID(string teamCreatorID);
+        /// <param name="teamName">teamName</param>
+        /// <param name="isStrict">isStrict</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict);
 
         /// <summary>
-        /// 取得車隊資料 (By TeamID)
+        /// 取得車隊資料
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <returns>TeamData</returns>
-        Task<TeamData> GetTeamDataByTeamID(string teamID);
+        Task<TeamData> GetTeamData(string teamID);
 
         /// <summary>
-        /// 取得車隊列表資料
+        /// 取得車隊列表資料 (By TeamID)
         /// </summary>
         /// <param name="teamIDs">teamIDs</param>
         /// <returns>TeamDatas</returns>
-        Task<IEnumerable<TeamData>> GetTeamDataList(IEnumerable<string> teamIDs);
+        Task<IEnumerable<TeamData>> GetTeamDataListByTeamID(IEnumerable<string> teamIDs);
 
         /// <summary>
         /// 取得會員的車隊列表資料
@@ -78,12 +79,12 @@ namespace GoBike.Team.Repository.Interface
         Task<Tuple<bool, string>> UpdateTeamData(TeamData teamData);
 
         /// <summary>
-        /// 更新車隊副隊長
+        /// 更新車隊副隊長群
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="viceLeaderID">viceLeaderID</param>
+        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
         /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamViceLeader(string teamID, string viceLeaderID);
+        Task<Tuple<bool, string>> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
 
         #endregion 車隊資料
 

@@ -6,6 +6,38 @@ using System.Collections.Generic;
 namespace GoBike.Team.Repository.Models
 {
     /// <summary>
+    /// 車隊審核狀態
+    /// </summary>
+    public enum TeamExamineStatusType
+    {
+        /// <summary>
+        /// 關閉
+        /// </summary>
+        Close = 0,
+
+        /// <summary>
+        /// 開啟
+        /// </summary>
+        Open = 1
+    }
+
+    /// <summary>
+    /// 車隊搜尋狀態
+    /// </summary>
+    public enum TeamSearchStatusType
+    {
+        /// <summary>
+        /// 關閉
+        /// </summary>
+        Close = 0,
+
+        /// <summary>
+        /// 開啟
+        /// </summary>
+        Open = 1
+    }
+
+    /// <summary>
     /// 車隊資料
     /// </summary>
     public class TeamData
@@ -40,10 +72,10 @@ namespace GoBike.Team.Repository.Models
         public DateTime TeamCreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamCreatorID
+        /// Gets or sets TeamLeaderID
         /// </summary>
-        [BsonElement("TeamCreatorID")]
-        public string TeamCreatorID { get; set; }
+        [BsonElement("TeamLeaderID")]
+        public string TeamLeaderID { get; set; }
 
         /// <summary>
         /// Gets or sets TeamEventIDs
@@ -106,9 +138,9 @@ namespace GoBike.Team.Repository.Models
         public int TeamSearchStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamViceLeaderID
+        /// Gets or sets TeamViceLeaderIDs
         /// </summary>
-        [BsonElement("TeamViceLeaderID")]
-        public string TeamViceLeaderID { get; set; }
+        [BsonElement("TeamViceLeaderIDs")]
+        public IEnumerable<string> TeamViceLeaderIDs { get; set; }
     }
 }

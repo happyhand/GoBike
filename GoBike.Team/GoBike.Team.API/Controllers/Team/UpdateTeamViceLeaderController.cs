@@ -38,14 +38,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamAction">teamAction</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamActionDto teamAction)
+        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.UpdateTeamViceLeader(teamAction);
+                string result = await this.teamService.UpdateTeamViceLeader(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("更新車隊副隊長成功");
@@ -55,7 +55,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamAction.TeamID} MemberID:{teamAction.MemberID} ActionID:{teamAction.ActionID}\n{ex}");
+                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}\n{ex}");
                 return BadRequest("更新車隊副隊長發生錯誤.");
             }
         }
