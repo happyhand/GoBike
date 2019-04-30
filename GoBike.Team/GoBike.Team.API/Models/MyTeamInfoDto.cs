@@ -1,4 +1,4 @@
-﻿using GoBike.Team.Service.Models;
+﻿using GoBike.Team.Service.Models.Data;
 using System.Collections.Generic;
 
 namespace GoBike.Team.API.Models

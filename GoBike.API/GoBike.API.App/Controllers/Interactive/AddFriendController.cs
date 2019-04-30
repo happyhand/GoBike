@@ -27,7 +27,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<AddFriendController> logger;
 
         /// <summary>
         /// 建構式

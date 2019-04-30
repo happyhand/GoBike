@@ -22,7 +22,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<UploadPhotoController> logger;
 
         /// <summary>
         /// memberService

@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -45,10 +45,10 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, false);
+                string result = await this.teamService.JoinTeam(teamCommand, false, true);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("加入車隊成功");
+                    return Ok("加入車隊成功.");
                 }
 
                 return BadRequest(result);
@@ -70,10 +70,10 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, true);
+                string result = await this.teamService.JoinTeam(teamCommand, true, false);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("加入車隊成功");
+                    return Ok("加入車隊成功.");
                 }
 
                 return BadRequest(result);

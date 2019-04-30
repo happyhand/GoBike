@@ -1,4 +1,6 @@
-﻿namespace GoBike.Team.Service.Models
+﻿using GoBike.API.Service.Models.Data;
+
+namespace GoBike.API.Service.Models.Command
 {
     /// <summary>
     /// 車隊指令資料

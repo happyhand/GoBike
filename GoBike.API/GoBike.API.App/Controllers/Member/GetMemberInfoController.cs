@@ -25,7 +25,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<GetMemberInfoController> logger;
 
         /// <summary>
         /// mapper

@@ -3,33 +3,28 @@ using GoBike.API.App.Filters;
 using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interactive;
-using GoBike.API.Service.Interface.Interactive;
+using GoBike.API.Service.Interface.Team;
+using GoBike.API.Service.Models.Command;
 using GoBike.API.Service.Models.Response;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GoBike.API.App.Controllers.Interactive
+namespace GoBike.API.App.Controllers.Team
 {
     /// <summary>
-    /// 取得好友名單
+    /// 申請加入車隊
     /// </summary>
-    [Route("api/friend/[controller]")]
     [ApiController]
-    public class GetFriendListController : ApiController
+    public class ApplyForJoinTeamController : ApiController
     {
-        /// <summary>
-        /// memberService
-        /// </summary>
-        private readonly IInteractiveService interactiveService;
-
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<GetFriendListController> logger;
+        private readonly ILogger<ApplyForJoinTeamController> logger;
 
         /// <summary>
         /// mapper
@@ -37,30 +32,38 @@ namespace GoBike.API.App.Controllers.Interactive
         private readonly IMapper mapper;
 
         /// <summary>
+        /// memberService
+        /// </summary>
+        private readonly ITeamService teamService;
+
+        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
-        /// <param name="interactiveService">interactiveService</param>
-        public GetFriendListController(ILogger<GetFriendListController> logger, IMapper mapper, IInteractiveService interactiveService)
+        /// <param name="memberService">memberService</param>
+        public ApplyForJoinTeamController(ILogger<ApplyForJoinTeamController> logger, IMapper mapper, ITeamService teamService)
         {
             this.logger = logger;
             this.mapper = mapper;
-            this.interactiveService = interactiveService;
+            this.teamService = teamService;
         }
 
         /// <summary>
-        /// GET
+        /// POST - 取得申請請求列表
         /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
-        [HttpGet]
+        [HttpPost]
+        [Route("api/team/[controller]/getRequestList")]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetApplyForRequestList(TeamCommandDto teamCommand)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.GetFriendList(new InteractiveInfoDto() { InitiatorID = memberID });
+                teamCommand.ExaminerID = memberID;
+                ResponseResultDto responseResultDto = await this.teamService.GetApplyForRequestList(teamCommand);
                 if (responseResultDto.Ok)
                 {
                     return Ok(this.mapper.Map<IEnumerable<MemberViewDto>>(responseResultDto.Data));
@@ -70,8 +73,8 @@ namespace GoBike.API.App.Controllers.Interactive
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
-                return BadRequest("取得好友名單發生錯誤.");
+                this.logger.LogError($"Get Apply For Request List Error >>> TemaID:{teamCommand.TeamID}\n{ex}");
+                return BadRequest("取得申請請求列表發生錯誤.");
             }
         }
     }

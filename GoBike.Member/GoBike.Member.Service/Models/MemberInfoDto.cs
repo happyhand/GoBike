@@ -6,6 +6,16 @@
     public class MemberInfoDto
     {
         /// <summary>
+        /// 建構式
+        /// </summary>
+        public MemberInfoDto()
+        {
+            this.BodyHeight = -1;
+            this.BodyWeight = -1;
+            this.Gender = -1;
+        }
+
+        /// <summary>
         /// Gets or sets BirthDayDate
         /// </summary>
         public string BirthDayDate { get; set; }
@@ -13,12 +23,12 @@
         /// <summary>
         /// Gets or sets BodyHeight
         /// </summary>
-        public decimal? BodyHeight { get; set; }
+        public decimal BodyHeight { get; set; }
 
         /// <summary>
         /// Gets or sets BodyWeight
         /// </summary>
-        public decimal? BodyWeight { get; set; }
+        public decimal BodyWeight { get; set; }
 
         /// <summary>
         /// Gets or sets Email
@@ -28,7 +38,7 @@
         /// <summary>
         /// Gets or sets Gender
         /// </summary>
-        public int? Gender { get; set; }
+        public int Gender { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID

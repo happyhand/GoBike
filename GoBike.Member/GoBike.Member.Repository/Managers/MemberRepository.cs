@@ -2,9 +2,11 @@
 using GoBike.Member.Repository.Interface;
 using GoBike.Member.Repository.Models;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GoBike.Member.Repository.Managers
@@ -25,6 +27,11 @@ namespace GoBike.Member.Repository.Managers
         private readonly IMongoCollection<MemberData> memberDatas;
 
         /// <summary>
+        /// serialNumberDatas
+        /// </summary>
+        private readonly IMongoCollection<SerialNumberData> serialNumberDatas;
+
+        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
@@ -34,6 +41,7 @@ namespace GoBike.Member.Repository.Managers
             IMongoClient client = new MongoClient(AppSettingHelper.Appsetting.MongoDBConfig.ConnectionString);
             IMongoDatabase db = client.GetDatabase(AppSettingHelper.Appsetting.MongoDBConfig.MemberDatabase);
             this.memberDatas = db.GetCollection<MemberData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Member);
+            this.serialNumberDatas = db.GetCollection<SerialNumberData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.SerialNumber);
         }
 
         /// <summary>
@@ -133,6 +141,25 @@ namespace GoBike.Member.Repository.Managers
         }
 
         /// <summary>
+        /// 取得會員資料列表
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>MemberDatas</returns>
+        public async Task<IEnumerable<MemberData>> GetMemebrDataList(IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.In("MemberID", memberIDs);
+                return await this.memberDatas.Find(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Memebr Data List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 更新會員資料
         /// </summary>
         /// <param name="memberData">memberData</param>
@@ -162,22 +189,30 @@ namespace GoBike.Member.Repository.Managers
             }
         }
 
-        ///// <summary>
-        ///// 建立會員序號
-        ///// </summary>
-        ///// <returns>long</returns>
-        //private async Task<string> CreateMemberSerialNumber()
-        //{
-        //    long count = await this.serialNumbers.CountDocumentsAsync(new BsonDocument());
-        //    if (count == 0)
-        //    {
-        //        await this.serialNumbers.InsertOneAsync(new SerialNumber() { SequenceName = "MemberSerialNumber", SequenceValue = 10001 });
-        //    }
+        /// <summary>
+        /// 取得會員序號
+        /// </summary>
+        /// <returns>long</returns>
+        public async Task<Tuple<long, string>> GetMemberSerialNumber()
+        {
+            try
+            {
+                long count = await this.serialNumberDatas.CountDocumentsAsync(new BsonDocument());
+                if (count == 0)
+                {
+                    await this.serialNumberDatas.InsertOneAsync(new SerialNumberData() { SequenceName = "MemberID", SequenceValue = 100001 });
+                }
 
-        //    var filter = Builders<SerialNumber>.Filter.Eq("SequenceName", "MemberSerialNumber");
-        //    var update = Builders<SerialNumber>.Update.Inc("SequenceValue", 1);
-        //    SerialNumber result = await this.serialNumbers.FindOneAndUpdateAsync(filter, update);
-        //    return result.SequenceValue;
-        //}
+                var filter = Builders<SerialNumberData>.Filter.Eq("SequenceName", "MemberID");
+                var update = Builders<SerialNumberData>.Update.Inc("SequenceValue", 1);
+                SerialNumberData result = await this.serialNumberDatas.FindOneAndUpdateAsync(filter, update);
+                return Tuple.Create(result.SequenceValue, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Member Serial Number Error\n{ex}");
+                return Tuple.Create<long, string>(-1, "取得會員序號發生錯誤.");
+            }
+        }
     }
 }

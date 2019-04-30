@@ -1,5 +1,6 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
+using GoBike.Team.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -57,7 +58,7 @@ namespace GoBike.Team.API.Controllers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(teamCommand)}\n{ex}");
-                return BadRequest("車隊編輯發生錯誤");
+                return BadRequest("車隊編輯發生錯誤.");
             }
         }
     }

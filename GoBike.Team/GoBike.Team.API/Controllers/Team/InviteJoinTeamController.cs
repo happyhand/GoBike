@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -38,24 +38,24 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.InviteJoinTeam(interactiveInfo);
+                string result = await this.teamService.InviteJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("邀請加入車隊成功");
+                    return Ok("邀請加入車隊成功.");
                 }
 
                 return BadRequest(result);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Invite Join Team Error >>> TemaID:{interactiveInfo.TeamID} MemberID:{interactiveInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Invite Join Team Error >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
                 return BadRequest("邀請加入車隊發生錯誤.");
             }
         }

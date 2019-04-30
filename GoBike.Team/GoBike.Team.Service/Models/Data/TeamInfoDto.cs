@@ -1,12 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using GoBike.Team.Repository.Models;
+using System.Collections.Generic;
 
-namespace GoBike.Team.Service.Models
+namespace GoBike.Team.Service.Models.Data
 {
     /// <summary>
     /// 車隊資料
     /// </summary>
     public class TeamInfoDto
     {
+        /// <summary>
+        /// 建構式
+        /// </summary>
+        public TeamInfoDto()
+        {
+            this.TeamExamineStatus = (int)TeamExamineStatusType.None;
+            this.TeamSearchStatus = (int)TeamSearchStatusType.None;
+        }
+
         /// <summary>
         /// Gets or sets TeamCoverPhoto
         /// </summary>

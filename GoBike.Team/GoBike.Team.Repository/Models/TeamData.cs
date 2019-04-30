@@ -11,6 +11,11 @@ namespace GoBike.Team.Repository.Models
     public enum TeamExamineStatusType
     {
         /// <summary>
+        /// 無設定
+        /// </summary>
+        None = -1,
+
+        /// <summary>
         /// 關閉
         /// </summary>
         Close = 0,
@@ -26,6 +31,11 @@ namespace GoBike.Team.Repository.Models
     /// </summary>
     public enum TeamSearchStatusType
     {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = -1,
+
         /// <summary>
         /// 關閉
         /// </summary>

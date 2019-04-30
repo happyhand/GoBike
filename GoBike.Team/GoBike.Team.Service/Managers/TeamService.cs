@@ -2,7 +2,8 @@
 using GoBike.Team.Repository.Interface;
 using GoBike.Team.Repository.Models;
 using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
+using GoBike.Team.Service.Models.Data;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -33,11 +34,6 @@ namespace GoBike.Team.Service.Managers
         private readonly IMapper mapper;
 
         /// <summary>
-        /// memberRepository
-        /// </summary>
-        private readonly IMemberRepository memberRepository;
-
-        /// <summary>
         /// teamRepository
         /// </summary>
         private readonly ITeamRepository teamRepository;
@@ -48,14 +44,12 @@ namespace GoBike.Team.Service.Managers
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="teamRepository">teamRepository</param>
-        /// <param name="memberRepository">memberRepository</param>
         /// <param name="eventRepository">eventRepository</param>
-        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IMemberRepository memberRepository, IEventRepository eventRepository)
+        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IEventRepository eventRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.teamRepository = teamRepository;
-            this.memberRepository = memberRepository;
             this.eventRepository = eventRepository;
         }
 
@@ -157,17 +151,19 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 取得我的車隊資訊列表
         /// </summary>
-        /// <param name="memberID">memberID</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(TeamInfoDto, TeamInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(string memberID)
+        public async Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(TeamCommandDto teamCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(memberID))
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>(null, null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>(null, null, verifyTeamCommandResult);
                 }
 
+                string memberID = teamCommand.TargetID;
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(memberID);
                 IEnumerable<TeamData> leaderTeamDatas = teamDatas.Where(x => x.TeamLeaderID.Equals(memberID));
                 IEnumerable<TeamData> joinTeamDatas = teamDatas.SkipWhile(x => x.TeamLeaderID.Equals(memberID));
@@ -175,7 +171,7 @@ namespace GoBike.Team.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get My Team Info List Error >>> MemberID:{memberID}\n{ex}");
+                this.logger.LogError($"Get My Team Info List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
                 return Tuple.Create<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>(null, null, "取得我的車隊資訊列表發生錯誤.");
             }
         }
@@ -185,48 +181,42 @@ namespace GoBike.Team.Service.Managers
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <param name="isExamine">isExamine</param>
+        /// <param name="isInvite">isInvite</param>
         /// <returns>string</returns>
-        public async Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine)
+        public async Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine, bool isInvite)
         {
             try
             {
-                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, isExamine, true);
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, isExamine, true, false);
                 if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
                     return verifyTeamCommandResult;
                 }
 
-                string verifyJoinTeamQualificationResult = await this.VerifyJoinTeamQualification(teamCommand.TeamID, teamCommand.TargetID);
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                string verifyJoinTeamQualificationResult = this.VerifyJoinTeamQualification(teamData, teamCommand.TargetID);
                 if (!string.IsNullOrEmpty(verifyJoinTeamQualificationResult))
                 {
                     return verifyJoinTeamQualificationResult;
                 }
 
-                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
-                if (teamData == null)
+                if (isInvite)
                 {
-                    return "車隊不存在.";
-                }
-
-                if (isExamine)
-                {
-                    string verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, false, true, teamCommand.TargetID);
-                    if (!string.IsNullOrEmpty(verifyTeamExaminerAuthorityResult))
+                    InteractiveData interactiveData = await this.teamRepository.GetTeamInteractiveData(teamCommand.TeamID, teamCommand.TargetID);
+                    if (interactiveData == null || interactiveData.Status != (int)InteractiveStatusType.InviteJoin)
                     {
-                        return verifyTeamExaminerAuthorityResult;
+                        return "車隊無邀請會員加入.";
                     }
                 }
                 else
                 {
-                    InteractiveData interactiveData = await this.teamRepository.GetTeamInteractiveData(teamCommand.TeamID, teamCommand.TargetID);
-                    if (interactiveData == null)
+                    if (isExamine)
                     {
-                        return "無車隊互動資料.";
-                    }
-
-                    if (interactiveData.Status != (int)InteractiveStatusType.InviteJoin)
-                    {
-                        return "車隊無邀請會員加入.";
+                        string verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, false, true, teamCommand.TargetID);
+                        if (!string.IsNullOrEmpty(verifyTeamExaminerAuthorityResult))
+                        {
+                            return verifyTeamExaminerAuthorityResult;
+                        }
                     }
                 }
 
@@ -244,7 +234,7 @@ namespace GoBike.Team.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Join Team Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID} IsExamine:{isExamine}\n{ex}");
+                this.logger.LogError($"Join Team Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID} IsExamine:{isExamine} IsInvite:{isInvite}\n{ex}");
                 return "加入車隊發生錯誤.";
             }
         }
@@ -305,55 +295,25 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 建立車隊
         /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
-        public async Task<string> Register(TeamInfoDto teamInfo)
+        public async Task<string> Register(TeamCommandDto teamCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(teamInfo.TeamName))
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, true);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return "車隊名稱無效.";
+                    return verifyTeamCommandResult;
                 }
 
-                if (string.IsNullOrEmpty(teamInfo.TeamLocation))
+                Tuple<TeamData, string> createTeamDataResult = await this.CreateTeamData(teamCommand.Data);
+                if (!string.IsNullOrEmpty(createTeamDataResult.Item2))
                 {
-                    return "車隊所在地無效.";
+                    return createTeamDataResult.Item2;
                 }
 
-                if (string.IsNullOrEmpty(teamInfo.TeamInfo))
-                {
-                    return "車隊簡介無效.";
-                }
-
-                if (string.IsNullOrEmpty(teamInfo.TeamPhoto))
-                {
-                    return "未上傳車隊頭像.";
-                }
-
-                if (string.IsNullOrEmpty(teamInfo.TeamCoverPhoto))
-                {
-                    return "未上傳車隊封面.";
-                }
-
-                if (string.IsNullOrEmpty(teamInfo.TeamLeaderID))
-                {
-                    return "創建人會員編號無效.";
-                }
-
-                MemberData memberData = await this.memberRepository.GetMemebrData(teamInfo.TeamLeaderID);
-                if (memberData == null)
-                {
-                    return "創建人不存在.";
-                }
-
-                bool isMultipleTeam = (await this.teamRepository.GetTeamDataListByTeamName(teamInfo.TeamName, true)).FirstOrDefault() != null;
-                if (isMultipleTeam)
-                {
-                    return "車隊名稱重複.";
-                }
-
-                TeamData teamData = this.CreateTeamData(teamInfo);
+                TeamData teamData = createTeamDataResult.Item1;
                 bool isSuccess = await this.teamRepository.CreateTeamData(teamData);
                 if (!isSuccess)
                 {
@@ -365,7 +325,7 @@ namespace GoBike.Team.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Data:{JsonConvert.SerializeObject(teamInfo)}\n{ex}");
+                this.logger.LogError($"Register Error >>> Data:{JsonConvert.SerializeObject(teamCommand)}\n{ex}");
                 return "建立車隊發生錯誤.";
             }
         }
@@ -386,7 +346,7 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
-                string verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, true, false, string.Empty);
+                string verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, true, false, string.Empty); //// 不需要對目標做審核，只要確定目前隊長的身分
                 if (!string.IsNullOrEmpty(verifyTeamExaminerAuthorityResult))
                 {
                     return verifyTeamExaminerAuthorityResult;
@@ -420,8 +380,9 @@ namespace GoBike.Team.Service.Managers
         /// 更新車隊副隊長
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
+        /// <param name="isAdd">isAdd</param>
         /// <returns>string</returns>
-        public async Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand)
+        public async Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand, bool isAdd)
         {
             try
             {
@@ -444,16 +405,29 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 IEnumerable<string> teamViceLeaderIDs = teamData.TeamViceLeaderIDs;
-                if (teamViceLeaderIDs.Contains(teamCommand.TargetID))
+                if (isAdd)
                 {
-                    return "該會員已是車隊副隊長.";
+                    if (teamViceLeaderIDs.Contains(teamCommand.TargetID))
+                    {
+                        return "該會員已是車隊副隊長.";
+                    }
+
+                    (teamViceLeaderIDs as List<string>).Add(teamCommand.TargetID);
+                }
+                else
+                {
+                    if (!teamViceLeaderIDs.Contains(teamCommand.TargetID))
+                    {
+                        return "該會員不是車隊副隊長.";
+                    }
+
+                    (teamViceLeaderIDs as List<string>).Remove(teamCommand.TargetID);
                 }
 
-                (teamViceLeaderIDs as List<string>).Add(teamCommand.TargetID);
                 Tuple<bool, string> result = await this.teamRepository.UpdateTeamViceLeaders(teamCommand.TeamID, teamViceLeaderIDs);
                 if (!result.Item1)
                 {
-                    this.logger.LogError($"Update Team Vice Leader Fail For Update Team Vice Leaders >>> Data:{JsonConvert.SerializeObject(teamData)} TeamViceLeaderIDs:{teamViceLeaderIDs}");
+                    this.logger.LogError($"Update Team Vice Leader Fail For Update Team Vice Leaders >>> TeamID:{teamCommand.TeamID} TeamViceLeaderIDs:{teamViceLeaderIDs}");
                     return result.Item2;
                 }
 
@@ -467,62 +441,56 @@ namespace GoBike.Team.Service.Managers
         }
 
         /// <summary>
-        /// 創建新車隊資料
+        /// 搜尋車隊資訊列表
         /// </summary>
-        /// <param name="teamInfoDto">teamInfoDto</param>
-        /// <returns>MemberData</returns>
-        private TeamData CreateTeamData(TeamInfoDto teamInfo)
+        /// <param name="teamSearchCommand">teamSearchCommand</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamInfoDto>, string>> SearchTeamInfoList(TeamSearchCommandDto teamSearchCommand)
         {
-            DateTime createDate = DateTime.Now;
-            string teamID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
-            TeamData teamData = this.mapper.Map<TeamData>(teamInfo);
-            teamData.TeamID = teamID;
-            teamData.TeamCreateDate = createDate;
-            //teamData.TeamSaveDeadline = createDate.AddDays(60);
-            teamData.TeamSaveDeadline = createDate.AddMinutes(30);
-            teamData.TeamViceLeaderIDs = new List<string>();
-            teamData.TeamPlayerIDs = new List<string>();
-            teamData.TeamBlacklistIDs = new List<string>();
-            teamData.TeamBlacklistedIDs = new List<string>();
-            teamData.TeamEventIDs = new List<string>();
-            return teamData;
+            try
+            {
+                string verifyTeamSearchCommandResult = this.VerifyTeamSearchCommand(teamSearchCommand);
+                if (!string.IsNullOrEmpty(verifyTeamSearchCommandResult))
+                {
+                    return Tuple.Create<IEnumerable<TeamInfoDto>, string>(null, verifyTeamSearchCommandResult);
+                }
+
+                int searchOpenStatus = (int)TeamSearchStatusType.Open;
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByTeamName(teamSearchCommand.SearchKey, false);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => !data.TeamBlacklistIDs.Contains(teamSearchCommand.SearcherID) && data.TeamSearchStatus == searchOpenStatus);
+                //// TODO 待確認是否要用 TeamID 搜尋
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamInfoDto>>(teamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Team Info List Error >>> SearcherID:{teamSearchCommand.SearcherID} SearchKey:{teamSearchCommand.SearchKey}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamInfoDto>, string>(null, "搜尋車隊資訊列表發生錯誤.");
+            }
         }
 
         /// <summary>
-        /// 車隊資料更新處理
+        /// 取得車隊資訊
         /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
-        /// <param name="teamData">teamData</param>
-        /// <returns>string</returns>
-        private async Task<string> UpdateTeamDataHandler(TeamInfoDto teamInfo, TeamData teamData)
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>Tuple(TeamInfoDto, string)</returns>
+        public async Task<Tuple<TeamInfoDto, string>> GetTeamInfo(TeamCommandDto teamCommand)
         {
-            if (!string.IsNullOrEmpty(teamInfo.TeamName))
+            try
             {
-                bool isMultipleTeam = (await this.teamRepository.GetTeamDataListByTeamName(teamInfo.TeamName, true)).FirstOrDefault() != null;
-                if (isMultipleTeam)
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, false, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return "車隊名稱重複.";
+                    return Tuple.Create<TeamInfoDto, string>(null, verifyTeamCommandResult);
                 }
 
-                teamData.TeamName = teamInfo.TeamName;
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                return Tuple.Create(this.mapper.Map<TeamInfoDto>(teamData), string.Empty);
             }
-
-            if (!string.IsNullOrEmpty(teamInfo.TeamLocation))
-                teamData.TeamLocation = teamInfo.TeamLocation;
-
-            if (!string.IsNullOrEmpty(teamInfo.TeamInfo))
-                teamData.TeamInfo = teamInfo.TeamInfo;
-
-            if (!string.IsNullOrEmpty(teamInfo.TeamPhoto))
-                teamData.TeamPhoto = teamInfo.TeamPhoto;
-
-            if (!string.IsNullOrEmpty(teamInfo.TeamCoverPhoto))
-                teamData.TeamCoverPhoto = teamInfo.TeamCoverPhoto;
-
-            teamData.TeamSearchStatus = teamInfo.TeamSearchStatus;
-            teamData.TeamExamineStatus = teamInfo.TeamExamineStatus;
-
-            return string.Empty;
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Info Error >>> TeamID:{teamCommand.TeamID}\n{ex}");
+                return Tuple.Create<TeamInfoDto, string>(null, "搜尋車隊資訊列表發生錯誤.");
+            }
         }
 
         /// <summary>
@@ -567,6 +535,32 @@ namespace GoBike.Team.Service.Managers
                 {
                     return "無車隊資訊.";
                 }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 驗證車隊搜尋指令資料
+        /// </summary>
+        /// <param name="teamSearchCommand">teamSearchCommand</param>
+        /// <param name="isVerifyTarger">isVerifyTarger</param>
+        /// <returns>string</returns>
+        private string VerifyTeamSearchCommand(TeamSearchCommandDto teamSearchCommand)
+        {
+            if (teamSearchCommand == null)
+            {
+                return "車隊搜尋指令資料不存在.";
+            }
+
+            if (string.IsNullOrEmpty(teamSearchCommand.SearcherID))
+            {
+                return "搜尋者會員編號無效.";
+            }
+
+            if (string.IsNullOrEmpty(teamSearchCommand.SearchKey))
+            {
+                return "無車隊搜尋關鍵字.";
             }
 
             return string.Empty;
@@ -629,31 +623,19 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 驗證加入車隊資格
         /// </summary>
-        /// <param name="teamID">teamID</param>
+        /// <param name="teamData">teamData</param>
         /// <param name="memberID">memberID</param>
         /// <returns>string</returns>
-        private async Task<string> VerifyJoinTeamQualification(string teamID, string memberID)
+        private string VerifyJoinTeamQualification(TeamData teamData, string memberID)
         {
-            if (string.IsNullOrEmpty(teamID))
-            {
-                return "車隊編號無效.";
-            }
-
-            if (string.IsNullOrEmpty(memberID))
-            {
-                return "會員編號無效.";
-            }
-
-            TeamData teamData = await this.teamRepository.GetTeamData(teamID);
             if (teamData == null)
             {
                 return "車隊不存在.";
             }
 
-            MemberData memberData = await this.memberRepository.GetMemebrData(memberID);
-            if (memberData == null)
+            if (string.IsNullOrEmpty(memberID))
             {
-                return "會員不存在.";
+                return "會員編號無效.";
             }
 
             if (teamData.TeamLeaderID.Equals(memberID) || teamData.TeamPlayerIDs.Contains(memberID))
@@ -674,6 +656,106 @@ namespace GoBike.Team.Service.Managers
             return string.Empty;
         }
 
+        /// <summary>
+        /// 創建新車隊資料
+        /// </summary>
+        /// <param name="teamInfoDto">teamInfoDto</param>
+        /// <returns>Tuple(TeamData, string)</returns>
+        private async Task<Tuple<TeamData, string>> CreateTeamData(TeamInfoDto teamInfo)
+        {
+            if (string.IsNullOrEmpty(teamInfo.TeamName))
+            {
+                return Tuple.Create<TeamData, string>(null, "車隊名稱無效.");
+            }
+            else
+            {
+                bool isMultipleTeam = (await this.teamRepository.GetTeamDataListByTeamName(teamInfo.TeamName, true)).FirstOrDefault() != null;
+                if (isMultipleTeam)
+                {
+                    return Tuple.Create<TeamData, string>(null, "車隊名稱重複.");
+                }
+            }
+
+            if (string.IsNullOrEmpty(teamInfo.TeamLocation))
+            {
+                return Tuple.Create<TeamData, string>(null, "車隊所在地無效.");
+            }
+
+            if (string.IsNullOrEmpty(teamInfo.TeamInfo))
+            {
+                return Tuple.Create<TeamData, string>(null, "車隊簡介無效.");
+            }
+
+            if (string.IsNullOrEmpty(teamInfo.TeamPhoto))
+            {
+                return Tuple.Create<TeamData, string>(null, "未上傳車隊頭像.");
+            }
+
+            if (string.IsNullOrEmpty(teamInfo.TeamCoverPhoto))
+            {
+                return Tuple.Create<TeamData, string>(null, "未上傳車隊封面.");
+            }
+
+            if (string.IsNullOrEmpty(teamInfo.TeamLeaderID))
+            {
+                return Tuple.Create<TeamData, string>(null, "創建人會員編號無效.");
+            }
+
+            DateTime createDate = DateTime.Now;
+            string teamID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
+            TeamData teamData = this.mapper.Map<TeamData>(teamInfo);
+            teamData.TeamID = teamID;
+            teamData.TeamCreateDate = createDate;
+            //teamData.TeamSaveDeadline = createDate.AddDays(60);
+            teamData.TeamSaveDeadline = createDate.AddMinutes(30);
+            teamData.TeamViceLeaderIDs = new List<string>();
+            teamData.TeamPlayerIDs = new List<string>();
+            teamData.TeamBlacklistIDs = new List<string>();
+            teamData.TeamBlacklistedIDs = new List<string>();
+            teamData.TeamEventIDs = new List<string>();
+            return Tuple.Create<TeamData, string>(teamData, string.Empty);
+        }
+
+        /// <summary>
+        /// 車隊資料更新處理
+        /// </summary>
+        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="teamData">teamData</param>
+        /// <returns>string</returns>
+        private async Task<string> UpdateTeamDataHandler(TeamInfoDto teamInfo, TeamData teamData)
+        {
+            if (!string.IsNullOrEmpty(teamInfo.TeamName))
+            {
+                bool isMultipleTeam = (await this.teamRepository.GetTeamDataListByTeamName(teamInfo.TeamName, true)).FirstOrDefault() != null;
+                if (isMultipleTeam)
+                {
+                    return "車隊名稱重複.";
+                }
+
+                teamData.TeamName = teamInfo.TeamName;
+            }
+
+            if (!string.IsNullOrEmpty(teamInfo.TeamLocation))
+                teamData.TeamLocation = teamInfo.TeamLocation;
+
+            if (!string.IsNullOrEmpty(teamInfo.TeamInfo))
+                teamData.TeamInfo = teamInfo.TeamInfo;
+
+            if (!string.IsNullOrEmpty(teamInfo.TeamPhoto))
+                teamData.TeamPhoto = teamInfo.TeamPhoto;
+
+            if (!string.IsNullOrEmpty(teamInfo.TeamCoverPhoto))
+                teamData.TeamCoverPhoto = teamInfo.TeamCoverPhoto;
+
+            if (teamInfo.TeamSearchStatus != (int)TeamSearchStatusType.None)
+                teamData.TeamSearchStatus = teamInfo.TeamSearchStatus;
+
+            if (teamInfo.TeamExamineStatus != (int)TeamExamineStatusType.None)
+                teamData.TeamExamineStatus = teamInfo.TeamExamineStatus;
+
+            return string.Empty;
+        }
+
         #endregion 車隊資料
 
         #region 車隊互動資料
@@ -681,28 +763,35 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 申請加入車隊
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>string</returns>
-        public async Task<string> ApplyForJoinTeam(InteractiveInfoDto interactiveInfo)
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>Tuple(int, string)</returns>
+        public async Task<string> ApplyForJoinTeam(TeamCommandDto teamCommand)
         {
             try
             {
-                TeamData teamData = await this.teamRepository.GetTeamData(interactiveInfo.TeamID);
-                if (teamData == null)
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return "車隊不存在.";
+                    return verifyTeamCommandResult;
                 }
 
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
                 if (teamData.TeamExamineStatus == (int)TeamExamineStatusType.Close)
                 {
-                    return await this.JoinTeam(new TeamCommandDto() { TeamID = interactiveInfo.TeamID, TargetID = interactiveInfo.MemberID }, false);
+                    return await this.JoinTeam(teamCommand, false, false);
                 }
 
-                return await this.CreateInteractiveData(interactiveInfo.TeamID, interactiveInfo.MemberID, (int)InteractiveStatusType.ApplyForJoin);
+                string verifyResult = this.VerifyJoinTeamQualification(teamData, teamCommand.TargetID);
+                if (!string.IsNullOrEmpty(verifyResult))
+                {
+                    return verifyResult;
+                }
+
+                return await this.CreateTeamInteractiveData(teamCommand.TeamID, teamCommand.TargetID, (int)InteractiveStatusType.ApplyForJoin);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Apply For Join Team Error >>> TemaID:{interactiveInfo.TeamID} MemberID:{interactiveInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Apply For Join Team Error >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
                 return "申請加入車隊發生錯誤.";
             }
         }
@@ -710,51 +799,59 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 取得申請請求列表
         /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <returns>Tuple(MemberInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetApplyForRequestList(string teamID)
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>Tuple(strings, string)</returns>
+        public async Task<Tuple<IEnumerable<string>, string>> GetApplyForRequestList(TeamCommandDto teamCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(teamID))
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "車隊編號無效.");
+                    return Tuple.Create<IEnumerable<string>, string>(null, verifyTeamCommandResult);
                 }
 
-                IEnumerable<InteractiveData> interactiveDatas = await this.teamRepository.GetTeamInteractiveDataListForApplyForJoin(teamID);
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                string verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, false, false, string.Empty);
+                if (!string.IsNullOrEmpty(verifyTeamExaminerAuthorityResult))
+                {
+                    return Tuple.Create<IEnumerable<string>, string>(null, verifyTeamExaminerAuthorityResult);
+                }
+
+                IEnumerable<InteractiveData> interactiveDatas = await this.teamRepository.GetTeamInteractiveDataListForApplyForJoin(teamCommand.TeamID);
                 IEnumerable<string> memberIDs = interactiveDatas.Select(x => x.MemberID);
-                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(memberIDs);
-                return Tuple.Create(this.mapper.Map<IEnumerable<MemberInfoDto>>(memberDatas), string.Empty);
+                return Tuple.Create(memberIDs, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Apply For Request List Error >>> TemaID:{teamID}\n{ex}");
-                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得申請請求列表發生錯誤.");
+                this.logger.LogError($"Get Apply For Request List Error >>> TemaID:{teamCommand.TeamID}\n{ex}");
+                return Tuple.Create<IEnumerable<string>, string>(null, "取得申請請求列表發生錯誤.");
             }
         }
 
         /// <summary>
         /// 取得邀請請求列表
         /// </summary>
-        /// <param name="memberID">memberID</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(string memberID)
+        public async Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(TeamCommandDto teamCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(memberID))
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<TeamInfoDto>, string>(null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<TeamInfoDto>, string>(null, verifyTeamCommandResult);
                 }
 
-                IEnumerable<InteractiveData> interactiveDatas = await this.teamRepository.GetTeamInteractiveDataListForInviteJoin(memberID);
+                IEnumerable<InteractiveData> interactiveDatas = await this.teamRepository.GetTeamInteractiveDataListForInviteJoin(teamCommand.TargetID);
                 IEnumerable<string> teamIDs = interactiveDatas.Select(x => x.TeamID);
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByTeamID(teamIDs);
                 return Tuple.Create(this.mapper.Map<IEnumerable<TeamInfoDto>>(teamDatas), string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Invite Request List Error >>> MemberID:{memberID}\n{ex}");
+                this.logger.LogError($"Get Invite Request List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
                 return Tuple.Create<IEnumerable<TeamInfoDto>, string>(null, "取得邀請請求列表發生錯誤.");
             }
         }
@@ -762,36 +859,43 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 邀請加入車隊
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
-        public async Task<string> InviteJoinTeam(InteractiveInfoDto interactiveInfo)
+        public async Task<string> InviteJoinTeam(TeamCommandDto teamCommand)
         {
             try
             {
-                return await this.CreateInteractiveData(interactiveInfo.TeamID, interactiveInfo.MemberID, (int)InteractiveStatusType.InviteJoin);
+                string verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false);
+                if (!string.IsNullOrEmpty(verifyTeamCommandResult))
+                {
+                    return verifyTeamCommandResult;
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                string verifyResult = this.VerifyJoinTeamQualification(teamData, teamCommand.TargetID);
+                if (!string.IsNullOrEmpty(verifyResult))
+                {
+                    return verifyResult;
+                }
+
+                return await this.CreateTeamInteractiveData(teamCommand.TeamID, teamCommand.TargetID, (int)InteractiveStatusType.InviteJoin);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Invite Join Team Error >>> TemaID:{interactiveInfo.TeamID} MemberID:{interactiveInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Invite Join Team Error >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
                 return "邀請加入車隊發生錯誤.";
             }
         }
 
         /// <summary>
-        /// 建立互動資料
+        /// 建立車隊互動資料
         /// </summary>
         /// <param name="temaID">temaID</param>
         /// <param name="memberID">memberID</param>
         /// <param name="status">status</param>
         /// <returns>string</returns>
-        private async Task<string> CreateInteractiveData(string teamID, string memberID, int status)
+        private async Task<string> CreateTeamInteractiveData(string teamID, string memberID, int status)
         {
-            string verifyResult = await this.VerifyJoinTeamQualification(teamID, memberID);
-            if (!string.IsNullOrEmpty(verifyResult))
-            {
-                return verifyResult;
-            }
-
             InteractiveData interactiveData = await this.teamRepository.GetTeamInteractiveData(teamID, memberID);
             if (interactiveData != null)
             {
@@ -810,7 +914,7 @@ namespace GoBike.Team.Service.Managers
             bool isSuccess = await this.teamRepository.CreateTeamInteractiveData(interactiveData);
             if (!isSuccess)
             {
-                this.logger.LogError($"Create Interactive Data Fail>>> TeamID:{teamID} MemberID:{memberID} Status:{status} Data:{JsonConvert.SerializeObject(interactiveData)}");
+                this.logger.LogError($"Create Team Interactive Data Fail>>> TeamID:{teamID} MemberID:{memberID} Status:{status} Data:{JsonConvert.SerializeObject(interactiveData)}");
                 return "建立車隊互動資料失敗.";
             }
 

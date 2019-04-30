@@ -1,4 +1,4 @@
-﻿namespace GoBike.Team.Service.Models
+﻿namespace GoBike.Team.Service.Models.Data
 {
     /// <summary>
     /// 車隊互動資料

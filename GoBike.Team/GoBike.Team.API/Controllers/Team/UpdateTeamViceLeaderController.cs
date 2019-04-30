@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,7 +10,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 更新車隊副隊長
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/team/[controller]/[action]")]
     [ApiController]
     public class UpdateTeamViceLeaderController : ControllerBase
     {
@@ -36,27 +36,52 @@ namespace GoBike.Team.API.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// POST - 新增車隊副隊長
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Add(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.UpdateTeamViceLeader(teamCommand);
+                string result = await this.teamService.UpdateTeamViceLeader(teamCommand, true);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("更新車隊副隊長成功");
+                    return Ok("新增車隊副隊長成功.");
                 }
 
                 return BadRequest(result);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}\n{ex}");
-                return BadRequest("更新車隊副隊長發生錯誤.");
+                this.logger.LogError($"Add Team Vice Leader Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return BadRequest("新增車隊副隊長發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// POST - 移除車隊副隊長
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        public async Task<IActionResult> Remove(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string result = await this.teamService.UpdateTeamViceLeader(teamCommand, false);
+                if (string.IsNullOrEmpty(result))
+                {
+                    return Ok("移除車隊副隊長成功.");
+                }
+
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Remove Team Vice Leader Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return BadRequest("移除車隊副隊長發生錯誤.");
             }
         }
     }

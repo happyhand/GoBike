@@ -1,5 +1,4 @@
-﻿using GoBike.Team.API.Models;
-using GoBike.Team.Service.Interface;
+﻿using GoBike.Team.Service.Interface;
 using GoBike.Team.Service.Models.Command;
 using GoBike.Team.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -11,16 +10,16 @@ using System.Threading.Tasks;
 namespace GoBike.Team.API.Controllers.Team
 {
     /// <summary>
-    /// 取得我的車隊資訊列表
+    /// 搜尋車隊資訊列表
     /// </summary>
     [Route("api/team/[controller]")]
     [ApiController]
-    public class GetMyTeamInfoListController : ControllerBase
+    public class SearchTeamInfoListController : ControllerBase
     {
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<GetMyTeamInfoListController> logger;
+        private readonly ILogger<SearchTeamInfoListController> logger;
 
         /// <summary>
         /// teamService
@@ -32,7 +31,7 @@ namespace GoBike.Team.API.Controllers.Team
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="teamService">teamService</param>
-        public GetMyTeamInfoListController(ILogger<GetMyTeamInfoListController> logger, ITeamService teamService)
+        public SearchTeamInfoListController(ILogger<SearchTeamInfoListController> logger, ITeamService teamService)
         {
             this.logger = logger;
             this.teamService = teamService;
@@ -41,25 +40,25 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamSearchCommand">teamSearchCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Post(TeamSearchCommandDto teamSearchCommand)
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetMyTeamInfoList(teamCommand);
-                if (string.IsNullOrEmpty(result.Item3))
+                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.SearchTeamInfoList(teamSearchCommand);
+                if (string.IsNullOrEmpty(result.Item2))
                 {
-                    return Ok(new MyTeamInfoDto { LeaderTeamDatas = result.Item1, JoinTeamDatas = result.Item2 });
+                    return Ok(result.Item1);
                 }
 
-                return BadRequest(result.Item3);
+                return BadRequest(result.Item2);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get My Team Info List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
-                return BadRequest("取得我的車隊資訊列表發生錯誤.");
+                this.logger.LogError($"Search Team Info List Error >>> SearcherID:{teamSearchCommand.SearcherID} SearchKey:{teamSearchCommand.SearchKey}\n{ex}");
+                return BadRequest("搜尋車隊資訊列表發生錯誤.");
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GoBike.Team.Repository.Models;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Data;
 
 namespace GoBike.Team.API.AutoMapperProfile
 {

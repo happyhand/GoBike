@@ -46,6 +46,11 @@
                 /// Gets or sets Member
                 /// </summary>
                 public string Member { get; set; }
+
+                /// <summary>
+                /// Gets or sets SerialNumber
+                /// </summary>
+                public string SerialNumber { get; set; }
             }
         }
 

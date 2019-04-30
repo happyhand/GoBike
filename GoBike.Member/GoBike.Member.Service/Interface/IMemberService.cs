@@ -1,5 +1,6 @@
 ﻿using GoBike.Member.Service.Models;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GoBike.Member.Service.Interface
@@ -25,6 +26,13 @@ namespace GoBike.Member.Service.Interface
         Task<Tuple<MemberInfoDto, string>> GetMemberInfo(MemberInfoDto memberInfo);
 
         /// <summary>
+        /// 取得會員資訊列表
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(MemberInfoDtos, string)</returns>
+        Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetMemberInfoList(IEnumerable<string> memberIDs);
+
+        /// <summary>
         /// 會員登入
         /// </summary>
         /// <param name="memberInfo">memberInfo</param>
@@ -37,12 +45,5 @@ namespace GoBike.Member.Service.Interface
         /// <param name="memberInfo">memberInfo</param>
         /// <returns>string</returns>
         Task<string> Register(MemberInfoDto memberInfo);
-
-        /// <summary>
-        /// 忘記密碼
-        /// </summary>
-        /// <param name="email">email</param>
-        /// <returns>Tuple(string, string)</returns>
-        Task<Tuple<string, string>> ResetPassword(string email);
     }
 }

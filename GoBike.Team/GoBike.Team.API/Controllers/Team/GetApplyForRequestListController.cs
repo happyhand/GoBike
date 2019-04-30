@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +39,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
         {
             try
             {
-                Tuple<IEnumerable<MemberInfoDto>, string> result = await this.teamService.GetApplyForRequestList(interactiveInfo.TeamID);
+                Tuple<IEnumerable<string>, string> result = await this.teamService.GetApplyForRequestList(teamCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,7 +56,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Apply For Request List Error >>> TemaID:{interactiveInfo.TeamID}\n{ex}");
+                this.logger.LogError($"Get Apply For Request List Error >>> TemaID:{teamCommand.TeamID}\n{ex}");
                 return BadRequest("取得申請請求列表發生錯誤.");
             }
         }

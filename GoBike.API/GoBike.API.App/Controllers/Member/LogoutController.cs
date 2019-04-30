@@ -14,7 +14,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<LoginController> logger;
 
         /// <summary>
         /// 建構式

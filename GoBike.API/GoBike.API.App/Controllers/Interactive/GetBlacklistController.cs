@@ -29,7 +29,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger logger;
+        private readonly ILogger<GetBlacklistController> logger;
 
         /// <summary>
         /// mapper

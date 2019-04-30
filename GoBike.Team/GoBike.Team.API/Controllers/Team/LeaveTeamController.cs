@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -48,7 +48,7 @@ namespace GoBike.Team.API.Controllers.Team
                 string result = await this.teamService.LeaveTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
-                    return Ok("離開車隊成功");
+                    return Ok("離開車隊成功.");
                 }
 
                 return BadRequest(result);

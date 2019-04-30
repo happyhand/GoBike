@@ -1,5 +1,6 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models;
+using GoBike.Team.Service.Models.Command;
+using GoBike.Team.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +40,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetInviteRequestList(interactiveInfo.MemberID);
+                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetInviteRequestList(teamCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,7 +57,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Invite Request List Error >>> MemberID:{interactiveInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Get Invite Request List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
                 return BadRequest("取得邀請請求列表發生錯誤.");
             }
         }

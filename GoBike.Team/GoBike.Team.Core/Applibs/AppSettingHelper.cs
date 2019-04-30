@@ -33,11 +33,6 @@
             public string ConnectionString { get; set; }
 
             /// <summary>
-            /// Gets or sets MemberDatabase
-            /// </summary>
-            public string MemberDatabase { get; set; }
-
-            /// <summary>
             /// Gets or sets TeamDatabase
             /// </summary>
             public string TeamDatabase { get; set; }
@@ -56,11 +51,6 @@
                 /// Gets or sets Interactive
                 /// </summary>
                 public string Interactive { get; set; }
-
-                /// <summary>
-                /// Gets or sets Member
-                /// </summary>
-                public string Member { get; set; }
 
                 /// <summary>
                 /// Gets or sets Team

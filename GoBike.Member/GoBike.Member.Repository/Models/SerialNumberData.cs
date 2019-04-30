@@ -6,7 +6,7 @@ namespace GoBike.Member.Repository.Models
     /// <summary>
     /// 流水序號
     /// </summary>
-    public class SerialNumber
+    public class SerialNumberData
     {
         /// <summary>
         /// Gets or sets Id
@@ -23,6 +23,6 @@ namespace GoBike.Member.Repository.Models
         /// Gets or sets SequenceValue
         /// </summary>
         [BsonElement("SequenceValue")]
-        public string SequenceValue { get; set; }
+        public long SequenceValue { get; set; }
     }
 }
