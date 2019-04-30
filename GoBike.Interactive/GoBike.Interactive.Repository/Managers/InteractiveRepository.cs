@@ -60,123 +60,103 @@ namespace GoBike.Interactive.Repository.Managers
         /// <summary>
         /// 刪除互動資料
         /// </summary>
-        /// <param name="initiatorID">initiatorID</param>
-        /// <param name="passiveID">passiveID</param>
+        /// <param name="memberID">memberID</param>
         /// <returns>bool</returns>
-        public async Task<bool> DeleteInteractiveData(string initiatorID, string passiveID)
+        public async Task<bool> DeleteInteractiveData(string memberID)
         {
             try
             {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                    {
-                        builder.Eq("InitiatorID", initiatorID),
-                        builder.Eq("PassiveID", passiveID),
-                    };
-                DeleteResult result = await this.interactiveDatas.DeleteManyAsync(builder.And(filters));
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
+                DeleteResult result = await this.interactiveDatas.DeleteManyAsync(filter);
                 return result.IsAcknowledged && result.DeletedCount > 0;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Interactive Data Error >>> InitiatorID:{initiatorID} PassiveID:{passiveID}\n{ex}");
+                this.logger.LogError($"Delete Interactive Data Error >>> MemberID:{memberID}\n{ex}");
                 return false;
             }
         }
 
         /// <summary>
-        /// 取得加入好友請求列表
+        /// 取得互動資料
         /// </summary>
         /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        public async Task<IEnumerable<InteractiveData>> GetAddFriendRequestList(string memberID)
-        {
-            try
-            {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                    {
-                        builder.Eq("PassiveID", memberID),
-                        builder.Eq("Status", (int)FriendStatusType.Request),
-                    };
-                return await this.interactiveDatas.Find(builder.And(filters)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Add Friend Request List Error >>> MemberID:{memberID}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 取得黑名單列表
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        public async Task<IEnumerable<InteractiveData>> GetBlacklist(string memberID)
-        {
-            try
-            {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                    {
-                        builder.Eq("InitiatorID", memberID),
-                        builder.Eq("Status", (int)FriendStatusType.Black),
-                    };
-                return await this.interactiveDatas.Find(builder.And(filters)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Blacklist Error >>> MemberID:{memberID}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 取得好友列表
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        public async Task<IEnumerable<InteractiveData>> GetFriendList(string memberID)
-        {
-            try
-            {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                    {
-                        builder.Eq("InitiatorID", memberID),
-                        builder.Eq("Status", (int)FriendStatusType.Friend),
-                    };
-                return await this.interactiveDatas.Find(builder.And(filters)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 取得指定互動資料
-        /// </summary>
-        /// <param name="initiatorID">initiatorID</param>
-        /// <param name="passiveID">passiveID</param>
         /// <returns>InteractiveData</returns>
-        public async Task<InteractiveData> GetInteractiveData(string initiatorID, string passiveID)
+        public async Task<InteractiveData> GetInteractiveData(string memberID)
         {
             try
             {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                    {
-                        builder.Eq("InitiatorID", initiatorID),
-                        builder.Eq("PassiveID", passiveID),
-                    };
-                return await this.interactiveDatas.Find(builder.And(filters)).FirstOrDefaultAsync();
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
+                return await this.interactiveDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Interactive Data Error >>> InitiatorID:{initiatorID} PassiveID:{passiveID}\n{ex}");
+                this.logger.LogError($"Get Interactive Data Error >>> MemberID:{memberID}\n{ex}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// 更新黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="blacklistIDs">blacklistIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs)
+        {
+            try
+            {
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
+                UpdateDefinition<InteractiveData> update = Builders<InteractiveData>.Update.Set(data => data.BlacklistIDs, blacklistIDs);
+                UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新黑名單.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "黑名單未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Blacklist Error >>> MemberID:{memberID} BlacklistIDs:{JsonConvert.SerializeObject(blacklistIDs)}\n{ex}");
+                return Tuple.Create(false, "更新黑名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 更新好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="friendListIDs">friendListIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs)
+        {
+            try
+            {
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
+                UpdateDefinition<InteractiveData> update = Builders<InteractiveData>.Update.Set(data => data.FriendListIDs, friendListIDs);
+                UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新好友名單.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "好友名單未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Friend List Error >>> MemberID:{memberID} FriendListIDs:{JsonConvert.SerializeObject(friendListIDs)}\n{ex}");
+                return Tuple.Create(false, "更新好友名單發生錯誤.");
             }
         }
 
@@ -189,13 +169,8 @@ namespace GoBike.Interactive.Repository.Managers
         {
             try
             {
-                FilterDefinitionBuilder<InteractiveData> builder = Builders<InteractiveData>.Filter;
-                List<FilterDefinition<InteractiveData>> filters = new List<FilterDefinition<InteractiveData>>()
-                {
-                    builder.Eq("InitiatorID", interactiveData.InitiatorID),
-                    builder.Eq("PassiveID", interactiveData.PassiveID),
-                };
-                ReplaceOneResult result = await this.interactiveDatas.ReplaceOneAsync(builder.And(filters), interactiveData);
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("_id", interactiveData.Id);
+                ReplaceOneResult result = await this.interactiveDatas.ReplaceOneAsync(filter, interactiveData);
                 if (!result.IsAcknowledged)
                 {
                     return Tuple.Create(false, "無法更新互動資料.");
@@ -212,6 +187,38 @@ namespace GoBike.Interactive.Repository.Managers
             {
                 this.logger.LogError($"Update Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
                 return Tuple.Create(false, "更新互動資料發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 更新請求名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="requestListIDs">requestListIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs)
+        {
+            try
+            {
+                FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
+                UpdateDefinition<InteractiveData> update = Builders<InteractiveData>.Update.Set(data => data.RequestListIDs, requestListIDs);
+                UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新請求名單.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "請求名單未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Request List Error >>> MemberID:{memberID} RequestListIDs:{JsonConvert.SerializeObject(requestListIDs)}\n{ex}");
+                return Tuple.Create(false, "更新請求名單發生錯誤.");
             }
         }
     }

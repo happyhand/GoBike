@@ -20,39 +20,16 @@ namespace GoBike.Interactive.Repository.Interface
         /// <summary>
         /// 刪除互動資料
         /// </summary>
-        /// <param name="initiatorID">initiatorID</param>
-        /// <param name="passiveID">passiveID</param>
+        /// <param name="memberID">memberID</param>
         /// <returns>bool</returns>
-        Task<bool> DeleteInteractiveData(string initiatorID, string passiveID);
+        Task<bool> DeleteInteractiveData(string memberID);
 
         /// <summary>
-        /// 取得加入好友請求列表
+        /// 取得互動資料
         /// </summary>
         /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        Task<IEnumerable<InteractiveData>> GetAddFriendRequestList(string memberID);
-
-        /// <summary>
-        /// 取得黑名單列表
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        Task<IEnumerable<InteractiveData>> GetBlacklist(string memberID);
-
-        /// <summary>
-        /// 取得好友列表
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        Task<IEnumerable<InteractiveData>> GetFriendList(string memberID);
-
-        /// <summary>
-        /// 取得指定互動資料
-        /// </summary>
-        /// <param name="initiatorID">initiatorID</param>
-        /// <param name="passiveID">passiveID</param>
         /// <returns>InteractiveData</returns>
-        Task<InteractiveData> GetInteractiveData(string initiatorID, string passiveID);
+        Task<InteractiveData> GetInteractiveData(string memberID);
 
         /// <summary>
         /// 更新互動資料
@@ -60,5 +37,29 @@ namespace GoBike.Interactive.Repository.Interface
         /// <param name="interactiveData">interactiveData</param>
         /// <returns>Tuple(bool, string)</returns>
         Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData);
+
+        /// <summary>
+        /// 更新黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="blacklistIDs">blacklistIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs);
+
+        /// <summary>
+        /// 更新好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="friendListIDs">friendListIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs);
+
+        /// <summary>
+        /// 更新請求名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="requestListIDs">requestListIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs);
     }
 }

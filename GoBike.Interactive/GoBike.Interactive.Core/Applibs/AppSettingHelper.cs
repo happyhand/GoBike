@@ -46,11 +46,6 @@
                 /// Gets or sets Interactive
                 /// </summary>
                 public string Interactive { get; set; }
-
-                /// <summary>
-                /// Gets or sets Member
-                /// </summary>
-                public string Member { get; set; }
             }
         }
 

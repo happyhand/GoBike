@@ -2,7 +2,8 @@
 using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using GoBike.Interactive.Service.Interface;
-using GoBike.Interactive.Service.Models;
+using GoBike.Interactive.Service.Models.Command;
+using GoBike.Interactive.Service.Models.Data;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -33,87 +34,82 @@ namespace GoBike.Interactive.Service.Managers
         private readonly IMapper mapper;
 
         /// <summary>
-        /// memberRepository
-        /// </summary>
-        private readonly IMemberRepository memberRepository;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="interactiveRepository">interactiveRepository</param>
         /// <param name="memberRepository">memberRepository</param>
-        public InteractiveService(ILogger<InteractiveService> logger, IMapper mapper, IInteractiveRepository interactiveRepository, IMemberRepository memberRepository)
+        public InteractiveService(ILogger<InteractiveService> logger, IMapper mapper, IInteractiveRepository interactiveRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.interactiveRepository = interactiveRepository;
-            this.memberRepository = memberRepository;
         }
 
         /// <summary>
         /// 加入黑名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> AddBlacklist(InteractiveInfoDto interactiveInfo)
+        public async Task<string> AddBlacklist(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                string validInteractiveMemberDataResult = await this.ValidInteractiveMemberData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (!string.IsNullOrEmpty(validInteractiveMemberDataResult))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return validInteractiveMemberDataResult;
+                    return verifyInteractiveCommandResult;
                 }
 
                 //// 處理發起者互動資料
-                bool isInitiatorSuccess = false;
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (initiatorInteractiveData == null)
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    initiatorInteractiveData = this.CreateInteractiveData(interactiveInfo, (int)FriendStatusType.Black);
-                    isInitiatorSuccess = await this.interactiveRepository.CreateInteractiveData(initiatorInteractiveData);
+                    return getInitiatorInteractiveDataReuslt.Item2;
                 }
-                else
-                {
-                    if (initiatorInteractiveData.Status == (int)FriendStatusType.Black)
-                    {
-                        return this.GetInteractiveStatusMemo(initiatorInteractiveData, false);
-                    }
 
-                    initiatorInteractiveData.Status = (int)FriendStatusType.Black;
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                bool updateInitiatorBlacklistResult = this.UpdateListHandler(initiatorInteractiveData.BlacklistIDs, interactiveCommand.ReceiverID, true);
+                bool updateInitiatorFriendListResult = this.UpdateListHandler(initiatorInteractiveData.FriendListIDs, interactiveCommand.ReceiverID, false);
+                bool updateInitiatorRequestListResult = this.UpdateListHandler(initiatorInteractiveData.RequestListIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorBlacklistResult || updateInitiatorFriendListResult || updateInitiatorRequestListResult)
+                {
                     Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
-                    isInitiatorSuccess = initiatorUpdateResult.Item1;
-                    if (!isInitiatorSuccess)
+                    if (!initiatorUpdateResult.Item1)
                     {
-                        this.logger.LogError($"Add Blacklist Fail >>> Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
+                        this.logger.LogError($"Add Blacklist Fail For Update Initiator Interactive Data >>> Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
                         return initiatorUpdateResult.Item2;
                     }
                 }
 
-                //// 處理被動者互動資料
-                bool isPassiveSuccess = true;
-                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (passiveInteractiveData != null)
+                //// 處理接收者互動資料
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    if (passiveInteractiveData.Status != (int)FriendStatusType.Black)
-                    {
-                        isPassiveSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                    }
+                    return getReceiverInteractiveDataReuslt.Item2;
                 }
 
-                //// 檢測結果
-                if (!isInitiatorSuccess || !isPassiveSuccess)
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                if (receiverInteractiveData != null)
                 {
-                    this.logger.LogError($"Add Blacklist Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
-                    return "加入黑名單失敗.";
+                    bool updateReceiverFriendListResult = this.UpdateListHandler(receiverInteractiveData.FriendListIDs, interactiveCommand.InitiatorID, false);
+                    bool updateReceiverRequestListResult = this.UpdateListHandler(receiverInteractiveData.RequestListIDs, interactiveCommand.InitiatorID, false);
+                    if (updateReceiverFriendListResult || updateReceiverRequestListResult)
+                    {
+                        Tuple<bool, string> receiverUpdateResult = await this.interactiveRepository.UpdateInteractiveData(receiverInteractiveData);
+                        if (!receiverUpdateResult.Item1)
+                        {
+                            this.logger.LogError($"Add Blacklist Fail For Update Receiver Interactive Data >>> Data:{JsonConvert.SerializeObject(receiverInteractiveData)}");
+                            return receiverUpdateResult.Item2;
+                        }
+                    }
                 }
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Blacklist Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Add Blacklist Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "加入黑名單發生錯誤.";
             }
         }
@@ -123,92 +119,67 @@ namespace GoBike.Interactive.Service.Managers
         /// </summary>
         /// <param name="interactiveInfo">interactiveInfo</param>
         /// <returns>string</returns>
-        public async Task<string> AddFriend(InteractiveInfoDto interactiveInfo)
+        public async Task<string> AddFriend(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                string validInteractiveMemberDataResult = await this.ValidInteractiveMemberData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (!string.IsNullOrEmpty(validInteractiveMemberDataResult))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return validInteractiveMemberDataResult;
+                    return verifyInteractiveCommandResult;
                 }
 
-                //// 處理被動者互動資料
-                bool isPassiveSuccess = false;
-                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (passiveInteractiveData == null)
+                //// 驗證成為好友資格
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    return "無請求者的互動資料.";
+                    return getInitiatorInteractiveDataReuslt.Item2;
                 }
 
-                switch (passiveInteractiveData.Status)
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    case (int)FriendStatusType.Black:
-                        return this.GetInteractiveStatusMemo(passiveInteractiveData, true);
-
-                    case (int)FriendStatusType.Request:
-                        passiveInteractiveData.Status = (int)FriendStatusType.Friend;
-                        Tuple<bool, string> passiveUpdateResult = await this.interactiveRepository.UpdateInteractiveData(passiveInteractiveData);
-                        isPassiveSuccess = passiveUpdateResult.Item1;
-                        if (!isPassiveSuccess)
-                        {
-                            this.logger.LogError($"Add Friend Fail >>> Passive Data:{JsonConvert.SerializeObject(passiveInteractiveData)}");
-                            return passiveUpdateResult.Item2;
-                        }
-                        break;
-
-                    case (int)FriendStatusType.Friend:
-                        isPassiveSuccess = true;
-                        break;
+                    return getReceiverInteractiveDataReuslt.Item2;
                 }
 
-                //// 處理發起者互動資料
-                bool isInitiatorSuccess = false;
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (initiatorInteractiveData == null)
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                string verifyBeFriendQualificationResult = this.VerifyBeFriendQualification(initiatorInteractiveData, receiverInteractiveData);
+                if (!string.IsNullOrEmpty(verifyBeFriendQualificationResult))
                 {
-                    initiatorInteractiveData = this.CreateInteractiveData(interactiveInfo, (int)FriendStatusType.Friend);
-                    isInitiatorSuccess = await this.interactiveRepository.CreateInteractiveData(initiatorInteractiveData);
+                    return verifyBeFriendQualificationResult;
                 }
-                else
+
+                //// 更新發起者互動資料
+                bool updateInitiatorFriendListResult = this.UpdateListHandler(initiatorInteractiveData.FriendListIDs, interactiveCommand.ReceiverID, true);
+                bool updateInitiatorRequestListResult = this.UpdateListHandler(initiatorInteractiveData.RequestListIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorFriendListResult || updateInitiatorRequestListResult)
                 {
-                    switch (initiatorInteractiveData.Status)
+                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
+                    if (!initiatorUpdateResult.Item1)
                     {
-                        case (int)FriendStatusType.Black:
-                            return this.GetInteractiveStatusMemo(passiveInteractiveData, false);
-
-                        case (int)FriendStatusType.Request:
-                            initiatorInteractiveData.Status = (int)FriendStatusType.Friend;
-                            Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateInteractiveData(initiatorInteractiveData);
-                            isInitiatorSuccess = initiatorUpdateResult.Item1;
-                            if (!isInitiatorSuccess)
-                            {
-                                this.logger.LogError($"Add Friend Fail >>> Initiator Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
-                                return initiatorUpdateResult.Item2;
-                            }
-
-                            break;
-
-                        case (int)FriendStatusType.Friend:
-                            isInitiatorSuccess = true;
-                            break;
+                        this.logger.LogError($"Add Friend Fail For Update Initiator Interactive Data >>> Data:{JsonConvert.SerializeObject(initiatorInteractiveData)}");
+                        return initiatorUpdateResult.Item2;
                     }
                 }
 
-                //// 檢測結果
-                if (!isInitiatorSuccess || !isPassiveSuccess)
+                //// 更新接收者互動資料
+                bool updateReceiveFriendListResult = this.UpdateListHandler(receiverInteractiveData.FriendListIDs, interactiveCommand.InitiatorID, true);
+                if (updateReceiveFriendListResult)
                 {
-                    this.logger.LogError($"Add Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
-                    return "加入好友失敗.";
+                    Tuple<bool, string> receiverUpdateResult = await this.interactiveRepository.UpdateFriendList(receiverInteractiveData.MemberID, receiverInteractiveData.FriendListIDs);
+                    if (!receiverUpdateResult.Item1)
+                    {
+                        this.logger.LogError($"Add Friend Fail For Update Receiver Friend List >>> MemberID:{receiverInteractiveData.MemberID} FriendListIDs:{JsonConvert.SerializeObject(receiverInteractiveData.FriendListIDs)}");
+                        return receiverUpdateResult.Item2;
+                    }
                 }
-
-                //// TODO 連線 Server 發送即時通知
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Add Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "加入好友發生錯誤.";
             }
         }
@@ -216,45 +187,56 @@ namespace GoBike.Interactive.Service.Managers
         /// <summary>
         /// 加入好友請求
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> AddFriendRequest(InteractiveInfoDto interactiveInfo)
+        public async Task<string> AddFriendRequest(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                string validInteractiveMemberDataResult = await this.ValidInteractiveMemberData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (!string.IsNullOrEmpty(validInteractiveMemberDataResult))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return validInteractiveMemberDataResult;
+                    return verifyInteractiveCommandResult;
                 }
 
-                string initiatorInteractiveStatusMemo = await this.GetInteractiveStatusMemo(interactiveInfo, false);
-                if (!string.IsNullOrEmpty(initiatorInteractiveStatusMemo))
+                //// 驗證發送加入好友請求資格
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    return initiatorInteractiveStatusMemo;
+                    return getInitiatorInteractiveDataReuslt.Item2;
                 }
 
-                string passiveInteractiveStatusMemo = await this.GetInteractiveStatusMemo(interactiveInfo, true);
-                if (!string.IsNullOrEmpty(passiveInteractiveStatusMemo))
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, true);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    return passiveInteractiveStatusMemo;
+                    return getReceiverInteractiveDataReuslt.Item2;
                 }
 
-                InteractiveData interactiveData = this.CreateInteractiveData(interactiveInfo, (int)FriendStatusType.Request);
-                bool isSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
-                if (!isSuccess)
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                string verifyFriendRequestQualificationResult = this.VerifyFriendRequestQualification(initiatorInteractiveData, receiverInteractiveData);
+                if (!string.IsNullOrEmpty(verifyFriendRequestQualificationResult))
                 {
-                    this.logger.LogError($"Add Friend Request Fail >>> InteractiveData:{JsonConvert.SerializeObject(interactiveData)}");
-                    return "建立互動資料失敗.";
+                    return verifyFriendRequestQualificationResult;
                 }
 
-                //// TODO 連線 Server 發送即時通知
+                //// 更新接收者互動資料
+                bool updateReceiveRequestListResult = this.UpdateListHandler(receiverInteractiveData.RequestListIDs, interactiveCommand.InitiatorID, true);
+                if (updateReceiveRequestListResult)
+                {
+                    Tuple<bool, string> receiverUpdateResult = await this.interactiveRepository.UpdateRequestList(receiverInteractiveData.MemberID, receiverInteractiveData.RequestListIDs);
+                    if (!receiverUpdateResult.Item1)
+                    {
+                        this.logger.LogError($"Add Friend Request Fail For Update Receiver Request List >>> MemberID:{receiverInteractiveData.MemberID} RequestListIDs:{JsonConvert.SerializeObject(receiverInteractiveData.RequestListIDs)}");
+                        return receiverUpdateResult.Item2;
+                    }
+                }
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Friend Request Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Add Friend Request Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "加入好友請求發生錯誤.";
             }
         }
@@ -262,40 +244,46 @@ namespace GoBike.Interactive.Service.Managers
         /// <summary>
         /// 刪除黑名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> DeleteBlacklist(InteractiveInfoDto interactiveInfo)
+        public async Task<string> DeleteBlacklist(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return "會員編號無效.";
+                    return verifyInteractiveCommandResult;
                 }
 
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (initiatorInteractiveData == null)
+                Tuple<InteractiveData, string> getInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
+                if (!string.IsNullOrEmpty(getInteractiveDataReuslt.Item2))
+                {
+                    return getInteractiveDataReuslt.Item2;
+                }
+
+                InteractiveData interactiveData = getInteractiveDataReuslt.Item1;
+                if (interactiveData == null)
                 {
                     return "無互動資料.";
                 }
 
-                if (initiatorInteractiveData.Status != (int)FriendStatusType.Black)
+                bool updateInitiatorBlacklistResult = this.UpdateListHandler(interactiveData.BlacklistIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorBlacklistResult)
                 {
-                    return "未設定對方為黑名單.";
-                }
-
-                bool isSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (!isSuccess)
-                {
-                    this.logger.LogError($"Delete Blacklist Fail >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}");
-                    return "刪除黑名單失敗.";
+                    Tuple<bool, string> updateInteractiveDataResult = await this.interactiveRepository.UpdateBlacklist(interactiveData.MemberID, interactiveData.BlacklistIDs);
+                    if (!updateInteractiveDataResult.Item1)
+                    {
+                        this.logger.LogError($"Delete Blacklist Fail For Update Black list >>> MemberID:{interactiveData.MemberID} BlacklistIDs:{JsonConvert.SerializeObject(interactiveData.BlacklistIDs)}");
+                        return updateInteractiveDataResult.Item2;
+                    }
                 }
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Blacklist Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Delete Blacklist Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "刪除黑名單發生錯誤.";
             }
         }
@@ -303,98 +291,119 @@ namespace GoBike.Interactive.Service.Managers
         /// <summary>
         /// 刪除好友
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> DeleteFriend(InteractiveInfoDto interactiveInfo)
+        public async Task<string> DeleteFriend(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return "會員編號無效.";
+                    return verifyInteractiveCommandResult;
                 }
 
-                //// 處理發起者互動資料
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                bool isInitiatorSuccess = true;
-                if (initiatorInteractiveData != null)
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    if (initiatorInteractiveData.Status == (int)FriendStatusType.Black)
+                    return getInitiatorInteractiveDataReuslt.Item2;
+                }
+
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                if (initiatorInteractiveData == null)
+                {
+                    return "無發起者的互動資料.";
+                }
+
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
+                {
+                    return getReceiverInteractiveDataReuslt.Item2;
+                }
+
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                if (receiverInteractiveData == null)
+                {
+                    return "無接收者的互動資料.";
+                }
+
+                //// 更新發起者互動資料
+                bool updateInitiatorFriendListResult = this.UpdateListHandler(initiatorInteractiveData.FriendListIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorFriendListResult)
+                {
+                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateFriendList(initiatorInteractiveData.MemberID, initiatorInteractiveData.FriendListIDs);
+                    if (!initiatorUpdateResult.Item1)
                     {
-                        return this.GetInteractiveStatusMemo(initiatorInteractiveData, false);
+                        this.logger.LogError($"Delete Friend Fail For Update Initiator Friend List >>> MemberID:{initiatorInteractiveData.MemberID} FriendListIDs:{JsonConvert.SerializeObject(initiatorInteractiveData.FriendListIDs)}");
+                        return initiatorUpdateResult.Item2;
                     }
-
-                    isInitiatorSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
                 }
 
-                //// 處理被動者互動資料
-                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                bool isPassiveSuccess = true;
-                if (passiveInteractiveData != null)
+                //// 更新接收者互動資料
+                bool updateReceiverFriendListResult = this.UpdateListHandler(receiverInteractiveData.FriendListIDs, interactiveCommand.InitiatorID, false);
+                if (updateReceiverFriendListResult)
                 {
-                    if (passiveInteractiveData.Status == (int)FriendStatusType.Black)
+                    Tuple<bool, string> receiverUpdateResult = await this.interactiveRepository.UpdateFriendList(receiverInteractiveData.MemberID, receiverInteractiveData.FriendListIDs);
+                    if (!receiverUpdateResult.Item1)
                     {
-                        return this.GetInteractiveStatusMemo(passiveInteractiveData, true);
+                        this.logger.LogError($"Delete Friend Fail For Update Receiver Friend List >>> MemberID:{receiverInteractiveData.MemberID} FriendListIDs:{JsonConvert.SerializeObject(receiverInteractiveData.FriendListIDs)}");
+                        return receiverUpdateResult.Item2;
                     }
-
-                    isPassiveSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
                 }
-
-                //// 檢測結果
-                if (!isInitiatorSuccess || !isPassiveSuccess)
-                {
-                    this.logger.LogError($"Delete Friend Fail >>> IsInitiatorSuccess:{isInitiatorSuccess} IsPassiveSuccess:{isPassiveSuccess}\nInitiatorInteractiveData:{JsonConvert.SerializeObject(initiatorInteractiveData)}\nPassiveInteractiveData:{JsonConvert.SerializeObject(passiveInteractiveData)}");
-                    return "刪除好友失敗.";
-                }
-
-                //// TODO 連線 Server 發送即時通知
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
-                return "刪除好友錯誤.";
+                this.logger.LogError($"Delete Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
+                return "刪除好友發生錯誤.";
             }
         }
 
         /// <summary>
         /// 刪除加入好友請求
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> DeleteRequestForAddFriend(InteractiveInfoDto interactiveInfo)
+        public async Task<string> DeleteRequestForAddFriend(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return "會員編號無效.";
+                    return verifyInteractiveCommandResult;
                 }
 
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (initiatorInteractiveData == null)
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    return "無互動資料.";
+                    return getReceiverInteractiveDataReuslt.Item2;
                 }
 
-                if (initiatorInteractiveData.Status != (int)FriendStatusType.Request)
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                if (receiverInteractiveData == null)
                 {
-                    return this.GetInteractiveStatusMemo(initiatorInteractiveData, false);
+                    return "無接收者的互動資料.";
                 }
 
-                bool isSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                if (!isSuccess)
+                //// 更新接收者互動資料
+                bool updateReceiverRequestListResult = this.UpdateListHandler(receiverInteractiveData.RequestListIDs, interactiveCommand.InitiatorID, false);
+                if (updateReceiverRequestListResult)
                 {
-                    this.logger.LogError($"Delete Request For Add Friend Fail >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}");
-                    return "刪除加入好友請求失敗.";
+                    Tuple<bool, string> receiverUpdateResult = await this.interactiveRepository.UpdateRequestList(receiverInteractiveData.MemberID, receiverInteractiveData.RequestListIDs);
+                    if (!receiverUpdateResult.Item1)
+                    {
+                        this.logger.LogError($"Delete Request For Add Friend Fail For Update Receiver Request List >>> MemberID:{receiverInteractiveData.MemberID} RequestListIDs:{JsonConvert.SerializeObject(receiverInteractiveData.RequestListIDs)}");
+                        return receiverUpdateResult.Item2;
+                    }
                 }
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "刪除加入好友請求發生錯誤.";
             }
         }
@@ -402,115 +411,140 @@ namespace GoBike.Interactive.Service.Managers
         /// <summary>
         /// 取得加入好友請求名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>Tuple(MemberInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetAddFriendRequestList(InteractiveInfoDto interactiveInfo)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>Tuple(strings, string)</returns>
+        public async Task<Tuple<IEnumerable<string>, string>> GetAddFriendRequestList(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
                 }
 
-                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetAddFriendRequestList(interactiveInfo.InitiatorID);
-                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.InitiatorID));
-                return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Request), string.Empty);
+                Tuple<InteractiveData, string> getInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInteractiveDataReuslt.Item2))
+                {
+                    return Tuple.Create<IEnumerable<string>, string>(null, getInteractiveDataReuslt.Item2);
+                }
+
+                InteractiveData interactiveData = getInteractiveDataReuslt.Item1;
+                return Tuple.Create(interactiveData.RequestListIDs, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Add Friend Request List Error >>> InitiatorID:{interactiveInfo.InitiatorID}\n{ex}");
-                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得加入好友請求名單發生錯誤.");
+                this.logger.LogError($"Get Add Friend Request List Error >>> InitiatorID:{interactiveCommand.InitiatorID}\n{ex}");
+                return Tuple.Create<IEnumerable<string>, string>(null, "取得加入好友請求名單發生錯誤.");
             }
         }
 
         /// <summary>
         /// 取得黑名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>Tuple(MemberInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetBlacklist(InteractiveInfoDto interactiveInfo)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>Tuple(strings, string)</returns>
+        public async Task<Tuple<IEnumerable<string>, string>> GetBlacklist(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
                 }
 
-                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetBlacklist(interactiveInfo.InitiatorID);
-                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.PassiveID));
-                return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Black), string.Empty);
+                Tuple<InteractiveData, string> getInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInteractiveDataReuslt.Item2))
+                {
+                    return Tuple.Create<IEnumerable<string>, string>(null, getInteractiveDataReuslt.Item2);
+                }
+
+                InteractiveData interactiveData = getInteractiveDataReuslt.Item1;
+                return Tuple.Create(interactiveData.BlacklistIDs, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Blacklist Error >>> InitiatorID:{interactiveInfo.InitiatorID}\n{ex}");
-                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得黑名單發生錯誤.");
+                this.logger.LogError($"Get Blacklist Error >>> InitiatorID:{interactiveCommand.InitiatorID}\n{ex}");
+                return Tuple.Create<IEnumerable<string>, string>(null, "取得黑名單發生錯誤.");
             }
         }
 
         /// <summary>
         /// 取得好友名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>Tuple(MemberInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetFriendList(InteractiveInfoDto interactiveInfo)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>Tuple(strings, string)</returns>
+        public async Task<Tuple<IEnumerable<string>, string>> GetFriendList(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
                 }
 
-                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetFriendList(interactiveInfo.InitiatorID);
-                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemebrDataList(interactiveDatas.Select(x => x.PassiveID));
-                return Tuple.Create(this.TransformMemberDataToInfo(memberDatas, (int)FriendStatusType.Friend), string.Empty);
+                Tuple<InteractiveData, string> getInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInteractiveDataReuslt.Item2))
+                {
+                    return Tuple.Create<IEnumerable<string>, string>(null, getInteractiveDataReuslt.Item2);
+                }
+
+                InteractiveData interactiveData = getInteractiveDataReuslt.Item1;
+                return Tuple.Create(interactiveData.FriendListIDs, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Friend List Error >>> InitiatorID:{interactiveInfo.InitiatorID}\n{ex}");
-                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得好友名單發生錯誤.");
+                this.logger.LogError($"Get Friend List Error >>> InitiatorID:{interactiveCommand.InitiatorID}\n{ex}");
+                return Tuple.Create<IEnumerable<string>, string>(null, "取得好友名單發生錯誤.");
             }
         }
 
         /// <summary>
         /// 拒絕加入好友
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>string</returns>
-        public async Task<string> RejectBeFriend(InteractiveInfoDto interactiveInfo)
+        public async Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return "會員編號無效.";
+                    return verifyInteractiveCommandResult;
                 }
 
-                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (passiveInteractiveData == null)
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    return "無請求者的互動資料.";
+                    return getInitiatorInteractiveDataReuslt.Item2;
                 }
 
-                if (passiveInteractiveData.Status != (int)FriendStatusType.Request)
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                if (initiatorInteractiveData == null)
                 {
-                    return this.GetInteractiveStatusMemo(passiveInteractiveData, true);
+                    return "無發起者的互動資料.";
                 }
 
-                bool isSuccess = await this.interactiveRepository.DeleteInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (!isSuccess)
+                //// 更新發起者互動資料
+                bool updateInitiatorRequestListResult = this.UpdateListHandler(initiatorInteractiveData.RequestListIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorRequestListResult)
                 {
-                    this.logger.LogError($"Reject Be Friend Fail >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}");
-                    return "拒絕加入好友失敗.";
+                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateRequestList(initiatorInteractiveData.MemberID, initiatorInteractiveData.RequestListIDs);
+                    if (!initiatorUpdateResult.Item1)
+                    {
+                        this.logger.LogError($"Reject Be Friend Fail For Update Initiator Request List >>> MemberID:{initiatorInteractiveData.MemberID} RequestListIDs:{JsonConvert.SerializeObject(initiatorInteractiveData.RequestListIDs)}");
+                        return initiatorUpdateResult.Item2;
+                    }
                 }
 
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reject Be Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Reject Be Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return "拒絕加入好友發生錯誤.";
             }
         }
@@ -518,149 +552,249 @@ namespace GoBike.Interactive.Service.Managers
         /// <summary>
         /// 搜尋好友
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <returns>Tuple(MemberInfoDto, string)</returns>
-        public async Task<Tuple<MemberInfoDto, string>> SearchFriend(InteractiveInfoDto interactiveInfo)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>Tuple(InteractiveInfoDto, string)</returns>
+        public async Task<Tuple<InteractiveInfoDto, string>> SearchFriend(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                if (string.IsNullOrEmpty(interactiveInfo.InitiatorID) || string.IsNullOrEmpty(interactiveInfo.PassiveID))
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return Tuple.Create<MemberInfoDto, string>(null, "會員編號無效.");
+                    return Tuple.Create<InteractiveInfoDto, string>(null, verifyInteractiveCommandResult);
                 }
 
-                InteractiveData passiveInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID);
-                if (passiveInteractiveData != null)
+                Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
+                if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    if (passiveInteractiveData.Status == (int)FriendStatusType.Black)
+                    return Tuple.Create<InteractiveInfoDto, string>(null, getReceiverInteractiveDataReuslt.Item2);
+                }
+
+                InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
+                if (receiverInteractiveData != null)
+                {
+                    if (receiverInteractiveData.BlacklistIDs.Contains(interactiveCommand.InitiatorID))
                     {
-                        return Tuple.Create<MemberInfoDto, string>(null, this.GetInteractiveStatusMemo(passiveInteractiveData, true));
+                        return Tuple.Create<InteractiveInfoDto, string>(null, "對方已設該會員為黑名單.");
+                    }
+
+                    if (receiverInteractiveData.FriendListIDs.Contains(interactiveCommand.InitiatorID))
+                    {
+                        return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Friend }, string.Empty);
+                    }
+
+                    if (receiverInteractiveData.RequestListIDs.Contains(interactiveCommand.InitiatorID))
+                    {
+                        return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Request }, string.Empty);
                     }
                 }
 
-                InteractiveData initiatorInteractiveData = await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-                MemberData memberData = await this.memberRepository.GetMemebrData(interactiveInfo.PassiveID);
-                MemberInfoDto memberInfo = this.mapper.Map<MemberInfoDto>(memberData);
-                if (initiatorInteractiveData == null)
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    if (passiveInteractiveData != null && passiveInteractiveData.Status == (int)FriendStatusType.Request)
-                    {
-                        memberInfo.Status = (int)FriendStatusType.RequestHandler;
-                    }
-                    else
-                    {
-                        memberInfo.Status = (int)FriendStatusType.None;
-                    }
-                }
-                else
-                {
-                    memberInfo.Status = initiatorInteractiveData.Status;
+                    return Tuple.Create<InteractiveInfoDto, string>(null, getInitiatorInteractiveDataReuslt.Item2);
                 }
 
-                return Tuple.Create(memberInfo, string.Empty);
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                if (initiatorInteractiveData.BlacklistIDs.Contains(interactiveCommand.ReceiverID))
+                {
+                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Black }, string.Empty);
+                }
+
+                if (initiatorInteractiveData.FriendListIDs.Contains(interactiveCommand.ReceiverID))
+                {
+                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Friend }, string.Empty);
+                }
+
+                if (initiatorInteractiveData.RequestListIDs.Contains(interactiveCommand.ReceiverID))
+                {
+                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.RequestHandler }, string.Empty);
+                }
+
+                return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.None }, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
-                return Tuple.Create<MemberInfoDto, string>(null, "搜尋好友發生錯誤.");
+                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
+                return Tuple.Create<InteractiveInfoDto, string>(null, "搜尋好友發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 創建互動資料
+        /// 驗證互動指令資料
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <param name="status">status</param>
-        /// <returns>FriendData</returns>
-        private InteractiveData CreateInteractiveData(InteractiveInfoDto interactiveInfo, int status)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>string</returns>
+        private string VerifyInteractiveCommand(InteractiveCommandDto interactiveCommand)
+        {
+            if (interactiveCommand == null)
+            {
+                return "互動指令資料不存在.";
+            }
+
+            if (string.IsNullOrEmpty(interactiveCommand.InitiatorID))
+            {
+                return "發起者會員編號無效.";
+            }
+
+            if (string.IsNullOrEmpty(interactiveCommand.ReceiverID))
+            {
+                return "接收者會員編號無效.";
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 驗證成為好友資格
+        /// </summary>
+        /// <param name="initiatorData">initiatorData</param>
+        /// <param name="receiveData">receiveData</param>
+        /// <returns>string</returns>
+        private string VerifyBeFriendQualification(InteractiveData initiatorData, InteractiveData receiveData)
+        {
+            if (initiatorData == null)
+            {
+                return "無發起者的互動資料.";
+            }
+
+            if (receiveData == null)
+            {
+                return "無接收者的互動資料.";
+            }
+
+            if (initiatorData.BlacklistIDs.Contains(receiveData.MemberID))
+            {
+                return "對方已設為黑名單.";
+            }
+
+            if (!initiatorData.RequestListIDs.Contains(receiveData.MemberID))
+            {
+                return "對方未提出加入好友請求.";
+            }
+
+            if (receiveData.BlacklistIDs.Contains(initiatorData.MemberID))
+            {
+                return "對方已設該會員為黑名單.";
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 驗證發送加入好友請求資格
+        /// </summary>
+        /// <param name="initiatorData">initiatorData</param>
+        /// <param name="receiveData">receiveData</param>
+        /// <returns>string</returns>
+        private string VerifyFriendRequestQualification(InteractiveData initiatorData, InteractiveData receiveData)
+        {
+            if (initiatorData == null)
+            {
+                return "無發起者的互動資料.";
+            }
+
+            if (receiveData == null)
+            {
+                return "無接收者的互動資料.";
+            }
+
+            if (initiatorData.BlacklistIDs.Contains(receiveData.MemberID))
+            {
+                return "對方已設為黑名單.";
+            }
+
+            if (initiatorData.FriendListIDs.Contains(receiveData.MemberID))
+            {
+                return "已為好友關係.";
+            }
+
+            if (receiveData.BlacklistIDs.Contains(initiatorData.MemberID))
+            {
+                return "對方已設該會員為黑名單.";
+            }
+
+            if (receiveData.FriendListIDs.Contains(initiatorData.MemberID))
+            {
+                return "對方已與該會員為好友關係.";
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 創建新互動資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>InteractiveData</returns>
+        private InteractiveData CreateInteractiveData(string memberID)
         {
             return new InteractiveData()
             {
-                InitiatorID = interactiveInfo.InitiatorID,
-                PassiveID = interactiveInfo.PassiveID,
-                Status = status
+                MemberID = memberID,
+                BlacklistIDs = new List<string>(),
+                FriendListIDs = new List<string>(),
+                RequestListIDs = new List<string>()
             };
         }
 
         /// <summary>
-        /// 取得互動資料狀態備註
+        /// 取得互動資料
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
-        /// <param name="isReverse">isReverse</param>
-        /// <returns>string</returns>
-        private async Task<string> GetInteractiveStatusMemo(InteractiveInfoDto interactiveInfo, bool isReverse)
+        /// <param name="memberID">memberID</param>
+        /// <param name="isCreate">isCreate</param>
+        /// <returns>Tuple(InteractiveData, string)</returns>
+        private async Task<Tuple<InteractiveData, string>> GetInteractiveData(string memberID, bool isCreate)
         {
-            InteractiveData interactiveData = isReverse ? await this.interactiveRepository.GetInteractiveData(interactiveInfo.PassiveID, interactiveInfo.InitiatorID) : await this.interactiveRepository.GetInteractiveData(interactiveInfo.InitiatorID, interactiveInfo.PassiveID);
-            return this.GetInteractiveStatusMemo(interactiveData, isReverse);
+            if (string.IsNullOrEmpty(memberID))
+            {
+                return Tuple.Create<InteractiveData, string>(null, "會員編號無效.");
+            }
+
+            InteractiveData interactiveData = await this.interactiveRepository.GetInteractiveData(memberID);
+            if (interactiveData == null && isCreate)
+            {
+                interactiveData = this.CreateInteractiveData(memberID);
+                bool isCreateSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
+                if (!isCreateSuccess)
+                {
+                    this.logger.LogError($"Get Interactive Data Fail For Create Interactive Data >>> InteractiveData:{JsonConvert.SerializeObject(interactiveData)}");
+                    return Tuple.Create<InteractiveData, string>(null, "建立互動資料失敗.");
+                }
+            }
+
+            return Tuple.Create<InteractiveData, string>(interactiveData, string.Empty);
         }
 
         /// <summary>
-        /// 取得互動資料狀態備註
+        /// 名單更新處理
         /// </summary>
-        /// <param name="interactiveData">interactiveData</param>
-        /// <param name="isReverse">isReverse</param>
-        /// <returns>string</returns>
-        private string GetInteractiveStatusMemo(InteractiveData interactiveData, bool isReverse)
+        /// <param name="list">list</param>
+        /// <param name="targetID">targetID</param>
+        /// <param name="isAdd">isAdd</param>
+        /// <returns>bool</returns>
+        private bool UpdateListHandler(IEnumerable<string> list, string targetID, bool isAdd)
         {
-            if (interactiveData == null)
+            if (isAdd)
             {
-                return string.Empty;
-            }
+                if (!list.Contains(targetID))
+                {
+                    (list as List<string>).Add(targetID);
+                    return true;
+                }
 
-            switch (interactiveData.Status)
+                return false;
+            }
+            else
             {
-                case (int)FriendStatusType.Black:
-                    return isReverse ? "對方已設該會員為黑名單." : "對方已設為黑名單.";
+                if (list.Contains(targetID))
+                {
+                    (list as List<string>).Remove(targetID);
+                    return true;
+                }
 
-                case (int)FriendStatusType.Request:
-                    return isReverse ? "對方已發送加入好友請求." : "已發送加入好友請求.";
-
-                case (int)FriendStatusType.Friend:
-                    return isReverse ? "對方已與該會員為好友關係." : "已為好友關係.";
-
-                default:
-                    return $"無法辨別此互動狀態:{interactiveData.Status}.";
+                return false;
             }
-        }
-
-        /// <summary>
-        /// 轉換會員資料
-        /// </summary>
-        /// <param name="memberDatas">memberDatas</param>
-        /// <param name="status">status</param>
-        /// <returns>MemberInfoDtos</returns>
-        private IEnumerable<MemberInfoDto> TransformMemberDataToInfo(IEnumerable<MemberData> memberDatas, int status)
-        {
-            IEnumerable<MemberInfoDto> memberInfos = this.mapper.Map<IEnumerable<MemberInfoDto>>(memberDatas);
-            foreach (MemberInfoDto memberInfo in memberInfos)
-            {
-                memberInfo.Status = status;
-            }
-
-            return memberInfos;
-        }
-
-        /// <summary>
-        /// 驗證互動會員資料
-        /// </summary>
-        /// <param name="initiatorID">initiatorID</param>
-        /// <param name="passiveID">passiveID</param>
-        /// <returns>string</returns>
-        private async Task<string> ValidInteractiveMemberData(string initiatorID, string passiveID)
-        {
-            if (string.IsNullOrEmpty(initiatorID) || string.IsNullOrEmpty(passiveID))
-            {
-                return "會員編號無效.";
-            }
-
-            bool missInitiator = await this.memberRepository.GetMemebrData(initiatorID) == null;
-            bool missPassive = await this.memberRepository.GetMemebrData(passiveID) == null;
-            if (missInitiator || missPassive)
-            {
-                return "會員不存在.";
-            }
-
-            return string.Empty;
         }
     }
 }

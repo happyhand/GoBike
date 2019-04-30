@@ -1,5 +1,5 @@
 ﻿using GoBike.Interactive.Service.Interface;
-using GoBike.Interactive.Service.Models;
+using GoBike.Interactive.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +39,14 @@ namespace GoBike.Interactive.API.Controllers.Blacklist
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> GetBlacklist(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> GetBlacklist(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                Tuple<IEnumerable<MemberInfoDto>, string> result = await this.interactiveService.GetBlacklist(interactiveInfo);
+                Tuple<IEnumerable<string>, string> result = await this.interactiveService.GetBlacklist(interactiveCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,7 +56,7 @@ namespace GoBike.Interactive.API.Controllers.Blacklist
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Blacklist Error >>> InitiatorID:{interactiveInfo.InitiatorID}\n{ex}");
+                this.logger.LogError($"Get Blacklist Error >>> InitiatorID:{interactiveCommand.InitiatorID}\n{ex}");
                 return BadRequest("取得黑名單發生錯誤.");
             }
         }

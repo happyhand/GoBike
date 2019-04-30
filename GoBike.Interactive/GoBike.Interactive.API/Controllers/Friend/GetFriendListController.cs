@@ -1,5 +1,5 @@
 ﻿using GoBike.Interactive.Service.Interface;
-using GoBike.Interactive.Service.Models;
+using GoBike.Interactive.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +39,14 @@ namespace GoBike.Interactive.API.Controllers.Friend
         /// <summary>
         /// POST - 取得好友名單
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> GetFriendList(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> GetFriendList(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                Tuple<IEnumerable<MemberInfoDto>, string> result = await this.interactiveService.GetFriendList(interactiveInfo);
+                Tuple<IEnumerable<string>, string> result = await this.interactiveService.GetFriendList(interactiveCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,7 +56,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Friend List Error >>> InitiatorID:{interactiveInfo.InitiatorID}\n{ex}");
+                this.logger.LogError($"Get Friend List Error >>> InitiatorID:{interactiveCommand.InitiatorID}\n{ex}");
                 return BadRequest("取得好友名單發生錯誤.");
             }
         }

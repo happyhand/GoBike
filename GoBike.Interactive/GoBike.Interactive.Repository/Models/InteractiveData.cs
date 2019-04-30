@@ -1,42 +1,72 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace GoBike.Interactive.Repository.Models
 {
+    /// <summary>
+    /// 互動狀態資料
+    /// </summary>
+    public enum InteractiveStatusType
+    {
+        /// <summary>
+        /// 無關聯
+        /// </summary>
+        None = -2,
+
+        /// <summary>
+        /// 黑名單
+        /// </summary>
+        Black = -1,
+
+        /// <summary>
+        /// 請求 - 等待確認
+        /// </summary>
+        Request = 0,
+
+        /// <summary>
+        /// 請求 - 處理確認
+        /// </summary>
+        RequestHandler = 1,
+
+        /// <summary>
+        /// 好友
+        /// </summary>
+        Friend = 2
+    }
+
     /// <summary>
     /// 互動資料
     /// </summary>
     public class InteractiveData
     {
-        #region Base Data
-
         /// <summary>
         /// Gets or sets Id
         /// </summary>
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Gets or sets InitiatorID
+        /// Gets or sets MemberID
         /// </summary>
-        [BsonElement("InitiatorID")]
-        public string InitiatorID { get; set; }
+        [BsonElement("MemberID")]
+        public string MemberID { get; set; }
 
         /// <summary>
-        /// Gets or sets FriendID
+        /// Gets or sets BlacklistIDs
         /// </summary>
-        [BsonElement("PassiveID")]
-        public string PassiveID { get; set; }
-
-        #endregion Base Data
-
-        #region InfoData
+        [BsonElement("BlacklistIDs")]
+        public IEnumerable<string> BlacklistIDs { get; set; }
 
         /// <summary>
-        /// Gets or sets Status (0:等待確認，1:好友，-1:黑名單)
+        /// Gets or sets FriendListIDs
         /// </summary>
-        [BsonElement("Status")]
-        public int Status { get; set; }
+        [BsonElement("FriendListIDs")]
+        public IEnumerable<string> FriendListIDs { get; set; }
 
-        #endregion InfoData
+        /// <summary>
+        /// Gets or sets RequestListIDs
+        /// </summary>
+        [BsonElement("RequestListIDs")]
+        public IEnumerable<string> RequestListIDs { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using GoBike.Interactive.Service.Interface;
-using GoBike.Interactive.Service.Models;
+using GoBike.Interactive.Service.Models.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -38,14 +38,14 @@ namespace GoBike.Interactive.API.Controllers.Friend
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                string result = await this.interactiveService.DeleteRequestForAddFriend(interactiveInfo);
+                string result = await this.interactiveService.DeleteRequestForAddFriend(interactiveCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("刪除加入好友請求成功.");
@@ -55,7 +55,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return BadRequest("刪除加入好友請求發生錯誤.");
             }
         }

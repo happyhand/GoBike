@@ -1,5 +1,6 @@
 ﻿using GoBike.Interactive.Service.Interface;
-using GoBike.Interactive.Service.Models;
+using GoBike.Interactive.Service.Models.Command;
+using GoBike.Interactive.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -41,11 +42,11 @@ namespace GoBike.Interactive.API.Controllers.Friend
         /// <param name="interactiveInfo">interactiveInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(InteractiveInfoDto interactiveInfo)
+        public async Task<IActionResult> Post(InteractiveCommandDto interactiveCommand)
         {
             try
             {
-                Tuple<MemberInfoDto, string> result = await this.interactiveService.SearchFriend(interactiveInfo);
+                Tuple<InteractiveInfoDto, string> result = await this.interactiveService.SearchFriend(interactiveCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -55,7 +56,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveInfo.InitiatorID} PassiveID:{interactiveInfo.PassiveID}\n{ex}");
+                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return BadRequest("搜尋好友發生錯誤.");
             }
         }

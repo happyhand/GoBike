@@ -55,7 +55,6 @@ namespace GoBike.Interactive.API
         {
             services.AddSingleton<IInteractiveService, InteractiveService>();
             services.AddSingleton<IInteractiveRepository, InteractiveRepository>();
-            services.AddSingleton<IMemberRepository, MemberRepository>();
         }
     }
 }

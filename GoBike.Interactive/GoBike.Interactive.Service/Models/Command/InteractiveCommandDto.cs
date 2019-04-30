@@ -1,9 +1,9 @@
-﻿namespace GoBike.Interactive.Service.Models
+﻿namespace GoBike.Interactive.Service.Models.Command
 {
     /// <summary>
-    /// 互動資料
+    /// 互動指令資料
     /// </summary>
-    public class InteractiveInfoDto
+    public class InteractiveCommandDto
     {
         /// <summary>
         /// Gets or sets InitiatorID
@@ -11,8 +11,8 @@
         public string InitiatorID { get; set; }
 
         /// <summary>
-        /// Gets or sets PassiveID
+        /// Gets or sets ReceiverID
         /// </summary>
-        public string PassiveID { get; set; }
+        public string ReceiverID { get; set; }
     }
 }
