@@ -68,7 +68,7 @@ namespace GoBike.Member.API.Controllers
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/[controller]/list")]
+        [Route("api/[controller]/List")]
         public async Task<IActionResult> GetMemberInfoList(IEnumerable<string> memberIDs)
         {
             try

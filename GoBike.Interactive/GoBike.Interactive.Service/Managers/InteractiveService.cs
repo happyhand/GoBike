@@ -55,7 +55,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -123,7 +123,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -193,7 +193,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -250,7 +250,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -297,7 +297,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -369,7 +369,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -417,7 +417,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, false);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
@@ -448,7 +448,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, false);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
@@ -479,7 +479,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, false);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return Tuple.Create<IEnumerable<string>, string>(null, verifyInteractiveCommandResult);
@@ -510,7 +510,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return verifyInteractiveCommandResult;
@@ -558,7 +558,7 @@ namespace GoBike.Interactive.Service.Managers
         {
             try
             {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand);
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
                     return Tuple.Create<InteractiveInfoDto, string>(null, verifyInteractiveCommandResult);
@@ -621,28 +621,78 @@ namespace GoBike.Interactive.Service.Managers
         }
 
         /// <summary>
-        /// 驗證互動指令資料
+        /// 創建新互動資料
         /// </summary>
-        /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <returns>string</returns>
-        private string VerifyInteractiveCommand(InteractiveCommandDto interactiveCommand)
+        /// <param name="memberID">memberID</param>
+        /// <returns>InteractiveData</returns>
+        private InteractiveData CreateInteractiveData(string memberID)
         {
-            if (interactiveCommand == null)
+            return new InteractiveData()
             {
-                return "互動指令資料不存在.";
+                MemberID = memberID,
+                BlacklistIDs = new List<string>(),
+                FriendListIDs = new List<string>(),
+                RequestListIDs = new List<string>()
+            };
+        }
+
+        /// <summary>
+        /// 取得互動資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="isCreate">isCreate</param>
+        /// <returns>Tuple(InteractiveData, string)</returns>
+        private async Task<Tuple<InteractiveData, string>> GetInteractiveData(string memberID, bool isCreate)
+        {
+            if (string.IsNullOrEmpty(memberID))
+            {
+                return Tuple.Create<InteractiveData, string>(null, "會員編號無效.");
             }
 
-            if (string.IsNullOrEmpty(interactiveCommand.InitiatorID))
+            InteractiveData interactiveData = await this.interactiveRepository.GetInteractiveData(memberID);
+            if (interactiveData == null && isCreate)
             {
-                return "發起者會員編號無效.";
+                interactiveData = this.CreateInteractiveData(memberID);
+                bool isCreateSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
+                if (!isCreateSuccess)
+                {
+                    this.logger.LogError($"Get Interactive Data Fail For Create Interactive Data >>> InteractiveData:{JsonConvert.SerializeObject(interactiveData)}");
+                    return Tuple.Create<InteractiveData, string>(null, "建立互動資料失敗.");
+                }
             }
 
-            if (string.IsNullOrEmpty(interactiveCommand.ReceiverID))
-            {
-                return "接收者會員編號無效.";
-            }
+            return Tuple.Create<InteractiveData, string>(interactiveData, string.Empty);
+        }
 
-            return string.Empty;
+        /// <summary>
+        /// 名單更新處理
+        /// </summary>
+        /// <param name="list">list</param>
+        /// <param name="targetID">targetID</param>
+        /// <param name="isAdd">isAdd</param>
+        /// <returns>bool</returns>
+        private bool UpdateListHandler(IEnumerable<string> list, string targetID, bool isAdd)
+        {
+            if (isAdd)
+            {
+                if (!list.Contains(targetID))
+                {
+                    (list as List<string>).Add(targetID);
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                if (list.Contains(targetID))
+                {
+                    (list as List<string>).Remove(targetID);
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -723,78 +773,36 @@ namespace GoBike.Interactive.Service.Managers
         }
 
         /// <summary>
-        /// 創建新互動資料
+        /// 驗證互動指令資料
         /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveData</returns>
-        private InteractiveData CreateInteractiveData(string memberID)
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <param name="isVerifyInitiator">isVerifyInitiator</param>
+        /// <param name="isVerifyReceiver">isVerifyReceiver</param>
+        /// <returns>string</returns>
+        private string VerifyInteractiveCommand(InteractiveCommandDto interactiveCommand, bool isVerifyInitiator, bool isVerifyReceiver)
         {
-            return new InteractiveData()
+            if (interactiveCommand == null)
             {
-                MemberID = memberID,
-                BlacklistIDs = new List<string>(),
-                FriendListIDs = new List<string>(),
-                RequestListIDs = new List<string>()
-            };
-        }
-
-        /// <summary>
-        /// 取得互動資料
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="isCreate">isCreate</param>
-        /// <returns>Tuple(InteractiveData, string)</returns>
-        private async Task<Tuple<InteractiveData, string>> GetInteractiveData(string memberID, bool isCreate)
-        {
-            if (string.IsNullOrEmpty(memberID))
-            {
-                return Tuple.Create<InteractiveData, string>(null, "會員編號無效.");
+                return "互動指令資料不存在.";
             }
 
-            InteractiveData interactiveData = await this.interactiveRepository.GetInteractiveData(memberID);
-            if (interactiveData == null && isCreate)
+            if (isVerifyInitiator)
             {
-                interactiveData = this.CreateInteractiveData(memberID);
-                bool isCreateSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
-                if (!isCreateSuccess)
+                if (string.IsNullOrEmpty(interactiveCommand.InitiatorID))
                 {
-                    this.logger.LogError($"Get Interactive Data Fail For Create Interactive Data >>> InteractiveData:{JsonConvert.SerializeObject(interactiveData)}");
-                    return Tuple.Create<InteractiveData, string>(null, "建立互動資料失敗.");
+                    return "發起者會員編號無效.";
                 }
             }
 
-            return Tuple.Create<InteractiveData, string>(interactiveData, string.Empty);
-        }
-
-        /// <summary>
-        /// 名單更新處理
-        /// </summary>
-        /// <param name="list">list</param>
-        /// <param name="targetID">targetID</param>
-        /// <param name="isAdd">isAdd</param>
-        /// <returns>bool</returns>
-        private bool UpdateListHandler(IEnumerable<string> list, string targetID, bool isAdd)
-        {
-            if (isAdd)
+            if (isVerifyReceiver)
             {
-                if (!list.Contains(targetID))
+                if (string.IsNullOrEmpty(interactiveCommand.ReceiverID))
                 {
-                    (list as List<string>).Add(targetID);
-                    return true;
+                    return "接收者會員編號無效.";
                 }
-
-                return false;
             }
-            else
-            {
-                if (list.Contains(targetID))
-                {
-                    (list as List<string>).Remove(targetID);
-                    return true;
-                }
 
-                return false;
-            }
+            return string.Empty;
         }
     }
 }

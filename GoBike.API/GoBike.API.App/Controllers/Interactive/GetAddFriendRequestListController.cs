@@ -3,8 +3,8 @@ using GoBike.API.App.Filters;
 using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interactive;
 using GoBike.API.Service.Interface.Interactive;
+using GoBike.API.Service.Models.Command;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,7 @@ namespace GoBike.API.App.Controllers.Interactive
     /// <summary>
     /// 取得加入好友請求名單
     /// </summary>
-    [Route("api/friend/[controller]")]
+    [Route("api/Friend/[controller]")]
     [ApiController]
     public class GetAddFriendRequestListController : ApiController
     {
@@ -60,7 +60,7 @@ namespace GoBike.API.App.Controllers.Interactive
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.GetAddFriendRequestList(new InteractiveInfoDto() { InitiatorID = memberID });
+                ResponseResultDto responseResultDto = await this.interactiveService.GetAddFriendRequestList(new InteractiveCommandDto() { InitiatorID = memberID });
                 if (responseResultDto.Ok)
                 {
                     return Ok(this.mapper.Map<IEnumerable<MemberViewDto>>(responseResultDto.Data));
@@ -70,7 +70,7 @@ namespace GoBike.API.App.Controllers.Interactive
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Add Friend Request List Error >>> MemberID:{memberID}\n{ex}");
+                this.logger.LogError($"Get Add Friend Request List Error >>> InitiatorID:{memberID}\n{ex}");
                 return BadRequest("取得加入好友請求名單發生錯誤.");
             }
         }

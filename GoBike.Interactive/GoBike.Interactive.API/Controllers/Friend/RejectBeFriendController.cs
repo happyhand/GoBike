@@ -10,7 +10,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
     /// <summary>
     /// 拒絕加入好友
     /// </summary>
-    [Route("api/friend/[controller]")]
+    [Route("api/Friend/[controller]")]
     [ApiController]
     public class RejectBeFriendController : ControllerBase
     {

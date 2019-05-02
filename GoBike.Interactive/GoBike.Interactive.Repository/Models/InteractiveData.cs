@@ -41,17 +41,6 @@ namespace GoBike.Interactive.Repository.Models
     public class InteractiveData
     {
         /// <summary>
-        /// Gets or sets Id
-        /// </summary>
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets MemberID
-        /// </summary>
-        [BsonElement("MemberID")]
-        public string MemberID { get; set; }
-
-        /// <summary>
         /// Gets or sets BlacklistIDs
         /// </summary>
         [BsonElement("BlacklistIDs")]
@@ -62,6 +51,17 @@ namespace GoBike.Interactive.Repository.Models
         /// </summary>
         [BsonElement("FriendListIDs")]
         public IEnumerable<string> FriendListIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets Id
+        /// </summary>
+        public ObjectId Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        [BsonElement("MemberID")]
+        public string MemberID { get; set; }
 
         /// <summary>
         /// Gets or sets RequestListIDs

@@ -3,7 +3,7 @@
     /// <summary>
     /// 會員資料
     /// </summary>
-    public class MemberInfoDto
+    public class MemberInfoDto : MemberBaseDto
     {
         /// <summary>
         /// 建構式
@@ -31,24 +31,14 @@
         public decimal BodyWeight { get; set; }
 
         /// <summary>
-        /// Gets or sets Email
-        /// </summary>
-        public string Email { get; set; }
-
-        /// <summary>
         /// Gets or sets Gender
         /// </summary>
         public int Gender { get; set; }
 
         /// <summary>
-        /// Gets or sets MemberID
+        /// Gets or sets InteractiveStatus (0:等待加入好友請求確認,1:處理加入好友請求，2:好友，-1:黑名單，-2:無互動資料)
         /// </summary>
-        public string MemberID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Mobile
-        /// </summary>
-        public string Mobile { get; set; }
+        public int InteractiveStatus { get; set; }
 
         /// <summary>
         /// Gets or sets Nickname
@@ -56,18 +46,8 @@
         public string Nickname { get; set; }
 
         /// <summary>
-        /// Gets or sets Password
-        /// </summary>
-        public string Password { get; set; }
-
-        /// <summary>
         /// Gets or sets Photo
         /// </summary>
         public string Photo { get; set; }
-
-        /// <summary>
-        /// Gets or sets Status (0:等待確認，1:好友，-1:黑名單，-2:無互動資料)
-        /// </summary>
-        public int Status { get; set; }
     }
 }

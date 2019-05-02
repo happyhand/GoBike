@@ -40,20 +40,20 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST - 一般登入
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]")]
-        public async Task<IActionResult> NormalLogin(MemberInfoDto memberInfo)
+        public async Task<IActionResult> NormalLogin(MemberBaseDto memberBase)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Login(memberInfo);
+                ResponseResultDto responseResultDto = await this.memberService.Login(memberBase.Email, memberBase.Password);
                 return this.ResponseResultHandler(responseResultDto);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Normal Login Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
+                this.logger.LogError($"Normal Login Error >>> Email:{memberBase.Email} Password:{memberBase.Password}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
@@ -65,16 +65,16 @@ namespace GoBike.API.App.Controllers.Member
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]/token")]
-        public async Task<IActionResult> TokenLogin(InputData inputData)
+        public async Task<IActionResult> TokenLogin(MemberBaseDto memberBase)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Login(inputData.Token);
+                ResponseResultDto responseResultDto = await this.memberService.Login(memberBase.Token);
                 return this.ResponseResultHandler(responseResultDto);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Token Login Error >>> Token:{inputData.Token}\n{ex}");
+                this.logger.LogError($"Token Login Error >>> Token:{memberBase.Token}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
@@ -88,23 +88,12 @@ namespace GoBike.API.App.Controllers.Member
         {
             if (responseResultDto.Ok)
             {
-                LoginInfoDto loginInfoDto = responseResultDto.Data as LoginInfoDto;
-                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, loginInfoDto.MemberID);
-                return Ok(loginInfoDto.Token);
+                MemberBaseDto memberBase = responseResultDto.Data as MemberBaseDto;
+                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberBase.MemberID);
+                return Ok(memberBase.Token);
             }
 
             return BadRequest(responseResultDto.Data);
-        }
-
-        /// <summary>
-        /// 請求資料
-        /// </summary>
-        public class InputData
-        {
-            /// <summary>
-            /// Gets or sets Token
-            /// </summary>
-            public string Token { get; set; }
         }
     }
 }

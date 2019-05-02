@@ -45,5 +45,12 @@ namespace GoBike.Member.Service.Interface
         /// <param name="memberInfo">memberInfo</param>
         /// <returns>string</returns>
         Task<string> Register(MemberInfoDto memberInfo);
+
+        /// <summary>
+        /// 驗證會員資料
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>string</returns>
+        Task<string> VerifyMemberList(IEnumerable<string> memberIDs);
     }
 }

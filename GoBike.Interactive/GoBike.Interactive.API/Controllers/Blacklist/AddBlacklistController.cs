@@ -10,7 +10,7 @@ namespace GoBike.Interactive.API.Controllers.Blacklist
     /// <summary>
     /// 加入黑名單
     /// </summary>
-    [Route("api/blacklist/[controller]")]
+    [Route("api/Blacklist/[controller]")]
     [ApiController]
     public class AddBlacklistController : ControllerBase
     {

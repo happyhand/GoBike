@@ -61,7 +61,7 @@ namespace GoBike.API.App.Controllers.Member
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(new MemberInfoDto() { MemberID = memberID });
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(new MemberBaseDto() { MemberID = memberID });
                 if (responseResultDto.Ok)
                 {
                     return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
@@ -83,11 +83,11 @@ namespace GoBike.API.App.Controllers.Member
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(MemberBaseDto memberBase)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberInfo);
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberBase);
                 if (responseResultDto.Ok)
                 {
                     return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
@@ -97,7 +97,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
         }

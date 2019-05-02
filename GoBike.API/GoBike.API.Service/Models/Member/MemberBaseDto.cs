@@ -1,19 +1,29 @@
 ﻿namespace GoBike.API.Service.Models.Member
 {
     /// <summary>
-    /// 登入資料
+    /// 會員基本資料
     /// </summary>
-    public class LoginInfoDto
+    public class MemberBaseDto
     {
+        /// <summary>
+        /// Gets or sets Email
+        /// </summary>
+        public string Email { get; set; }
+
         /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
 
         /// <summary>
-        /// Gets or sets Status
+        /// Gets or sets Mobile
         /// </summary>
-        public int Status { get; set; }
+        public string Mobile { get; set; }
+
+        /// <summary>
+        /// Gets or sets Password
+        /// </summary>
+        public string Password { get; set; }
 
         /// <summary>
         /// Gets or sets Token

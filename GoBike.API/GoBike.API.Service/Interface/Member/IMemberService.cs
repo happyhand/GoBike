@@ -20,16 +20,17 @@ namespace GoBike.API.Service.Interface.Member
         /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> GetMemberInfo(MemberInfoDto memberInfo);
+        Task<ResponseResultDto> GetMemberInfo(MemberBaseDto memberBase);
 
         /// <summary>
         /// 會員登入 (normal)
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> Login(MemberInfoDto memberInfo);
+        Task<ResponseResultDto> Login(string email, string password);
 
         /// <summary>
         /// 會員登入 (token)
@@ -41,16 +42,16 @@ namespace GoBike.API.Service.Interface.Member
         /// <summary>
         /// 會員註冊
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> Register(MemberInfoDto memberInfo);
+        Task<ResponseResultDto> Register(MemberBaseDto memberBase);
 
         /// <summary>
-        /// 忘記密碼
+        /// 重設密碼
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> ResetPassword(MemberInfoDto memberInfo);
+        /// <param name="memberBase">memberBase</param>
+        /// <returns>HttpResponseMessage</returns>
+        Task<ResponseResultDto> ResetPassword(MemberBaseDto memberBase);
 
         /// <summary>
         /// 上傳頭像

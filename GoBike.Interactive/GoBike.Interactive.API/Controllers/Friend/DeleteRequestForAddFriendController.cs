@@ -10,7 +10,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
     /// <summary>
     /// 刪除加入好友請求
     /// </summary>
-    [Route("api/friend/[controller]")]
+    [Route("api/Friend/[controller]")]
     [ApiController]
     public class DeleteRequestForAddFriendController : ControllerBase
     {

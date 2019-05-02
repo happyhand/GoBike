@@ -94,7 +94,7 @@ namespace GoBike.API.App.Controllers.Member
                 }
                 else
                 {
-                    ResponseResultDto responseResultDto = await this.memberService.ResetPassword(new MemberInfoDto() { Email = verifierInfo.Email });
+                    ResponseResultDto responseResultDto = await this.memberService.ResetPassword(new MemberBaseDto() { Email = verifierInfo.Email });
                     if (responseResultDto.Ok)
                     {
                         return Ok(responseResultDto.Data);

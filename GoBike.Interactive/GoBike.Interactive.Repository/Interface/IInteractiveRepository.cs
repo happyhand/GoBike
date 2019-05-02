@@ -32,13 +32,6 @@ namespace GoBike.Interactive.Repository.Interface
         Task<InteractiveData> GetInteractiveData(string memberID);
 
         /// <summary>
-        /// 更新互動資料
-        /// </summary>
-        /// <param name="interactiveData">interactiveData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData);
-
-        /// <summary>
         /// 更新黑名單
         /// </summary>
         /// <param name="memberID">memberID</param>
@@ -53,6 +46,13 @@ namespace GoBike.Interactive.Repository.Interface
         /// <param name="friendListIDs">friendListIDs</param>
         /// <returns>Tuple(bool, string)</returns>
         Task<Tuple<bool, string>> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs);
+
+        /// <summary>
+        /// 更新互動資料
+        /// </summary>
+        /// <param name="interactiveData">interactiveData</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData);
 
         /// <summary>
         /// 更新請求名單

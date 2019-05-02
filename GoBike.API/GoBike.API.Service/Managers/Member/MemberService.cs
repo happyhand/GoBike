@@ -84,13 +84,13 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> GetMemberInfo(MemberInfoDto memberInfo)
+        public async Task<ResponseResultDto> GetMemberInfo(MemberBaseDto memberBase)
         {
             try
             {
-                if (string.IsNullOrEmpty(memberInfo.MemberID) && string.IsNullOrEmpty(memberInfo.Email) && string.IsNullOrEmpty(memberInfo.Mobile))
+                if (string.IsNullOrEmpty(memberBase.MemberID) && string.IsNullOrEmpty(memberBase.Email) && string.IsNullOrEmpty(memberBase.Mobile))
                 {
                     return new ResponseResultDto()
                     {
@@ -99,7 +99,7 @@ namespace GoBike.API.Service.Managers.Member
                     };
                 }
 
-                string postData = JsonConvert.SerializeObject(memberInfo);
+                string postData = JsonConvert.SerializeObject(memberBase);
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
@@ -118,7 +118,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -130,11 +130,12 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員登入 (normal)
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Login(MemberInfoDto memberInfo)
+        public async Task<ResponseResultDto> Login(string email, string password)
         {
-            if (string.IsNullOrEmpty(memberInfo.Email) || string.IsNullOrEmpty(memberInfo.Password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 return new ResponseResultDto()
                 {
@@ -145,7 +146,7 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                string postData = JsonConvert.SerializeObject(memberInfo);
+                string postData = JsonConvert.SerializeObject(new MemberBaseDto() { Email = email, Password = password });
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
                 string result = await httpResponseMessage.Content.ReadAsAsync<string>();
                 if (httpResponseMessage.IsSuccessStatusCode)
@@ -153,10 +154,10 @@ namespace GoBike.API.Service.Managers.Member
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = new LoginInfoDto()
+                        Data = new MemberBaseDto()
                         {
                             MemberID = result,
-                            Token = $"{Utility.EncryptAES(memberInfo.Email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(memberInfo.Password)}"
+                            Token = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
                         }
                     };
                 }
@@ -169,7 +170,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Login Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
+                this.logger.LogError($"Login Error >>> Email:{email} Password:{password}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -212,17 +213,17 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
 
-            return await this.Login(new MemberInfoDto() { Email = email, Password = password });
+            return await this.Login(email, password);
         }
 
         /// <summary>
         /// 會員註冊
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Register(MemberInfoDto memberInfo)
+        public async Task<ResponseResultDto> Register(MemberBaseDto memberBase)
         {
-            if (string.IsNullOrEmpty(memberInfo.Email) || string.IsNullOrEmpty(memberInfo.Password))
+            if (string.IsNullOrEmpty(memberBase.Email) || string.IsNullOrEmpty(memberBase.Password))
             {
                 return new ResponseResultDto()
                 {
@@ -233,7 +234,7 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                string postData = JsonConvert.SerializeObject(memberInfo);
+                string postData = JsonConvert.SerializeObject(memberBase);
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
                 return new ResponseResultDto()
                 {
@@ -243,7 +244,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
+                this.logger.LogError($"Register Error >>> Email:{memberBase.Email} Password:{memberBase.Password}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -255,11 +256,11 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 重設密碼
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<ResponseResultDto> ResetPassword(MemberInfoDto memberInfo)
+        public async Task<ResponseResultDto> ResetPassword(MemberBaseDto memberBase)
         {
-            if (string.IsNullOrEmpty(memberInfo.Email))
+            if (string.IsNullOrEmpty(memberBase.Email))
             {
                 return new ResponseResultDto()
                 {
@@ -270,12 +271,12 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                memberInfo.Password = Guid.NewGuid().ToString().Substring(0, 8);
-                string postData = JsonConvert.SerializeObject(memberInfo);
+                memberBase.Password = Guid.NewGuid().ToString().Substring(0, 8);
+                string postData = JsonConvert.SerializeObject(memberBase);
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberInfo.Email, memberInfo.Password);
+                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberBase.Email, memberBase.Password);
                     postData = JsonConvert.SerializeObject(emailContext);
                     httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
@@ -296,7 +297,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,

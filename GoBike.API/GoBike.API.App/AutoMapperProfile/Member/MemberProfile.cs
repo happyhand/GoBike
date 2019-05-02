@@ -9,7 +9,6 @@ namespace GoBike.API.App.AutoMapperProfile.Member
         public MemberProfile()
         {
             CreateMap<MemberInfoDto, MemberViewDto>().ReverseMap();
-            CreateMap<MemberInfoDto, MemberInteractiveViewDto>().ReverseMap();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
     /// <summary>
     /// 取得好友名單
     /// </summary>
-    [Route("api/friend/[controller]")]
+    [Route("api/Friend/[controller]")]
     [ApiController]
     public class GetFriendListController : ControllerBase
     {

@@ -250,6 +250,30 @@ namespace GoBike.Member.Service.Managers
         }
 
         /// <summary>
+        /// 驗證會員資料
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>string</returns>
+        public async Task<string> VerifyMemberList(IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                if (memberIDs == null || memberIDs.Count() == 0)
+                {
+                    return "無查詢資料.";
+                }
+
+                bool result = await this.memberRepository.VerifyMemberList(memberIDs.Distinct());
+                return result ? string.Empty : "無會員資料.";
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Member List Error >>> Data:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return "驗證會員資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
         /// 驗證密碼格式
         /// </summary>
         /// <param name="password">password</param>

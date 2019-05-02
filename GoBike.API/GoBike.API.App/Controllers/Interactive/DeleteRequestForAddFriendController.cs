@@ -1,8 +1,8 @@
 ﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interactive;
 using GoBike.API.Service.Interface.Interactive;
+using GoBike.API.Service.Models.Command;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +15,7 @@ namespace GoBike.API.App.Controllers.Interactive
     /// <summary>
     /// 刪除加入好友請求
     /// </summary>
-    [Route("api/friend/[controller]")]
+    [Route("api/Friend/[controller]")]
     [ApiController]
     public class DeleteRequestForAddFriendController : ApiController
     {
@@ -43,16 +43,16 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(MemberBaseDto memberBase)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.DeleteRequestForAddFriend(new InteractiveInfoDto() { InitiatorID = memberID, PassiveID = memberInfo.MemberID });
+                ResponseResultDto responseResultDto = await this.interactiveService.DeleteRequestForAddFriend(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = memberBase.MemberID });
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -62,7 +62,7 @@ namespace GoBike.API.App.Controllers.Interactive
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{memberID} PassiveID:{memberInfo.MemberID}\n{ex}");
+                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{memberID} ReceiverID:{memberBase.MemberID}\n{ex}");
                 return BadRequest("刪除加入好友請求錯誤.");
             }
         }

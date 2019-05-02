@@ -3,9 +3,9 @@ using GoBike.API.App.Filters;
 using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interactive;
 using GoBike.API.Service.Interface.Interactive;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Command;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -60,22 +60,22 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(MemberBaseDto memberBase)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberInfo);
+                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberBase);
                 if (responseResultDto.Ok)
                 {
-                    responseResultDto = await this.interactiveService.SearchFriend(new InteractiveInfoDto() { InitiatorID = memberID, PassiveID = (responseResultDto.Data as MemberInfoDto).MemberID });
+                    responseResultDto = await this.interactiveService.SearchFriend(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = (responseResultDto.Data as MemberInfoDto).MemberID });
                     if (responseResultDto.Ok)
                     {
-                        return Ok(this.mapper.Map<MemberInteractiveViewDto>(responseResultDto.Data));
+                        return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
                     }
 
                     return BadRequest(responseResultDto.Data);
@@ -85,7 +85,7 @@ namespace GoBike.API.App.Controllers.Interactive
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Friend Error >>> InitiatorID:{memberID} PassiveEmail:{memberInfo.Email}\n{ex}");
+                this.logger.LogError($"Search Friend Error >>> InitiatorID:{memberID} ReceiverEmail:{memberBase.Email}\n{ex}");
                 return BadRequest("搜尋好友發生錯誤.");
             }
         }

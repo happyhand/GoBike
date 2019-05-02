@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GoBike.Member.Repository.Managers
@@ -212,6 +213,26 @@ namespace GoBike.Member.Repository.Managers
             {
                 this.logger.LogError($"Update Memebr Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
                 return Tuple.Create(false, "更新會員資料發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 驗證會員資料
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        public async Task<bool> VerifyMemberList(IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.In("MemberID", memberIDs);
+                long count = await this.memberDatas.CountDocumentsAsync(filter);
+                return memberIDs.Count() == count;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Member List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
             }
         }
     }

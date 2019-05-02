@@ -39,14 +39,14 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberBase">memberBase</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(MemberBaseDto memberBase)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Register(memberInfo);
+                ResponseResultDto responseResultDto = await this.memberService.Register(memberBase);
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -56,7 +56,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Email:{memberInfo.Email} Password:{memberInfo.Password}\n{ex}");
+                this.logger.LogError($"Register Error >>> Email:{memberBase.Email} Password:{memberBase.Password}\n{ex}");
                 return BadRequest("會員註冊發生錯誤.");
             }
         }
