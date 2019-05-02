@@ -54,7 +54,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
@@ -100,7 +100,7 @@ namespace GoBike.API.Service.Managers.Member
                 }
 
                 string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
@@ -146,7 +146,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
                 string result = await httpResponseMessage.Content.ReadAsAsync<string>();
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
@@ -234,7 +234,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -272,12 +272,12 @@ namespace GoBike.API.Service.Managers.Member
             {
                 memberInfo.Password = Guid.NewGuid().ToString().Substring(0, 8);
                 string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberInfo.Email, memberInfo.Password);
                     postData = JsonConvert.SerializeObject(emailContext);
-                    httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         return new ResponseResultDto()
@@ -333,7 +333,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 //this.logger.LogInformation($"UploadPhoto >>> {file.Length}");
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.UploadFilesService, "api/UploadFiles/Images", new FormFileCollection() { file });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.UploadFilesService, "api/UploadFiles/Images", new FormFileCollection() { file });
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     string photoUrl = (await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>()).FirstOrDefault();

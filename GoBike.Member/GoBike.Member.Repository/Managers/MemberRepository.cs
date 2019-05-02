@@ -84,6 +84,32 @@ namespace GoBike.Member.Repository.Managers
         }
 
         /// <summary>
+        /// 取得會員序號
+        /// </summary>
+        /// <returns>long</returns>
+        public async Task<Tuple<long, string>> GetMemberSerialNumber()
+        {
+            try
+            {
+                long count = await this.serialNumberDatas.CountDocumentsAsync(new BsonDocument());
+                if (count == 0)
+                {
+                    await this.serialNumberDatas.InsertOneAsync(new SerialNumberData() { SequenceName = "MemberID", SequenceValue = 100001 });
+                }
+
+                var filter = Builders<SerialNumberData>.Filter.Eq("SequenceName", "MemberID");
+                var update = Builders<SerialNumberData>.Update.Inc("SequenceValue", 1);
+                SerialNumberData result = await this.serialNumberDatas.FindOneAndUpdateAsync(filter, update);
+                return Tuple.Create(result.SequenceValue, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Member Serial Number Error\n{ex}");
+                return Tuple.Create<long, string>(-1, "取得會員序號發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 取得會員資料 (By Email)
         /// </summary>
         /// <param name="email">email</param>
@@ -186,32 +212,6 @@ namespace GoBike.Member.Repository.Managers
             {
                 this.logger.LogError($"Update Memebr Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
                 return Tuple.Create(false, "更新會員資料發生錯誤.");
-            }
-        }
-
-        /// <summary>
-        /// 取得會員序號
-        /// </summary>
-        /// <returns>long</returns>
-        public async Task<Tuple<long, string>> GetMemberSerialNumber()
-        {
-            try
-            {
-                long count = await this.serialNumberDatas.CountDocumentsAsync(new BsonDocument());
-                if (count == 0)
-                {
-                    await this.serialNumberDatas.InsertOneAsync(new SerialNumberData() { SequenceName = "MemberID", SequenceValue = 100001 });
-                }
-
-                var filter = Builders<SerialNumberData>.Filter.Eq("SequenceName", "MemberID");
-                var update = Builders<SerialNumberData>.Update.Inc("SequenceValue", 1);
-                SerialNumberData result = await this.serialNumberDatas.FindOneAndUpdateAsync(filter, update);
-                return Tuple.Create(result.SequenceValue, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Member Serial Number Error\n{ex}");
-                return Tuple.Create<long, string>(-1, "取得會員序號發生錯誤.");
             }
         }
     }

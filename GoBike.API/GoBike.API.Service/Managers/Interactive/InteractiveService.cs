@@ -60,7 +60,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/AddBlacklist", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/AddBlacklist", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -106,7 +106,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriend", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriend", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -152,7 +152,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriendRequest", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriendRequest", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -189,7 +189,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/DeleteBlacklist", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/DeleteBlacklist", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -226,7 +226,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteFriend", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteFriend", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -263,7 +263,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteRequestForAddFriend", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteRequestForAddFriend", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -300,7 +300,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetAddFriendRequestList", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetAddFriendRequestList", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
@@ -346,7 +346,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/GetBlacklist", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/GetBlacklist", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
@@ -392,7 +392,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetFriendList", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetFriendList", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()
@@ -438,7 +438,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/RejectBeFriend", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/RejectBeFriend", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -475,7 +475,7 @@ namespace GoBike.API.Service.Managers.Interactive
             try
             {
                 string postData = JsonConvert.SerializeObject(interactiveInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/SearchFriend", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/SearchFriend", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new ResponseResultDto()

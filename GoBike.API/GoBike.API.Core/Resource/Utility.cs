@@ -101,13 +101,27 @@ namespace GoBike.API.Core.Resource
         #region API 串接
 
         /// <summary>
-        /// POST API
+        /// API Get
+        /// </summary>
+        /// <param name="domain">domain</param>
+        /// <param name="apiUrl">apiUrl</param>
+        /// <returns>HttpResponseMessage</returns>
+        public static async Task<HttpResponseMessage> ApiGet(string domain, string apiUrl)
+        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri($"http://{domain}/");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return await client.GetAsync(apiUrl);
+        }
+
+        /// <summary>
+        /// API POST
         /// </summary>
         /// <param name="domain">domain</param>
         /// <param name="apiUrl">apiUrl</param>
         /// <param name="postData">postData</param>
         /// <returns>HttpResponseMessage</returns>
-        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, string postData)
+        public static async Task<HttpResponseMessage> ApiPost(string domain, string apiUrl, string postData)
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri($"http://{domain}/");
@@ -117,13 +131,13 @@ namespace GoBike.API.Core.Resource
         }
 
         /// <summary>
-        /// POST API
+        /// API POST
         /// </summary>
         /// <param name="domain">domain</param>
         /// <param name="apiUrl">apiUrl</param>
         /// <param name="files">files</param>
         /// <returns>HttpResponseMessage</returns>
-        public static async Task<HttpResponseMessage> POST(string domain, string apiUrl, IFormFileCollection files)
+        public static async Task<HttpResponseMessage> ApiPost(string domain, string apiUrl, IFormFileCollection files)
         {
             //// 建立 HttpClient
             HttpClient client = new HttpClient();

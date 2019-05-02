@@ -52,12 +52,12 @@ namespace GoBike.API.Service.Managers.Team
                 }
 
                 string postData = JsonConvert.SerializeObject(teamCommand);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/team/GetApplyForRequestList", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/team/GetApplyForRequestList", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     IEnumerable<string> memberIDs = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>();
                     postData = JsonConvert.SerializeObject(memberIDs);
-                    httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/list", postData);
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/list", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         return new ResponseResultDto()

@@ -250,6 +250,40 @@ namespace GoBike.Member.Service.Managers
         }
 
         /// <summary>
+        /// 驗證密碼格式
+        /// </summary>
+        /// <param name="password">password</param>
+        /// <returns>bool</returns>
+        private bool IsValidPassword(string password)
+        {
+            int passwordCount = password.Length;
+            if (passwordCount < 8 || passwordCount > 14)
+            {
+                return false;
+            }
+
+            int preCharCode = -1;
+            for (int i = 0; i < passwordCount; i++)
+            {
+                string word = password[i].ToString();
+                int charCode = (int)password[i];
+                if (!Regex.IsMatch(word, @"[0-9a-zＡ-Ｚ０-９]"))
+                {
+                    return false;
+                }
+
+                if (Math.Abs(charCode - preCharCode) == 1)
+                {
+                    return false;
+                }
+
+                preCharCode = charCode;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// 會員資料更新處理
         /// </summary>
         /// <param name="memberInfo">memberInfo</param>
@@ -261,10 +295,10 @@ namespace GoBike.Member.Service.Managers
             if (!string.IsNullOrEmpty(memberInfo.BirthDayDate))
                 memberData.BirthDayDate = memberInfo.BirthDayDate;
 
-            if (memberInfo.BodyHeight != -1)
+            if (memberInfo.BodyHeight != decimal.MinusOne)
                 memberData.BodyHeight = memberInfo.BodyHeight;
 
-            if (memberInfo.BodyWeight != -1)
+            if (memberInfo.BodyWeight != decimal.MinusOne)
                 memberData.BodyWeight = memberInfo.BodyWeight;
 
             if (memberInfo.Gender != -1)
@@ -301,40 +335,6 @@ namespace GoBike.Member.Service.Managers
             }
 
             return string.Empty;
-        }
-
-        /// <summary>
-        /// 驗證密碼格式
-        /// </summary>
-        /// <param name="password">password</param>
-        /// <returns>bool</returns>
-        private bool IsValidPassword(string password)
-        {
-            int passwordCount = password.Length;
-            if (passwordCount < 8 || passwordCount > 14)
-            {
-                return false;
-            }
-
-            int preCharCode = -1;
-            for (int i = 0; i < passwordCount; i++)
-            {
-                string word = password[i].ToString();
-                int charCode = (int)password[i];
-                if (!Regex.IsMatch(word, @"[0-9a-zＡ-Ｚ０-９]"))
-                {
-                    return false;
-                }
-
-                if (Math.Abs(charCode - preCharCode) == 1)
-                {
-                    return false;
-                }
-
-                preCharCode = charCode;
-            }
-
-            return true;
         }
     }
 }

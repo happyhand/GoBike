@@ -39,14 +39,14 @@
             public string MemberService { get; set; }
 
             /// <summary>
-            /// Gets or sets TeamService
-            /// </summary>
-            public string TeamService { get; set; }
-
-            /// <summary>
             /// Gets or sets SmtpService
             /// </summary>
             public string SmtpService { get; set; }
+
+            /// <summary>
+            /// Gets or sets TeamService
+            /// </summary>
+            public string TeamService { get; set; }
 
             /// <summary>
             /// Gets or sets UploadFilesService

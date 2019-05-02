@@ -10,8 +10,8 @@
         /// </summary>
         public MemberInfoDto()
         {
-            this.BodyHeight = -1;
-            this.BodyWeight = -1;
+            this.BodyHeight = decimal.MinusOne;
+            this.BodyWeight = decimal.MinusOne;
             this.Gender = -1;
         }
 

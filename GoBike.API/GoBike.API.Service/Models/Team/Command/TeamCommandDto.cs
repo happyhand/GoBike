@@ -8,6 +8,11 @@ namespace GoBike.API.Service.Models.Command
     public class TeamCommandDto
     {
         /// <summary>
+        /// Gets or sets Data
+        /// </summary>
+        public TeamInfoDto Data { get; set; }
+
+        /// <summary>
         /// Gets or sets ExaminerID
         /// </summary>
         public string ExaminerID { get; set; }
@@ -21,10 +26,5 @@ namespace GoBike.API.Service.Models.Command
         /// Gets or sets TeamID
         /// </summary>
         public string TeamID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Data
-        /// </summary>
-        public TeamInfoDto Data { get; set; }
     }
 }

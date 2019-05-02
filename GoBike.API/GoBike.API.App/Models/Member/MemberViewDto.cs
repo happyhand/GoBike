@@ -13,12 +13,12 @@
         /// <summary>
         /// Gets or sets BodyHeight
         /// </summary>
-        public decimal? BodyHeight { get; set; }
+        public decimal BodyHeight { get; set; }
 
         /// <summary>
         /// Gets or sets BodyWeight
         /// </summary>
-        public decimal? BodyWeight { get; set; }
+        public decimal BodyWeight { get; set; }
 
         /// <summary>
         /// Gets or sets Email
@@ -28,7 +28,7 @@
         /// <summary>
         /// Gets or sets Gender
         /// </summary>
-        public int? Gender { get; set; }
+        public int Gender { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID

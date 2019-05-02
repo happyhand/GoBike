@@ -110,7 +110,7 @@ namespace GoBike.API.Service.Managers.Verifier
             try
             {
                 string postData = JsonConvert.SerializeObject(emailContext);
-                HttpResponseMessage httpResponseMessage = await Utility.POST(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierInfo.Type}-{verifierInfo.Email}-{verifierInfo.VerifierCode}";

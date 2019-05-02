@@ -25,6 +25,12 @@ namespace GoBike.Member.Repository.Interface
         Task<bool> DeleteMemebrData(string memberID);
 
         /// <summary>
+        /// 取得會員序號
+        /// </summary>
+        /// <returns>Tuple(long, string)</returns>
+        Task<Tuple<long, string>> GetMemberSerialNumber();
+
+        /// <summary>
         /// 取得會員資料 (By Email)
         /// </summary>
         /// <param name="email">email</param>
@@ -58,11 +64,5 @@ namespace GoBike.Member.Repository.Interface
         /// <param name="memberData">memberData</param>
         /// <returns>Tuple(bool, string)</returns>
         Task<Tuple<bool, string>> UpdateMemebrData(MemberData memberData);
-
-        /// <summary>
-        /// 取得會員序號
-        /// </summary>
-        /// <returns>Tuple(long, string)</returns>
-        Task<Tuple<long, string>> GetMemberSerialNumber();
     }
 }
