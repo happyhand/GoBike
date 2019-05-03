@@ -23,11 +23,6 @@ namespace GoBike.Team.Service.Models.Data
         public string TeamCoverPhoto { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamLeaderID
-        /// </summary>
-        public string TeamLeaderID { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamExamineStatus (0:close, 1:open)
         /// </summary>
         public int TeamExamineStatus { get; set; }
@@ -41,6 +36,11 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets TeamInfo
         /// </summary>
         public string TeamInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamLeaderID
+        /// </summary>
+        public string TeamLeaderID { get; set; }
 
         /// <summary>
         /// Gets or sets TeamLocation

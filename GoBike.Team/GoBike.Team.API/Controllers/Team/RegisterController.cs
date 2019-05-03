@@ -1,5 +1,5 @@
 ﻿using GoBike.Team.Service.Interface;
-using GoBike.Team.Service.Models.Command;
+using GoBike.Team.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -39,14 +39,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamInfo">teamInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Post(TeamInfoDto teamInfo)
         {
             try
             {
-                string result = await this.teamService.Register(teamCommand);
+                string result = await this.teamService.Register(teamInfo);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("建立車隊成功.");
@@ -56,7 +56,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Data:{JsonConvert.SerializeObject(teamCommand)}\n{ex}");
+                this.logger.LogError($"Register Error >>> Data:{JsonConvert.SerializeObject(teamInfo)}\n{ex}");
                 return BadRequest("建立車隊發生錯誤.");
             }
         }

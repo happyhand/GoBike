@@ -58,6 +58,12 @@ namespace GoBike.Team.Repository.Models
         public ObjectId Id { get; set; }
 
         /// <summary>
+        /// Gets or sets TeamApplyForJoinIDs
+        /// </summary>
+        [BsonElement("TeamApplyForJoinIDs")]
+        public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamBlacklistedIDs
         /// </summary>
         [BsonElement("TeamBlacklistedIDs")]
@@ -82,12 +88,6 @@ namespace GoBike.Team.Repository.Models
         public DateTime TeamCreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamLeaderID
-        /// </summary>
-        [BsonElement("TeamLeaderID")]
-        public string TeamLeaderID { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamEventIDs
         /// </summary>
         [BsonElement("TeamEventIDs")]
@@ -110,6 +110,18 @@ namespace GoBike.Team.Repository.Models
         /// </summary>
         [BsonElement("TeamInfo")]
         public string TeamInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamInviteJoinIDs
+        /// </summary>
+        [BsonElement("TeamInviteJoinIDs")]
+        public IEnumerable<string> TeamInviteJoinIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamLeaderID
+        /// </summary>
+        [BsonElement("TeamLeaderID")]
+        public string TeamLeaderID { get; set; }
 
         /// <summary>
         /// Gets or sets TeamLocation

@@ -17,11 +17,6 @@ namespace GoBike.Team.Repository.Managers
     public class TeamRepository : ITeamRepository
     {
         /// <summary>
-        /// interactiveDatas
-        /// </summary>
-        private readonly IMongoCollection<InteractiveData> interactiveDatas;
-
-        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<TeamRepository> logger;
@@ -41,7 +36,6 @@ namespace GoBike.Team.Repository.Managers
             IMongoClient client = new MongoClient(AppSettingHelper.Appsetting.MongoDBConfig.ConnectionString);
             IMongoDatabase db = client.GetDatabase(AppSettingHelper.Appsetting.MongoDBConfig.TeamDatabase);
             this.teamDatas = db.GetCollection<TeamData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Team);
-            this.interactiveDatas = db.GetCollection<InteractiveData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Interactive);
         }
 
         #region 車隊資料
@@ -86,25 +80,6 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得車隊資料列表 (By TeamName)
-        /// </summary>
-        /// <param name="teamName">teamName</param>
-        /// <param name="isStrict">isStrict</param>
-        /// <returns>TeamDatas</returns>
-        public async Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict)
-        {
-            try
-            {
-                return await this.teamDatas.Find(data => isStrict ? data.TeamName.Equals(teamName) : data.TeamName.Contains(teamName)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Team Data List By TeamName Error >>> TeamName:{teamName} IsStrict:{isStrict}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 取得車隊資料
         /// </summary>
         /// <param name="teamID">teamID</param>
@@ -143,6 +118,48 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
+        /// 取得車隊資料列表 (By TeamName)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <param name="isStrict">isStrict</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict)
+        {
+            try
+            {
+                if (isStrict)
+                {
+                    return await this.teamDatas.Find(data => data.TeamName.Equals(teamName)).ToListAsync();
+                }
+
+                return await this.teamDatas.Find(data => data.TeamName.Contains(teamName)).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List By TeamName Error >>> TeamName:{teamName} IsStrict:{isStrict}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得會員的邀請加入車隊列表資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID)
+        {
+            try
+            {
+                return await this.teamDatas.Find(data => data.TeamInviteJoinIDs.Contains(memberID)).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List Of Invite Join Error >>> MemberID:{memberID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 取得會員的車隊列表資料
         /// </summary>
         /// <param name="memberID">memberID</param>
@@ -157,70 +174,6 @@ namespace GoBike.Team.Repository.Managers
             {
                 this.logger.LogError($"Get Team Data List Of Member Error >>> MemberID:{memberID}\n{ex}");
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// 更新車隊黑名單資料
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="blacklistIDs">blacklistIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> blacklistIDs)
-        {
-            try
-            {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamBlacklistIDs, blacklistIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    return Tuple.Create(false, "無法更新車隊黑名單資料.");
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    return Tuple.Create(false, "車隊黑名單資料未更改.");
-                }
-
-                return Tuple.Create(true, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} BlacklistIDs:{JsonConvert.SerializeObject(blacklistIDs)}\n{ex}");
-                return Tuple.Create(false, "更新車隊黑名單資料發生錯誤.");
-            }
-        }
-
-        /// <summary>
-        /// 更新車隊被列入黑名單資料
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs)
-        {
-            try
-            {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamBlacklistedIDs, memberIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    return Tuple.Create(false, "無法更新車隊被列入黑名單資料.");
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    return Tuple.Create(false, "車隊被列入黑名單資料未更改.");
-                }
-
-                return Tuple.Create(true, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return Tuple.Create(false, "更新車隊被列入黑名單資料發生錯誤.");
             }
         }
 
@@ -291,98 +244,130 @@ namespace GoBike.Team.Repository.Managers
         #region 車隊互動資料
 
         /// <summary>
-        /// 建立車隊互動資料
-        /// </summary>
-        /// <param name="interactiveData">interactiveData</param>
-        /// <returns>bool</returns>
-        public async Task<bool> CreateTeamInteractiveData(InteractiveData interactiveData)
-        {
-            try
-            {
-                await this.interactiveDatas.InsertOneAsync(interactiveData);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Create Team Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 刪除車隊互動資料
+        /// 更新申請加入名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>bool</returns>
-        public async Task<bool> DeleteTeamInteractiveData(string teamID, string memberID)
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
-                DeleteResult result = await this.interactiveDatas.DeleteManyAsync(data => data.TeamID.Equals(teamID) && data.MemberID.Equals(memberID));
-                return result.IsAcknowledged && result.DeletedCount > 0;
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamApplyForJoinIDs, memberIDs);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新申請加入名單資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "申請加入名單資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Team Interactive Data Error >>> TeamID:{teamID} MemberID:{memberID}\n{ex}");
-                return false;
+                this.logger.LogError($"Update Team Apply For Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return Tuple.Create(false, "更新申請加入名單資料發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 取得車隊指定互動資料
+        /// 更新車隊黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveData</returns>
-        public async Task<InteractiveData> GetTeamInteractiveData(string teamID, string memberID)
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
-                return await this.interactiveDatas.Find(data => data.TeamID.Equals(teamID) && data.MemberID.Equals(memberID)).FirstOrDefaultAsync();
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamBlacklistIDs, memberIDs);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新車隊黑名單資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "車隊黑名單資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Interactive Data Error >>> TeamID:{teamID} MemberID:{memberID}\n{ex}");
-                return null;
+                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return Tuple.Create(false, "更新車隊黑名單資料發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 取得申請加入互動資料列表
+        /// 更新車隊被列入黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <returns>InteractiveDatas</returns>
-        public async Task<IEnumerable<InteractiveData>> GetTeamInteractiveDataListForApplyForJoin(string teamID)
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
-                int applyForJoinStatus = (int)InteractiveStatusType.ApplyForJoin;
-                return await this.interactiveDatas.Find(data => data.TeamID.Equals(teamID) && data.Status == applyForJoinStatus).ToListAsync();
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamBlacklistedIDs, memberIDs);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新車隊被列入黑名單資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "車隊被列入黑名單資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Interactive Data List For Apply For Join Error >>> TeamID:{teamID}\n{ex}");
-                return null;
+                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return Tuple.Create(false, "更新車隊被列入黑名單資料發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 取得邀請加入互動資料列表
+        /// 更新邀請加入名單資料
         /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        public async Task<IEnumerable<InteractiveData>> GetTeamInteractiveDataListForInviteJoin(string memberID)
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
-                int inviteJoinStatus = (int)InteractiveStatusType.InviteJoin;
-                return await this.interactiveDatas.Find(data => data.MemberID.Equals(memberID) && data.Status == inviteJoinStatus).ToListAsync();
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamInviteJoinIDs, memberIDs);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新邀請加入名單資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "邀請加入名單資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Interactive Data List For Invite Join Error >>> MemberID:{memberID}\n{ex}");
-                return null;
+                this.logger.LogError($"Update Team Invite Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return Tuple.Create(false, "更新邀請加入名單資料發生錯誤.");
             }
         }
 

@@ -41,14 +41,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="memberCommand">memberCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Post(MemberCommandDto memberCommand)
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetMyTeamInfoList(teamCommand);
+                Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetMyTeamInfoList(memberCommand);
                 if (string.IsNullOrEmpty(result.Item3))
                 {
                     return Ok(new MyTeamInfoDto { LeaderTeamDatas = result.Item1, JoinTeamDatas = result.Item2 });
@@ -58,7 +58,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get My Team Info List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
+                this.logger.LogError($"Get My Team Info List Error >>> MemberID:{memberCommand.MemberID}\n{ex}");
                 return BadRequest("取得我的車隊資訊列表發生錯誤.");
             }
         }

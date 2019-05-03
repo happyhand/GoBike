@@ -16,14 +16,14 @@ namespace GoBike.Team.Repository.Managers
     public class EventRepository : IEventRepository
     {
         /// <summary>
-        /// logger
-        /// </summary>
-        private readonly ILogger<EventRepository> logger;
-
-        /// <summary>
         /// eventDatas
         /// </summary>
         private readonly IMongoCollection<EventData> eventDatas;
+
+        /// <summary>
+        /// logger
+        /// </summary>
+        private readonly ILogger<EventRepository> logger;
 
         /// <summary>
         /// 建構式

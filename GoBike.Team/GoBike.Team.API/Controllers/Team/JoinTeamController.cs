@@ -36,16 +36,16 @@ namespace GoBike.Team.API.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 邀請加入
+        /// POST - 申請加入
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Invite(TeamCommandDto teamCommand)
+        public async Task<IActionResult> ApplyFor(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, false, true);
+                string result = await this.teamService.JoinTeam(teamCommand, true, false);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("加入車隊成功.");
@@ -61,16 +61,16 @@ namespace GoBike.Team.API.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 申請加入
+        /// POST - 邀請加入
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> ApplyFor(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Invite(TeamCommandDto teamCommand)
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, true, false);
+                string result = await this.teamService.JoinTeam(teamCommand, false, true);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("加入車隊成功.");

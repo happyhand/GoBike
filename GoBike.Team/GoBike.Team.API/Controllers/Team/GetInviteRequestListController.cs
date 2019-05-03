@@ -40,14 +40,14 @@ namespace GoBike.Team.API.Controllers.Team
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="memberCommand">memberCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(TeamCommandDto teamCommand)
+        public async Task<IActionResult> Post(MemberCommandDto memberCommand)
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetInviteRequestList(teamCommand);
+                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetInviteRequestList(memberCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -57,7 +57,7 @@ namespace GoBike.Team.API.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Invite Request List Error >>> TargetID:{teamCommand.TargetID}\n{ex}");
+                this.logger.LogError($"Get Invite Request List Error >>> MemberID:{memberCommand.MemberID}\n{ex}");
                 return BadRequest("取得邀請請求列表發生錯誤.");
             }
         }

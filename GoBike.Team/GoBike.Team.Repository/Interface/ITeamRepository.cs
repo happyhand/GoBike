@@ -27,14 +27,6 @@ namespace GoBike.Team.Repository.Interface
         Task<bool> DeleteTeamData(string teamID);
 
         /// <summary>
-        /// 取得車隊資料列表 (By TeamName)
-        /// </summary>
-        /// <param name="teamName">teamName</param>
-        /// <param name="isStrict">isStrict</param>
-        /// <returns>TeamDatas</returns>
-        Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict);
-
-        /// <summary>
         /// 取得車隊資料
         /// </summary>
         /// <param name="teamID">teamID</param>
@@ -49,27 +41,26 @@ namespace GoBike.Team.Repository.Interface
         Task<IEnumerable<TeamData>> GetTeamDataListByTeamID(IEnumerable<string> teamIDs);
 
         /// <summary>
+        /// 取得車隊資料列表 (By TeamName)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <param name="isStrict">isStrict</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict);
+
+        /// <summary>
+        /// 取得會員的邀請加入車隊列表資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID);
+
+        /// <summary>
         /// 取得會員的車隊列表資料
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <returns>TeamDatas</returns>
         Task<IEnumerable<TeamData>> GetTeamDataListOfMember(string memberID);
-
-        /// <summary>
-        /// 更新車隊黑名單資料
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="blacklistIDs">blacklistIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> blacklistIDs);
-
-        /// <summary>
-        /// 更新車隊被列入黑名單資料
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
         /// 更新車隊資料
@@ -91,41 +82,36 @@ namespace GoBike.Team.Repository.Interface
         #region 車隊互動資料
 
         /// <summary>
-        /// 建立車隊互動資料
-        /// </summary>
-        /// <param name="interactiveData">interactiveData</param>
-        /// <returns>bool</returns>
-        Task<bool> CreateTeamInteractiveData(InteractiveData interactiveData);
-
-        /// <summary>
-        /// 刪除車隊互動資料
+        /// 更新申請加入名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>bool</returns>
-        Task<bool> DeleteTeamInteractiveData(string teamID, string memberID);
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
-        /// 取得車隊指定互動資料
+        /// 更新車隊黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveData</returns>
-        Task<InteractiveData> GetTeamInteractiveData(string teamID, string memberID);
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
-        /// 取得申請加入互動資料列表
+        /// 更新車隊被列入黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <returns>InteractiveDatas</returns>
-        Task<IEnumerable<InteractiveData>> GetTeamInteractiveDataListForApplyForJoin(string teamID);
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
-        /// 取得邀請加入互動資料列表
+        /// 更新邀請加入名單資料
         /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>InteractiveDatas</returns>
-        Task<IEnumerable<InteractiveData>> GetTeamInteractiveDataListForInviteJoin(string memberID);
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
 
         #endregion 車隊互動資料
     }

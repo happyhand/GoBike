@@ -30,9 +30,16 @@ namespace GoBike.Team.Service.Interface
         /// <summary>
         /// 取得我的車隊資訊列表
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="memberCommand">memberCommand</param>
         /// <returns>Tuple(TeamInfoDto, TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(TeamCommandDto teamCommand);
+        Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(MemberCommandDto memberCommand);
+
+        /// <summary>
+        /// 取得車隊資訊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>Tuple(TeamInfoDto, string)</returns>
+        Task<Tuple<TeamInfoDto, string>> GetTeamInfo(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 加入車隊
@@ -53,9 +60,16 @@ namespace GoBike.Team.Service.Interface
         /// <summary>
         /// 建立車隊
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamInfo">teamInfo</param>
         /// <returns>string</returns>
-        Task<string> Register(TeamCommandDto teamCommand);
+        Task<string> Register(TeamInfoDto teamInfo);
+
+        /// <summary>
+        /// 搜尋車隊資訊列表
+        /// </summary>
+        /// <param name="teamSearchCommand">teamSearchCommand</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        Task<Tuple<IEnumerable<TeamInfoDto>, string>> SearchTeamInfoList(TeamSearchCommandDto teamSearchCommand);
 
         /// <summary>
         /// 更新車隊隊長
@@ -71,20 +85,6 @@ namespace GoBike.Team.Service.Interface
         /// <param name="isAdd">isAdd</param>
         /// <returns>string</returns>
         Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand, bool isAdd);
-
-        /// <summary>
-        /// 搜尋車隊資訊列表
-        /// </summary>
-        /// <param name="teamSearchCommand">teamSearchCommand</param>
-        /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, string>> SearchTeamInfoList(TeamSearchCommandDto teamSearchCommand);
-
-        /// <summary>
-        /// 取得車隊資訊
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>Tuple(TeamInfoDto, string)</returns>
-        Task<Tuple<TeamInfoDto, string>> GetTeamInfo(TeamCommandDto teamCommand);
 
         #endregion 車隊資料
 
@@ -107,9 +107,9 @@ namespace GoBike.Team.Service.Interface
         /// <summary>
         /// 取得邀請請求列表
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="memberCommand">memberCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(TeamCommandDto teamCommand);
+        Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(MemberCommandDto memberCommand);
 
         /// <summary>
         /// 邀請加入車隊
