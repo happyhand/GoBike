@@ -75,7 +75,7 @@ namespace GoBike.API.App.Controllers.Interactive
                     responseResultDto = await this.interactiveService.SearchFriend(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = (responseResultDto.Data as MemberInfoDto).MemberID });
                     if (responseResultDto.Ok)
                     {
-                        return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
+                        return Ok(this.mapper.Map<MemberInteractiveViewDto>(responseResultDto.Data));
                     }
 
                     return BadRequest(responseResultDto.Data);

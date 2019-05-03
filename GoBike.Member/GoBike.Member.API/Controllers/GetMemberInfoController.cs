@@ -58,7 +58,7 @@ namespace GoBike.Member.API.Controllers
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Info Error >>> MemberID:{memberInfo.MemberID} Email:{memberInfo.Email} Mobile:{memberInfo.Mobile}\n{ex}");
-                return BadRequest("取得會員資訊發生錯誤");
+                return BadRequest("取得會員資訊發生錯誤.");
             }
         }
 
@@ -84,7 +84,7 @@ namespace GoBike.Member.API.Controllers
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Info List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return BadRequest("取得會員資訊列表發生錯誤");
+                return BadRequest("取得會員資訊列表發生錯誤.");
             }
         }
     }

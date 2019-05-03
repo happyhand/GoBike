@@ -54,6 +54,14 @@ namespace GoBike.API.Service.Interface.Member
         Task<ResponseResultDto> ResetPassword(MemberBaseDto memberBase);
 
         /// <summary>
+        /// 搜尋會員資訊
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="targetMemberBase">targetMemberBase</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> SearchMemberInfo(string memberID, MemberBaseDto targetMemberBase);
+
+        /// <summary>
         /// 上傳頭像
         /// </summary>
         /// <param name="memberID">memberID</param>

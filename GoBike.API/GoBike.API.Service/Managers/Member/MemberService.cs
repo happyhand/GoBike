@@ -2,6 +2,8 @@
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Command;
+using GoBike.API.Service.Models.Data;
 using GoBike.API.Service.Models.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Http;
@@ -302,6 +304,67 @@ namespace GoBike.API.Service.Managers.Member
                 {
                     Ok = false,
                     Data = "重設密碼驗證發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 搜尋會員資訊
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="targetMemberBase">targetMemberBase</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> SearchMemberInfo(string memberID, MemberBaseDto targetMemberBase)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberID))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = "會員編號無效."
+                    };
+                }
+
+                ResponseResultDto responseResult = await this.GetMemberInfo(targetMemberBase);
+                if (responseResult.Ok)
+                {
+                    MemberInfoDto targetMemberInfo = responseResult.Data as MemberInfoDto;
+                    if (targetMemberInfo.MemberID.Equals(memberID))
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = false,
+                            Data = "無法查詢會員本身資料."
+                        };
+                    }
+
+                    string postData = JsonConvert.SerializeObject(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = targetMemberInfo.MemberID });
+                    HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/SearchFriend", postData);
+                    if (!httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = false,
+                            Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                        };
+                    }
+
+                    InteractiveInfoDto interactiveInfo = await httpResponseMessage.Content.ReadAsAsync<InteractiveInfoDto>();
+                    targetMemberInfo.InteractiveStatus = interactiveInfo.Status;
+                    responseResult.Data = targetMemberInfo;
+                }
+
+                return responseResult;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Member Info Error >>> MemberID:{memberID} TargetData:{JsonConvert.SerializeObject(targetMemberBase)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "搜尋會員資訊發生錯誤."
                 };
             }
         }

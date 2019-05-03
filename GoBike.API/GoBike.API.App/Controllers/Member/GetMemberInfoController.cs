@@ -85,12 +85,13 @@ namespace GoBike.API.App.Controllers.Member
         [CheckLoginActionFilter(true)]
         public async Task<IActionResult> Post(MemberBaseDto memberBase)
         {
+            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(memberBase);
+                ResponseResultDto responseResultDto = await this.memberService.SearchMemberInfo(memberID, memberBase);
                 if (responseResultDto.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<MemberInteractiveViewDto>(responseResultDto.Data));
                 }
 
                 return BadRequest(responseResultDto.Data);

@@ -6,16 +6,6 @@
     public class MemberInfoDto
     {
         /// <summary>
-        /// 建構式
-        /// </summary>
-        public MemberInfoDto()
-        {
-            this.BodyHeight = decimal.MinusOne;
-            this.BodyWeight = decimal.MinusOne;
-            this.Gender = -1;
-        }
-
-        /// <summary>
         /// Gets or sets BirthDayDate
         /// </summary>
         public string BirthDayDate { get; set; }
