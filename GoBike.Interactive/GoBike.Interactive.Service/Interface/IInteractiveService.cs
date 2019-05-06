@@ -74,17 +74,17 @@ namespace GoBike.Interactive.Service.Interface
         Task<Tuple<IEnumerable<string>, string>> GetFriendList(InteractiveCommandDto interactiveCommand);
 
         /// <summary>
-        /// 拒絕加入好友
-        /// </summary>
-        /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <returns>string</returns>
-        Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand);
-
-        /// <summary>
         /// 取得會員互動狀態
         /// </summary>
         /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>Tuple(int, string)</returns>
         Task<Tuple<int, string>> GetMemberInteractiveStatus(InteractiveCommandDto interactiveCommand);
+
+        /// <summary>
+        /// 拒絕加入好友
+        /// </summary>
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>string</returns>
+        Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand);
     }
 }

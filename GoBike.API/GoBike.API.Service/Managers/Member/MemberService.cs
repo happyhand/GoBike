@@ -79,7 +79,7 @@ namespace GoBike.API.Service.Managers.Member
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "會員更新資訊發生錯誤."
+                    Data = "會員編輯發生錯誤."
                 };
             }
         }
@@ -151,7 +151,7 @@ namespace GoBike.API.Service.Managers.Member
                     }
 
                     postData = JsonConvert.SerializeObject(new MemberInteractiveCommandDto() { InitiatorID = memberID, ReceiverID = targetMemberInfo.MemberID });
-                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/GetMemberInteractiveStatus", postData);
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Member/GetMemberInteractiveStatus", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         targetMemberInfo.InteractiveStatus = await httpResponseMessage.Content.ReadAsAsync<int>();
@@ -860,7 +860,7 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
-        /// 取得會員資料列表
+        /// 取得會員資訊列表
         /// </summary>
         /// <param name="memberIDs">memberIDs</param>
         /// <param name="interactiveStatus">interactiveStatus</param>
@@ -892,7 +892,7 @@ namespace GoBike.API.Service.Managers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Memebr Info List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)} InteractiveStatus:{interactiveStatus}\n{ex}");
-                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得會員資料列表發生錯誤.");
+                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得會員資訊列表發生錯誤.");
             }
         }
 

@@ -22,11 +22,6 @@ namespace GoBike.API.App.Controllers.Interactive
     public class GetBlacklistController : ApiController
     {
         /// <summary>
-        /// memberService
-        /// </summary>
-        private readonly IMemberService memberService;
-
-        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<GetBlacklistController> logger;
@@ -35,6 +30,11 @@ namespace GoBike.API.App.Controllers.Interactive
         /// mapper
         /// </summary>
         private readonly IMapper mapper;
+
+        /// <summary>
+        /// memberService
+        /// </summary>
+        private readonly IMemberService memberService;
 
         /// <summary>
         /// 建構式

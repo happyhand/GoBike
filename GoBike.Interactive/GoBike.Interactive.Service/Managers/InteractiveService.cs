@@ -501,54 +501,6 @@ namespace GoBike.Interactive.Service.Managers
         }
 
         /// <summary>
-        /// 拒絕加入好友
-        /// </summary>
-        /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <returns>string</returns>
-        public async Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand)
-        {
-            try
-            {
-                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
-                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
-                {
-                    return verifyInteractiveCommandResult;
-                }
-
-                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
-                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
-                {
-                    return getInitiatorInteractiveDataReuslt.Item2;
-                }
-
-                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
-                if (initiatorInteractiveData == null)
-                {
-                    return "無發起者的互動資料.";
-                }
-
-                //// 更新發起者互動資料
-                bool updateInitiatorRequestListResult = this.UpdateListHandler(initiatorInteractiveData.RequestListIDs, interactiveCommand.ReceiverID, false);
-                if (updateInitiatorRequestListResult)
-                {
-                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateRequestList(initiatorInteractiveData.MemberID, initiatorInteractiveData.RequestListIDs);
-                    if (!initiatorUpdateResult.Item1)
-                    {
-                        this.logger.LogError($"Reject Be Friend Fail For Update Initiator Request List >>> MemberID:{initiatorInteractiveData.MemberID} RequestListIDs:{JsonConvert.SerializeObject(initiatorInteractiveData.RequestListIDs)}");
-                        return initiatorUpdateResult.Item2;
-                    }
-                }
-
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Reject Be Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
-                return "拒絕加入好友發生錯誤.";
-            }
-        }
-
-        /// <summary>
         /// 取得會員互動狀態
         /// </summary>
         /// <param name="interactiveCommand">interactiveCommand</param>
@@ -616,6 +568,54 @@ namespace GoBike.Interactive.Service.Managers
             {
                 this.logger.LogError($"Get Member Interactive Status Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
                 return Tuple.Create((int)InteractiveStatusType.None, "取得會員互動狀態發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 拒絕加入好友
+        /// </summary>
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <returns>string</returns>
+        public async Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand)
+        {
+            try
+            {
+                string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
+                {
+                    return verifyInteractiveCommandResult;
+                }
+
+                Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, false);
+                if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
+                {
+                    return getInitiatorInteractiveDataReuslt.Item2;
+                }
+
+                InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
+                if (initiatorInteractiveData == null)
+                {
+                    return "無發起者的互動資料.";
+                }
+
+                //// 更新發起者互動資料
+                bool updateInitiatorRequestListResult = this.UpdateListHandler(initiatorInteractiveData.RequestListIDs, interactiveCommand.ReceiverID, false);
+                if (updateInitiatorRequestListResult)
+                {
+                    Tuple<bool, string> initiatorUpdateResult = await this.interactiveRepository.UpdateRequestList(initiatorInteractiveData.MemberID, initiatorInteractiveData.RequestListIDs);
+                    if (!initiatorUpdateResult.Item1)
+                    {
+                        this.logger.LogError($"Reject Be Friend Fail For Update Initiator Request List >>> MemberID:{initiatorInteractiveData.MemberID} RequestListIDs:{JsonConvert.SerializeObject(initiatorInteractiveData.RequestListIDs)}");
+                        return initiatorUpdateResult.Item2;
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Be Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
+                return "拒絕加入好友發生錯誤.";
             }
         }
 

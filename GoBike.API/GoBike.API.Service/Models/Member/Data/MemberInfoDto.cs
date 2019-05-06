@@ -7,40 +7,7 @@ namespace GoBike.API.Service.Models.Member.Data
     /// </summary>
     public class MemberInfoDto
     {
-        /// <summary>
-        /// Gets or sets CreateDate
-        /// </summary>
-        public DateTime CreateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets Email
-        /// </summary>
-        public string Email { get; set; }
-
-        /// <summary>
-        /// Gets or sets LoginDate
-        /// </summary>
-        public DateTime LoginDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets MemberID
-        /// </summary>
-        public string MemberID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Mobile
-        /// </summary>
-        public string Mobile { get; set; }
-
-        /// <summary>
-        /// Gets or sets Password
-        /// </summary>
-        public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets Token
-        /// </summary>
-        public string Token { get; set; }
+        #region 會員資料
 
         /// <summary>
         /// Gets or sets BirthDayDate
@@ -58,9 +25,34 @@ namespace GoBike.API.Service.Models.Member.Data
         public decimal BodyWeight { get; set; }
 
         /// <summary>
+        /// Gets or sets CreateDate
+        /// </summary>
+        public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets Email
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
         /// Gets or sets Gender
         /// </summary>
         public int Gender { get; set; }
+
+        /// <summary>
+        /// Gets or sets LoginDate
+        /// </summary>
+        public DateTime LoginDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets MemberID
+        /// </summary>
+        public string MemberID { get; set; }
+
+        /// <summary>
+        /// Gets or sets Mobile
+        /// </summary>
+        public string Mobile { get; set; }
 
         /// <summary>
         /// Gets or sets Nickname
@@ -68,9 +60,23 @@ namespace GoBike.API.Service.Models.Member.Data
         public string Nickname { get; set; }
 
         /// <summary>
+        /// Gets or sets Password
+        /// </summary>
+        public string Password { get; set; }
+
+        /// <summary>
         /// Gets or sets Photo
         /// </summary>
         public string Photo { get; set; }
+
+        /// <summary>
+        /// Gets or sets Token
+        /// </summary>
+        public string Token { get; set; }
+
+        #endregion 會員資料
+
+        #region 會員互動資料
 
         /// <summary>
         /// Gets or sets InteractiveStatus (-1:黑名單，0:無狀態，1:等待加入好友請求確認，2:處理加入好友請求，3:好友)
@@ -83,13 +89,15 @@ namespace GoBike.API.Service.Models.Member.Data
         public int TeamJoinSetting { get; set; }
 
         /// <summary>
+        /// Gets or sets TeamKickOutSetting (0:無設定，1:請離車隊)
+        /// </summary>
+        public int TeamKickOutSetting { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamViceLeaderSetting (-1:取消副隊長，0:無設定，1:設為副隊長)
         /// </summary>
         public int TeamViceLeaderSetting { get; set; }
 
-        /// <summary>
-        /// Gets or sets TeamKickOutSetting (0:無設定，1:請離車隊)
-        /// </summary>
-        public int TeamKickOutSetting { get; set; }
+        #endregion 會員互動資料
     }
 }

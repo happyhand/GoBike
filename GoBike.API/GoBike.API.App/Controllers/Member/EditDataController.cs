@@ -73,7 +73,7 @@ namespace GoBike.API.App.Controllers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Edit Data Error >>> EditData:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
-                return BadRequest("會員更新資訊發生錯誤.");
+                return BadRequest("會員編輯發生錯誤.");
             }
         }
     }

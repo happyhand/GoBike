@@ -19,14 +19,14 @@ namespace GoBike.API.App.Controllers.Interactive
     public class DeleteBlacklistController : ApiController
     {
         /// <summary>
-        /// memberService
-        /// </summary>
-        private readonly IMemberService memberService;
-
-        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<DeleteBlacklistController> logger;
+
+        /// <summary>
+        /// memberService
+        /// </summary>
+        private readonly IMemberService memberService;
 
         /// <summary>
         /// 建構式

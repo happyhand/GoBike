@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using System;
 
 namespace GoBike.Member.API
 {
@@ -44,6 +48,7 @@ namespace GoBike.Member.API
             services.AddAutoMapper();
             this.ConfigurationHandler(services);
             this.DependencyInjectionHandler(services);
+            this.MongoDBSettingHandler();
         }
 
         private void ConfigurationHandler(IServiceCollection services)
@@ -55,6 +60,12 @@ namespace GoBike.Member.API
         {
             services.AddSingleton<IMemberService, MemberService>();
             services.AddSingleton<IMemberRepository, MemberRepository>();
+        }
+
+        private void MongoDBSettingHandler()
+        {
+            DateTimeSerializer dateTimeSerializer = new DateTimeSerializer(DateTimeKind.Local, BsonType.DateTime);
+            BsonSerializer.RegisterSerializer(typeof(DateTime), dateTimeSerializer);
         }
     }
 }

@@ -19,14 +19,14 @@ namespace GoBike.API.App.Controllers.Interactive
     public class DeleteRequestForAddFriendController : ApiController
     {
         /// <summary>
-        /// memberService
-        /// </summary>
-        private readonly IMemberService memberService;
-
-        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<DeleteRequestForAddFriendController> logger;
+
+        /// <summary>
+        /// memberService
+        /// </summary>
+        private readonly IMemberService memberService;
 
         /// <summary>
         /// 建構式

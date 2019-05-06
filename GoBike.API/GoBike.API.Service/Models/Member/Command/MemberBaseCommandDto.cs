@@ -21,13 +21,13 @@
         public string Mobile { get; set; }
 
         /// <summary>
-        /// Gets or sets Token
-        /// </summary>
-        public string Token { get; set; }
-
-        /// <summary>
         /// Gets or sets Password
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets Token
+        /// </summary>
+        public string Token { get; set; }
     }
 }

@@ -29,6 +29,12 @@ namespace GoBike.Member.Repository.Models
         public ObjectId Id { get; set; }
 
         /// <summary>
+        /// Gets or sets LoginDate
+        /// </summary>
+        [BsonElement("LoginDate")]
+        public DateTime LoginDate { get; set; }
+
+        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         [BsonElement("MemberID")]
@@ -39,12 +45,6 @@ namespace GoBike.Member.Repository.Models
         /// </summary>
         [BsonElement("Password")]
         public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets LoginDate
-        /// </summary>
-        [BsonElement("LoginDate")]
-        public DateTime LoginDate { get; set; }
 
         #endregion Base Data
 

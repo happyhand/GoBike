@@ -20,6 +20,11 @@ namespace GoBike.Member.Service.Models
         public string Email { get; set; }
 
         /// <summary>
+        /// Gets or sets LoginDate
+        /// </summary>
+        public DateTime LoginDate { get; set; }
+
+        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
@@ -28,11 +33,6 @@ namespace GoBike.Member.Service.Models
         /// Gets or sets Password
         /// </summary>
         public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets LoginDate
-        /// </summary>
-        public DateTime LoginDate { get; set; }
 
         #endregion Base Data
 
