@@ -52,13 +52,13 @@ namespace GoBike.API.App.Controllers.Member
             IFormFileCollection files = this.Request.Form.Files;
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.UploadPhoto(memberID, files.FirstOrDefault());
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.UploadPhoto(memberID, files.FirstOrDefault());
+                if (responseResult.Ok)
                 {
-                    return Ok(responseResultDto.Data);
+                    return Ok(responseResult.Data);
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {

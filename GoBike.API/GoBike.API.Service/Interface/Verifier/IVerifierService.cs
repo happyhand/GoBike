@@ -1,4 +1,4 @@
-﻿using GoBike.API.Service.Email;
+﻿using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Verifier;
 using System.Threading.Tasks;

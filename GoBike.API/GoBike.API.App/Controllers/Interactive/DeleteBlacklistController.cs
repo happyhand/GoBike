@@ -1,9 +1,8 @@
 ﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Interactive;
-using GoBike.API.Service.Models.Command;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// memberService
         /// </summary>
-        private readonly IInteractiveService interactiveService;
+        private readonly IMemberService memberService;
 
         /// <summary>
         /// logger
@@ -33,36 +32,36 @@ namespace GoBike.API.App.Controllers.Interactive
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="interactiveService">interactiveService</param>
-        public DeleteBlacklistController(ILogger<DeleteBlacklistController> logger, IInteractiveService interactiveService)
+        /// <param name="memberService">memberService</param>
+        public DeleteBlacklistController(ILogger<DeleteBlacklistController> logger, IMemberService memberService)
         {
             this.logger = logger;
-            this.interactiveService = interactiveService;
+            this.memberService = memberService;
         }
 
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberBase">memberBase</param>
+        /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberBaseDto memberBase)
+        public async Task<IActionResult> Post(MemberBaseCommandDto memberBaseCommand)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.DeleteBlacklist(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = memberBase.MemberID });
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.DeleteBlacklist(new MemberInteractiveCommandDto() { InitiatorID = memberID, ReceiverID = memberBaseCommand.MemberID });
+                if (responseResult.Ok)
                 {
-                    return Ok(responseResultDto.Data);
+                    return Ok(responseResult.Data);
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Delete Blacklist Error >>> InitiatorID:{memberID} ReceiverID:{memberBase.MemberID}\n{ex}");
+                this.logger.LogError($"Delete Blacklist Error >>> InitiatorID:{memberID} ReceiverID:{memberBaseCommand.MemberID}\n{ex}");
                 return BadRequest("刪除黑名單發生錯誤.");
             }
         }

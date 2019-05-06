@@ -1,19 +1,18 @@
 ﻿using GoBike.Interactive.Service.Interface;
 using GoBike.Interactive.Service.Models.Command;
-using GoBike.Interactive.Service.Models.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GoBike.Interactive.API.Controllers.Friend
+namespace GoBike.Interactive.API.Controllers.Member
 {
     /// <summary>
-    /// 搜尋好友
+    /// 取得會員互動狀態
     /// </summary>
-    [Route("api/Friend/[controller]")]
+    [Route("api/Member/[controller]")]
     [ApiController]
-    public class SearchFriendController : ControllerBase
+    public class GetMemberInteractiveStatusController : ControllerBase
     {
         /// <summary>
         /// interactiveService
@@ -23,14 +22,14 @@ namespace GoBike.Interactive.API.Controllers.Friend
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<SearchFriendController> logger;
+        private readonly ILogger<GetMemberInteractiveStatusController> logger;
 
         /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="interactiveService">interactiveService</param>
-        public SearchFriendController(ILogger<SearchFriendController> logger, IInteractiveService interactiveService)
+        public GetMemberInteractiveStatusController(ILogger<GetMemberInteractiveStatusController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
             this.interactiveService = interactiveService;
@@ -46,7 +45,7 @@ namespace GoBike.Interactive.API.Controllers.Friend
         {
             try
             {
-                Tuple<InteractiveInfoDto, string> result = await this.interactiveService.SearchFriend(interactiveCommand);
+                Tuple<int, string> result = await this.interactiveService.GetMemberInteractiveStatus(interactiveCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -56,8 +55,8 @@ namespace GoBike.Interactive.API.Controllers.Friend
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
-                return BadRequest("搜尋好友發生錯誤.");
+                this.logger.LogError($"Get Member Interactive Status Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
+                return BadRequest("取得會員互動狀態發生錯誤.");
             }
         }
     }

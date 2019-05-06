@@ -1,6 +1,6 @@
-﻿using GoBike.API.Service.Models.Data;
+﻿using GoBike.API.Service.Models.Team.Data;
 
-namespace GoBike.API.Service.Models.Command
+namespace GoBike.API.Service.Models.Team.Command
 {
     /// <summary>
     /// 車隊指令資料

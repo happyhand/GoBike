@@ -4,7 +4,7 @@ using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,13 +61,13 @@ namespace GoBike.API.App.Controllers.Member
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.GetMemberInfo(new MemberBaseDto() { MemberID = memberID });
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.GetMemberInfo(memberID, null);
+                if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<MemberDetailViewDto>(responseResult.Data));
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
@@ -79,26 +79,26 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="targetData">targetData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberBaseDto memberBase)
+        public async Task<IActionResult> Post(MemberBaseCommandDto targetData)
         {
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.SearchMemberInfo(memberID, memberBase);
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.GetMemberInfo(memberID, targetData);
+                if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberInteractiveViewDto>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<MemberDetailViewDto>(responseResult.Data));
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID} TargetData:{JsonConvert.SerializeObject(targetData)}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
         }

@@ -1,9 +1,9 @@
-﻿namespace GoBike.API.Service.Models.Member
+﻿namespace GoBike.API.Service.Models.Member.Command
 {
     /// <summary>
-    /// 會員基本資料
+    /// 會員基本指令資料
     /// </summary>
-    public class MemberBaseDto
+    public class MemberBaseCommandDto
     {
         /// <summary>
         /// Gets or sets Email
@@ -21,13 +21,13 @@
         public string Mobile { get; set; }
 
         /// <summary>
-        /// Gets or sets Password
-        /// </summary>
-        public string Password { get; set; }
-
-        /// <summary>
         /// Gets or sets Token
         /// </summary>
         public string Token { get; set; }
+
+        /// <summary>
+        /// Gets or sets Password
+        /// </summary>
+        public string Password { get; set; }
     }
 }

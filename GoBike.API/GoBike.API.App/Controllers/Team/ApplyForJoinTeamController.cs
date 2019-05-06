@@ -4,8 +4,8 @@ using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Team;
-using GoBike.API.Service.Models.Command;
 using GoBike.API.Service.Models.Response;
+using GoBike.API.Service.Models.Team.Command;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,7 +32,7 @@ namespace GoBike.API.App.Controllers.Team
         private readonly IMapper mapper;
 
         /// <summary>
-        /// memberService
+        /// teamService
         /// </summary>
         private readonly ITeamService teamService;
 
@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Team
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
-        /// <param name="memberService">memberService</param>
+        /// <param name="teamService">teamService</param>
         public ApplyForJoinTeamController(ILogger<ApplyForJoinTeamController> logger, IMapper mapper, ITeamService teamService)
         {
             this.logger = logger;
@@ -63,13 +63,13 @@ namespace GoBike.API.App.Controllers.Team
             try
             {
                 teamCommand.ExaminerID = memberID;
-                ResponseResultDto responseResultDto = await this.teamService.GetApplyForRequestList(teamCommand);
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.teamService.GetApplyForRequestList(teamCommand);
+                if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<IEnumerable<MemberViewDto>>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<IEnumerable<MemberDetailViewDto>>(responseResult.Data));
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {

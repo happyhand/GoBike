@@ -1,9 +1,9 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Team;
-using GoBike.API.Service.Models.Command;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
+using GoBike.API.Service.Models.Team.Command;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

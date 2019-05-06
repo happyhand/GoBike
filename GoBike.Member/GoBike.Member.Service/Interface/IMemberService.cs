@@ -10,8 +10,6 @@ namespace GoBike.Member.Service.Interface
     /// </summary>
     public interface IMemberService
     {
-        #region 會員資料
-
         /// <summary>
         /// 會員編輯
         /// </summary>
@@ -54,32 +52,5 @@ namespace GoBike.Member.Service.Interface
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>string</returns>
         Task<string> VerifyMemberList(IEnumerable<string> memberIDs);
-
-        #endregion 會員資料
-
-        #region 車輛資料
-
-        /// <summary>
-        /// 新增車輛
-        /// </summary>
-        /// <param name="bikeInfo">bikeInfo</param>
-        /// <returns>string</returns>
-        Task<string> AddBike(BikeInfoDto bikeInfo);
-
-        /// <summary>
-        /// 取得我的車輛資訊列表
-        /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
-        /// <returns>string</returns>
-        Task<Tuple<IEnumerable<BikeInfoDto>, string>> GetMyBikeInfoList(MemberInfoDto memberInfo);
-
-        /// <summary>
-        /// 移除車輛
-        /// </summary>
-        /// <param name="bikeInfo">bikeInfo</param>
-        /// <returns>string</returns>
-        Task<string> RemoveBike(BikeInfoDto bikeInfo);
-
-        #endregion 車輛資料
     }
 }

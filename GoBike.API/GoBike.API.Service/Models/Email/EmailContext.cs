@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GoBike.API.Service.Email
+namespace GoBike.API.Service.Models.Email
 {
     /// <summary>
     /// 郵件資料

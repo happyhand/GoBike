@@ -1,8 +1,8 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Repository.Interface;
-using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Verifier;
+using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Verifier;
 using Microsoft.Extensions.Logging;

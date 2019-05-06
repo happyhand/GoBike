@@ -11,8 +11,8 @@
         public string MemberID { get; set; }
 
         /// <summary>
-        /// Gets or sets Status (0:等待加入好友請求確認,1:處理加入好友請求，2:好友，-1:黑名單，-2:無互動資料)
+        /// Gets or sets InteractiveStatus (-1:黑名單，0:無狀態，1:等待加入好友請求確認，2:處理加入好友請求，3:好友)
         /// </summary>
-        public int Status { get; set; }
+        public int InteractiveStatus { get; set; }
     }
 }

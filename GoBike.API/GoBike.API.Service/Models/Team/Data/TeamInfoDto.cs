@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GoBike.API.Service.Models.Data
+namespace GoBike.API.Service.Models.Team.Data
 {
     /// <summary>
     /// 車隊資料

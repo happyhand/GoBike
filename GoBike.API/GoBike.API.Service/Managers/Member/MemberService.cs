@@ -1,10 +1,9 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Email;
 using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Command;
-using GoBike.API.Service.Models.Data;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Email;
+using GoBike.API.Service.Models.Member.Command;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
@@ -37,10 +36,12 @@ namespace GoBike.API.Service.Managers.Member
             this.logger = logger;
         }
 
+        #region 會員資料
+
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="MemberInfoDto">memberInfo</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> EditData(MemberInfoDto memberInfo)
         {
@@ -86,30 +87,80 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 取得會員資訊
         /// </summary>
-        /// <param name="memberBase">memberBase</param>
+        /// <param name="memberID">memberID</param>
+        /// <param name="targetData">targetData</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> GetMemberInfo(MemberBaseDto memberBase)
+        public async Task<ResponseResultDto> GetMemberInfo(string memberID, MemberBaseCommandDto targetData)
         {
+            if (string.IsNullOrEmpty(memberID))
+            {
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員編號無效."
+                };
+            }
+
+            string postData = null;
+            HttpResponseMessage httpResponseMessage = null;
             try
             {
-                if (string.IsNullOrEmpty(memberBase.MemberID) && string.IsNullOrEmpty(memberBase.Email) && string.IsNullOrEmpty(memberBase.Mobile))
+                //// 查詢會員本身資料
+                if (targetData == null)
                 {
+                    postData = JsonConvert.SerializeObject(new MemberBaseCommandDto() { MemberID = memberID });
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = true,
+                            Data = await httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>()
+                        };
+                    }
+
                     return new ResponseResultDto()
                     {
                         Ok = false,
-                        Data = "無效的查詢參數."
+                        Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                     };
                 }
 
-                string postData = JsonConvert.SerializeObject(memberBase);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
+                //// 查詢指定會員資料
+                postData = JsonConvert.SerializeObject(targetData);
+                httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    return new ResponseResultDto()
+                    MemberInfoDto targetMemberInfo = await httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>();
+                    if (targetMemberInfo == null)
                     {
-                        Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberInfoDto>()
-                    };
+                        return new ResponseResultDto()
+                        {
+                            Ok = false,
+                            Data = "無會員資料."
+                        };
+                    }
+
+                    if (memberID.Equals(targetData.MemberID))
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = false,
+                            Data = "無法查詢會員本身資料."
+                        };
+                    }
+
+                    postData = JsonConvert.SerializeObject(new MemberInteractiveCommandDto() { InitiatorID = memberID, ReceiverID = targetMemberInfo.MemberID });
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/GetMemberInteractiveStatus", postData);
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        targetMemberInfo.InteractiveStatus = await httpResponseMessage.Content.ReadAsAsync<int>();
+                        return new ResponseResultDto()
+                        {
+                            Ok = true,
+                            Data = targetMemberInfo
+                        };
+                    }
                 }
 
                 return new ResponseResultDto()
@@ -120,7 +171,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID} TargetData:{JsonConvert.SerializeObject(targetData)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -148,7 +199,7 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                string postData = JsonConvert.SerializeObject(new MemberBaseDto() { Email = email, Password = password });
+                string postData = JsonConvert.SerializeObject(new MemberBaseCommandDto() { Email = email, Password = password });
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
                 string result = await httpResponseMessage.Content.ReadAsAsync<string>();
                 if (httpResponseMessage.IsSuccessStatusCode)
@@ -156,7 +207,7 @@ namespace GoBike.API.Service.Managers.Member
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = new MemberBaseDto()
+                        Data = new MemberInfoDto()
                         {
                             MemberID = result,
                             Token = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
@@ -221,11 +272,11 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員註冊
         /// </summary>
-        /// <param name="memberBase">memberBase</param>
+        /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Register(MemberBaseDto memberBase)
+        public async Task<ResponseResultDto> Register(MemberBaseCommandDto memberBaseCommand)
         {
-            if (string.IsNullOrEmpty(memberBase.Email) || string.IsNullOrEmpty(memberBase.Password))
+            if (string.IsNullOrEmpty(memberBaseCommand.Email) || string.IsNullOrEmpty(memberBaseCommand.Password))
             {
                 return new ResponseResultDto()
                 {
@@ -236,7 +287,7 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                string postData = JsonConvert.SerializeObject(memberBase);
+                string postData = JsonConvert.SerializeObject(memberBaseCommand);
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
                 return new ResponseResultDto()
                 {
@@ -246,7 +297,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Email:{memberBase.Email} Password:{memberBase.Password}\n{ex}");
+                this.logger.LogError($"Register Error >>> Email:{memberBaseCommand.Email} Password:{memberBaseCommand.Password}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -258,11 +309,11 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 重設密碼
         /// </summary>
-        /// <param name="memberBase">memberBase</param>
+        /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<ResponseResultDto> ResetPassword(MemberBaseDto memberBase)
+        public async Task<ResponseResultDto> ResetPassword(MemberBaseCommandDto memberBaseCommand)
         {
-            if (string.IsNullOrEmpty(memberBase.Email))
+            if (string.IsNullOrEmpty(memberBaseCommand.Email))
             {
                 return new ResponseResultDto()
                 {
@@ -273,12 +324,12 @@ namespace GoBike.API.Service.Managers.Member
 
             try
             {
-                memberBase.Password = Guid.NewGuid().ToString().Substring(0, 8);
-                string postData = JsonConvert.SerializeObject(memberBase);
+                memberBaseCommand.Password = Guid.NewGuid().ToString().Substring(0, 8);
+                string postData = JsonConvert.SerializeObject(memberBaseCommand);
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberBase.Email, memberBase.Password);
+                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberBaseCommand.Email, memberBaseCommand.Password);
                     postData = JsonConvert.SerializeObject(emailContext);
                     httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
@@ -299,72 +350,11 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Data:{JsonConvert.SerializeObject(memberBase)}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Email:{memberBaseCommand.Email}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "重設密碼驗證發生錯誤."
-                };
-            }
-        }
-
-        /// <summary>
-        /// 搜尋會員資訊
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="targetMemberBase">targetMemberBase</param>
-        /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> SearchMemberInfo(string memberID, MemberBaseDto targetMemberBase)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(memberID))
-                {
-                    return new ResponseResultDto()
-                    {
-                        Ok = false,
-                        Data = "會員編號無效."
-                    };
-                }
-
-                ResponseResultDto responseResult = await this.GetMemberInfo(targetMemberBase);
-                if (responseResult.Ok)
-                {
-                    MemberInfoDto targetMemberInfo = responseResult.Data as MemberInfoDto;
-                    if (targetMemberInfo.MemberID.Equals(memberID))
-                    {
-                        return new ResponseResultDto()
-                        {
-                            Ok = false,
-                            Data = "無法查詢會員本身資料."
-                        };
-                    }
-
-                    string postData = JsonConvert.SerializeObject(new InteractiveCommandDto() { InitiatorID = memberID, ReceiverID = targetMemberInfo.MemberID });
-                    HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/SearchFriend", postData);
-                    if (!httpResponseMessage.IsSuccessStatusCode)
-                    {
-                        return new ResponseResultDto()
-                        {
-                            Ok = false,
-                            Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                        };
-                    }
-
-                    InteractiveInfoDto interactiveInfo = await httpResponseMessage.Content.ReadAsAsync<InteractiveInfoDto>();
-                    targetMemberInfo.InteractiveStatus = interactiveInfo.Status;
-                    responseResult.Data = targetMemberInfo;
-                }
-
-                return responseResult;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Search Member Info Error >>> MemberID:{memberID} TargetData:{JsonConvert.SerializeObject(targetMemberBase)}\n{ex}");
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "搜尋會員資訊發生錯誤."
+                    Data = "重設密碼發生錯誤."
                 };
             }
         }
@@ -372,6 +362,7 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 上傳頭像
         /// </summary>
+        /// <param name="memberID">memberID</param>
         /// <param name="files">files</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> UploadPhoto(string memberID, IFormFile file)
@@ -423,5 +414,551 @@ namespace GoBike.API.Service.Managers.Member
                 };
             }
         }
+
+        #endregion 會員資料
+
+        #region 會員互動資料
+
+        /// <summary>
+        /// 加入黑名單
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AddBlacklist(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/AddBlacklist", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Add Blacklist Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 加入好友
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AddFriend(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Add Friend Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入好友發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 加入好友請求
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AddFriendRequest(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/AddFriendRequest", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Add Friend Request Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入好友請求發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 刪除黑名單
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteBlacklist(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/DeleteBlacklist", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Blacklist Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 刪除好友
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteFriend(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Friend Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除好友發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 刪除加入好友請求
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteRequestForAddFriend(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/DeleteRequestForAddFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Request For Add Friend Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除加入好友請求發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得加入好友請求名單
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetAddFriendRequestList(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, false);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetAddFriendRequestList", postData);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                    };
+                }
+
+                IEnumerable<string> memberIDs = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>();
+                Tuple<IEnumerable<MemberInfoDto>, string> getMemebrInfoListResult = await this.GetMemebrInfoList(memberIDs, (int)InteractiveStatusType.Request);
+                if (!string.IsNullOrEmpty(getMemebrInfoListResult.Item2))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = getMemebrInfoListResult.Item2
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = true,
+                    Data = getMemebrInfoListResult.Item1
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Add Friend Request List Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得加入好友請求名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得黑名單
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetBlacklist(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, false);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Blacklist/GetBlacklist", postData);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                    };
+                }
+
+                IEnumerable<string> memberIDs = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>();
+                Tuple<IEnumerable<MemberInfoDto>, string> getMemebrInfoListResult = await this.GetMemebrInfoList(memberIDs, (int)InteractiveStatusType.Black);
+                if (!string.IsNullOrEmpty(getMemebrInfoListResult.Item2))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = getMemebrInfoListResult.Item2
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = true,
+                    Data = getMemebrInfoListResult.Item1
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Blacklist Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得好友名單
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetFriendList(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, false);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/GetFriendList", postData);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                    };
+                }
+
+                IEnumerable<string> memberIDs = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>();
+                Tuple<IEnumerable<MemberInfoDto>, string> getMemebrInfoListResult = await this.GetMemebrInfoList(memberIDs, (int)InteractiveStatusType.Friend);
+                if (!string.IsNullOrEmpty(getMemebrInfoListResult.Item2))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = getMemebrInfoListResult.Item2
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = true,
+                    Data = getMemebrInfoListResult.Item1
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Friend List Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得好友名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 拒絕加入好友
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RejectBeFriend(MemberInteractiveCommandDto memberInteractiveCommand)
+        {
+            try
+            {
+                string verifyMemberResult = await this.VerifyMemebr(memberInteractiveCommand, true, true);
+                if (!string.IsNullOrEmpty(verifyMemberResult))
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = verifyMemberResult
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberInteractiveCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/Friend/RejectBeFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Be Friend Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "拒絕加入好友發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得會員資料列表
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <param name="interactiveStatus">interactiveStatus</param>
+        /// <returns>Tuple(MemberInfoDtos, string)</returns>
+        private async Task<Tuple<IEnumerable<MemberInfoDto>, string>> GetMemebrInfoList(IEnumerable<string> memberIDs, int interactiveStatus)
+        {
+            if (memberIDs == null || memberIDs.Count() == 0)
+            {
+                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(new List<MemberInfoDto>(), string.Empty);
+            }
+
+            try
+            {
+                string postData = JsonConvert.SerializeObject(memberIDs);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/List", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    IEnumerable<MemberInfoDto> memberInfos = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberInfoDto>>();
+                    foreach (MemberInfoDto memberInfo in memberInfos)
+                    {
+                        memberInfo.InteractiveStatus = interactiveStatus;
+                    }
+
+                    return Tuple.Create(memberInfos, string.Empty);
+                }
+
+                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, await httpResponseMessage.Content.ReadAsAsync<string>());
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Memebr Info List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)} InteractiveStatus:{interactiveStatus}\n{ex}");
+                return Tuple.Create<IEnumerable<MemberInfoDto>, string>(null, "取得會員資料列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 驗證會員資料
+        /// </summary>
+        /// <param name="memberInteractiveCommand">memberInteractiveCommand</param>
+        /// <param name="isVerifyInitiator">isVerifyInitiator</param>
+        /// <param name="isVerifyReceiver">isVerifyReceiver</param>
+        /// <returns>string</returns>
+        private async Task<string> VerifyMemebr(MemberInteractiveCommandDto memberInteractiveCommand, bool isVerifyInitiator, bool isVerifyReceiver)
+        {
+            try
+            {
+                if (memberInteractiveCommand == null)
+                {
+                    return "會員互動指令資料不存在.";
+                }
+
+                List<string> verifyMemberIDList = new List<string>();
+                if (isVerifyInitiator)
+                {
+                    if (string.IsNullOrEmpty(memberInteractiveCommand.InitiatorID))
+                    {
+                        return "發起者會員編號無效.";
+                    }
+
+                    if (memberInteractiveCommand.InitiatorID.Equals(memberInteractiveCommand.ReceiverID))
+                    {
+                        return "互動對象不得為會員本身.";
+                    }
+
+                    verifyMemberIDList.Add(memberInteractiveCommand.InitiatorID);
+                }
+
+                if (isVerifyReceiver)
+                {
+                    if (string.IsNullOrEmpty(memberInteractiveCommand.ReceiverID))
+                    {
+                        return "接收者會員編號無效.";
+                    }
+
+                    if (memberInteractiveCommand.ReceiverID.Equals(memberInteractiveCommand.InitiatorID))
+                    {
+                        return "互動對象不得為會員本身.";
+                    }
+
+                    verifyMemberIDList.Add(memberInteractiveCommand.ReceiverID);
+                }
+
+                if (verifyMemberIDList.Count == 0)
+                {
+                    return "無查詢資料.";
+                }
+
+                string postData = JsonConvert.SerializeObject(verifyMemberIDList);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/VerifyMember", postData);
+                return httpResponseMessage.IsSuccessStatusCode ? string.Empty : "無會員資料.";
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Memebr Error >>> InitiatorID:{memberInteractiveCommand.InitiatorID} ReceiverID:{memberInteractiveCommand.ReceiverID} IsVerifyInitiator:{isVerifyInitiator} IsVerifyReceiver:{isVerifyReceiver}\n{ex}");
+                return "驗證會員資料發生錯誤.";
+            }
+        }
+
+        #endregion 會員互動資料
     }
 }

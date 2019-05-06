@@ -3,8 +3,8 @@ using GoBike.API.App.Filters;
 using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Interactive;
-using GoBike.API.Service.Models.Command;
+using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,7 +24,7 @@ namespace GoBike.API.App.Controllers.Interactive
         /// <summary>
         /// memberService
         /// </summary>
-        private readonly IInteractiveService interactiveService;
+        private readonly IMemberService memberService;
 
         /// <summary>
         /// logger
@@ -41,12 +41,12 @@ namespace GoBike.API.App.Controllers.Interactive
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
-        /// <param name="interactiveService">interactiveService</param>
-        public GetBlacklistController(ILogger<GetBlacklistController> logger, IMapper mapper, IInteractiveService interactiveService)
+        /// <param name="memberService">memberService</param>
+        public GetBlacklistController(ILogger<GetBlacklistController> logger, IMapper mapper, IMemberService memberService)
         {
             this.logger = logger;
             this.mapper = mapper;
-            this.interactiveService = interactiveService;
+            this.memberService = memberService;
         }
 
         /// <summary>
@@ -60,13 +60,13 @@ namespace GoBike.API.App.Controllers.Interactive
             string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResultDto = await this.interactiveService.GetBlacklist(new InteractiveCommandDto() { InitiatorID = memberID });
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.GetBlacklist(new MemberInteractiveCommandDto() { InitiatorID = memberID });
+                if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<IEnumerable<MemberInteractiveViewDto>>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<IEnumerable<MemberSimpleViewDto>>(responseResult.Data));
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {

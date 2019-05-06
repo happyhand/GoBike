@@ -235,5 +235,37 @@ namespace GoBike.Member.Repository.Managers
                 return false;
             }
         }
+
+        /// <summary>
+        /// 更新會員登入日期資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="loginDate">loginDate</param>
+        /// <returns>Tuple(bool, string)</returns>
+        public async Task<Tuple<bool, string>> UpdateMemebrLoginDate(string memberID, DateTime loginDate)
+        {
+            try
+            {
+                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
+                UpdateDefinition<MemberData> update = Builders<MemberData>.Update.Set(data => data.LoginDate, loginDate);
+                UpdateResult result = await this.memberDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    return Tuple.Create(false, "無法更新會員登入日期資料.");
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    return Tuple.Create(false, "會員登入日期資料未更改.");
+                }
+
+                return Tuple.Create(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Memebr Login Date Error >>> MemberID:{memberID} LoginDate:{loginDate}\n{ex}");
+                return Tuple.Create(false, "更新會員登入日期資料發生錯誤.");
+            }
+        }
     }
 }

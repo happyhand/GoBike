@@ -3,7 +3,6 @@ using GoBike.Interactive.Repository.Interface;
 using GoBike.Interactive.Repository.Models;
 using GoBike.Interactive.Service.Interface;
 using GoBike.Interactive.Service.Models.Command;
-using GoBike.Interactive.Service.Models.Data;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -550,24 +549,24 @@ namespace GoBike.Interactive.Service.Managers
         }
 
         /// <summary>
-        /// 搜尋好友
+        /// 取得會員互動狀態
         /// </summary>
         /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <returns>Tuple(InteractiveInfoDto, string)</returns>
-        public async Task<Tuple<InteractiveInfoDto, string>> SearchFriend(InteractiveCommandDto interactiveCommand)
+        /// <returns>Tuple(int, string)</returns>
+        public async Task<Tuple<int, string>> GetMemberInteractiveStatus(InteractiveCommandDto interactiveCommand)
         {
             try
             {
                 string verifyInteractiveCommandResult = this.VerifyInteractiveCommand(interactiveCommand, true, true);
                 if (!string.IsNullOrEmpty(verifyInteractiveCommandResult))
                 {
-                    return Tuple.Create<InteractiveInfoDto, string>(null, verifyInteractiveCommandResult);
+                    return Tuple.Create((int)InteractiveStatusType.None, verifyInteractiveCommandResult);
                 }
 
                 Tuple<InteractiveData, string> getReceiverInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.ReceiverID, false);
                 if (!string.IsNullOrEmpty(getReceiverInteractiveDataReuslt.Item2))
                 {
-                    return Tuple.Create<InteractiveInfoDto, string>(null, getReceiverInteractiveDataReuslt.Item2);
+                    return Tuple.Create((int)InteractiveStatusType.None, getReceiverInteractiveDataReuslt.Item2);
                 }
 
                 InteractiveData receiverInteractiveData = getReceiverInteractiveDataReuslt.Item1;
@@ -575,48 +574,48 @@ namespace GoBike.Interactive.Service.Managers
                 {
                     if (receiverInteractiveData.BlacklistIDs.Contains(interactiveCommand.InitiatorID))
                     {
-                        return Tuple.Create<InteractiveInfoDto, string>(null, "對方已設該會員為黑名單.");
+                        return Tuple.Create((int)InteractiveStatusType.None, "對方已設該會員為黑名單.");
                     }
 
                     if (receiverInteractiveData.FriendListIDs.Contains(interactiveCommand.InitiatorID))
                     {
-                        return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Friend }, string.Empty);
+                        return Tuple.Create((int)InteractiveStatusType.Friend, string.Empty);
                     }
 
                     if (receiverInteractiveData.RequestListIDs.Contains(interactiveCommand.InitiatorID))
                     {
-                        return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Request }, string.Empty);
+                        return Tuple.Create((int)InteractiveStatusType.Request, string.Empty);
                     }
                 }
 
                 Tuple<InteractiveData, string> getInitiatorInteractiveDataReuslt = await this.GetInteractiveData(interactiveCommand.InitiatorID, true);
                 if (!string.IsNullOrEmpty(getInitiatorInteractiveDataReuslt.Item2))
                 {
-                    return Tuple.Create<InteractiveInfoDto, string>(null, getInitiatorInteractiveDataReuslt.Item2);
+                    return Tuple.Create((int)InteractiveStatusType.None, getInitiatorInteractiveDataReuslt.Item2);
                 }
 
                 InteractiveData initiatorInteractiveData = getInitiatorInteractiveDataReuslt.Item1;
                 if (initiatorInteractiveData.BlacklistIDs.Contains(interactiveCommand.ReceiverID))
                 {
-                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Black }, string.Empty);
+                    return Tuple.Create((int)InteractiveStatusType.Black, string.Empty);
                 }
 
                 if (initiatorInteractiveData.FriendListIDs.Contains(interactiveCommand.ReceiverID))
                 {
-                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.Friend }, string.Empty);
+                    return Tuple.Create((int)InteractiveStatusType.Friend, string.Empty);
                 }
 
                 if (initiatorInteractiveData.RequestListIDs.Contains(interactiveCommand.ReceiverID))
                 {
-                    return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.RequestHandler }, string.Empty);
+                    return Tuple.Create((int)InteractiveStatusType.RequestHandler, string.Empty);
                 }
 
-                return Tuple.Create(new InteractiveInfoDto() { MemberID = interactiveCommand.ReceiverID, Status = (int)InteractiveStatusType.None }, string.Empty);
+                return Tuple.Create((int)InteractiveStatusType.None, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Friend Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
-                return Tuple.Create<InteractiveInfoDto, string>(null, "搜尋好友發生錯誤.");
+                this.logger.LogError($"Get Member Interactive Status Error >>> InitiatorID:{interactiveCommand.InitiatorID} ReceiverID:{interactiveCommand.ReceiverID}\n{ex}");
+                return Tuple.Create((int)InteractiveStatusType.None, "取得會員互動狀態發生錯誤.");
             }
         }
 
@@ -661,7 +660,7 @@ namespace GoBike.Interactive.Service.Managers
                 }
             }
 
-            return Tuple.Create<InteractiveData, string>(interactiveData, string.Empty);
+            return Tuple.Create(interactiveData, string.Empty);
         }
 
         /// <summary>

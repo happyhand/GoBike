@@ -1,5 +1,4 @@
 ﻿using GoBike.Interactive.Service.Models.Command;
-using GoBike.Interactive.Service.Models.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -82,10 +81,10 @@ namespace GoBike.Interactive.Service.Interface
         Task<string> RejectBeFriend(InteractiveCommandDto interactiveCommand);
 
         /// <summary>
-        /// 搜尋好友
+        /// 取得會員互動狀態
         /// </summary>
         /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <returns>Tuple(InteractiveInfoDto, string)</returns>
-        Task<Tuple<InteractiveInfoDto, string>> SearchFriend(InteractiveCommandDto interactiveCommand);
+        /// <returns>Tuple(int, string)</returns>
+        Task<Tuple<int, string>> GetMemberInteractiveStatus(InteractiveCommandDto interactiveCommand);
     }
 }

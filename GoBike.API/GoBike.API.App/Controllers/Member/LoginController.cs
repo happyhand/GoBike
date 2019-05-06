@@ -1,7 +1,8 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Member.Command;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -40,20 +41,20 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST - 一般登入
         /// </summary>
-        /// <param name="memberBase">memberBase</param>
+        /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]")]
-        public async Task<IActionResult> NormalLogin(MemberBaseDto memberBase)
+        public async Task<IActionResult> NormalLogin(MemberBaseCommandDto memberBaseCommand)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Login(memberBase.Email, memberBase.Password);
-                return this.ResponseResultHandler(responseResultDto);
+                ResponseResultDto responseResult = await this.memberService.Login(memberBaseCommand.Email, memberBaseCommand.Password);
+                return this.ResponseResultHandler(responseResult);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Normal Login Error >>> Email:{memberBase.Email} Password:{memberBase.Password}\n{ex}");
+                this.logger.LogError($"Normal Login Error >>> Email:{memberBaseCommand.Email} Password:{memberBaseCommand.Password}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
@@ -61,20 +62,20 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST - Token 登入
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]/token")]
-        public async Task<IActionResult> TokenLogin(MemberBaseDto memberBase)
+        public async Task<IActionResult> TokenLogin(MemberBaseCommandDto memberBaseCommand)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.Login(memberBase.Token);
-                return this.ResponseResultHandler(responseResultDto);
+                ResponseResultDto responseResult = await this.memberService.Login(memberBaseCommand.Token);
+                return this.ResponseResultHandler(responseResult);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Token Login Error >>> Token:{memberBase.Token}\n{ex}");
+                this.logger.LogError($"Token Login Error >>> Token:{memberBaseCommand.Token}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
@@ -82,18 +83,18 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// 處理回應資料
         /// </summary>
-        /// <param name="responseResultDto">responseResultDto</param>
+        /// <param name="responseResult">responseResult</param>
         /// <returns>IActionResult</returns>
-        private IActionResult ResponseResultHandler(ResponseResultDto responseResultDto)
+        private IActionResult ResponseResultHandler(ResponseResultDto responseResult)
         {
-            if (responseResultDto.Ok)
+            if (responseResult.Ok)
             {
-                MemberBaseDto memberBase = responseResultDto.Data as MemberBaseDto;
-                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberBase.MemberID);
-                return Ok(memberBase.Token);
+                MemberInfoDto memberInfo = responseResult.Data as MemberInfoDto;
+                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberInfo.MemberID);
+                return Ok(memberInfo.Token);
             }
 
-            return BadRequest(responseResultDto.Data);
+            return BadRequest(responseResult.Data);
         }
     }
 }

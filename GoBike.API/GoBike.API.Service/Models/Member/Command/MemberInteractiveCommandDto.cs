@@ -1,9 +1,9 @@
-﻿namespace GoBike.API.Service.Models.Command
+﻿namespace GoBike.API.Service.Models.Member.Command
 {
     /// <summary>
-    /// 互動指令資料
+    /// 會員互動指令資料
     /// </summary>
-    public class InteractiveCommandDto
+    public class MemberInteractiveCommandDto
     {
         /// <summary>
         /// Gets or sets InitiatorID

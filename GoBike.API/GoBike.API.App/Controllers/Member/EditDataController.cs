@@ -4,7 +4,7 @@ using GoBike.API.App.Models.Member;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -62,13 +62,13 @@ namespace GoBike.API.App.Controllers.Member
             memberInfo.MemberID = memberID;
             try
             {
-                ResponseResultDto responseResultDto = await this.memberService.EditData(memberInfo);
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.memberService.EditData(memberInfo);
+                if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberViewDto>(responseResultDto.Data));
+                    return Ok(this.mapper.Map<MemberDetailViewDto>(responseResult.Data));
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {

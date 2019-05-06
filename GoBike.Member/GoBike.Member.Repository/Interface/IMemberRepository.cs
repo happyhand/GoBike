@@ -66,6 +66,14 @@ namespace GoBike.Member.Repository.Interface
         Task<Tuple<bool, string>> UpdateMemebrData(MemberData memberData);
 
         /// <summary>
+        /// 更新會員登入日期資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="loginDate">loginDate</param>
+        /// <returns>Tuple(bool, string)</returns>
+        Task<Tuple<bool, string>> UpdateMemebrLoginDate(string memberID, DateTime loginDate);
+
+        /// <summary>
         /// 驗證會員資料
         /// </summary>
         /// <param name="memberIDs">memberIDs</param>

@@ -1,7 +1,7 @@
-﻿using GoBike.API.Service.Email;
-using GoBike.API.Service.Interface.Member;
+﻿using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Interface.Verifier;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Email;
+using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Verifier;
 using Microsoft.AspNetCore.Mvc;
@@ -60,13 +60,13 @@ namespace GoBike.API.App.Controllers.Member
                 verifierInfo.Type = "Password";
                 verifierInfo.VerifierCode = await this.verifierService.GetVerifierCode(verifierInfo);
                 EmailContext emailContext = EmailContext.GetVerifierCodetEmailContext(verifierInfo.Email, verifierInfo.VerifierCode);
-                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(verifierInfo, emailContext);
-                if (responseResultDto.Ok)
+                ResponseResultDto responseResult = await this.verifierService.SendVerifierCode(verifierInfo, emailContext);
+                if (responseResult.Ok)
                 {
-                    return Ok(responseResultDto.Data);
+                    return Ok(responseResult.Data);
                 }
 
-                return BadRequest(responseResultDto.Data);
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
@@ -78,7 +78,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// Post - 驗證驗證碼並重設密碼
         /// </summary>
-        /// <param name="inputData">inputData</param>
+        /// <param name="verifierInfo">verifierInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/member/[controller]/valid")]
@@ -94,13 +94,13 @@ namespace GoBike.API.App.Controllers.Member
                 }
                 else
                 {
-                    ResponseResultDto responseResultDto = await this.memberService.ResetPassword(new MemberBaseDto() { Email = verifierInfo.Email });
-                    if (responseResultDto.Ok)
+                    ResponseResultDto responseResult = await this.memberService.ResetPassword(new MemberBaseCommandDto() { Email = verifierInfo.Email });
+                    if (responseResult.Ok)
                     {
-                        return Ok(responseResultDto.Data);
+                        return Ok(responseResult.Data);
                     }
 
-                    return BadRequest(responseResultDto.Data);
+                    return BadRequest(responseResult.Data);
                 }
             }
             catch (Exception ex)

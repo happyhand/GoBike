@@ -20,11 +20,6 @@ namespace GoBike.Member.Service.Managers
     public class MemberService : IMemberService
     {
         /// <summary>
-        /// bikeRepository
-        /// </summary>
-        private readonly IBikeRepository bikeRepository;
-
-        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<MemberService> logger;
@@ -46,12 +41,11 @@ namespace GoBike.Member.Service.Managers
         /// <param name="mapper">mapper</param>
         /// <param name="memberRepository">memberRepository</param>
         /// <param name="bikeRepository">bikeRepository</param>
-        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IBikeRepository bikeRepository)
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.memberRepository = memberRepository;
-            this.bikeRepository = bikeRepository;
         }
 
         #region 會員資料
@@ -187,6 +181,12 @@ namespace GoBike.Member.Service.Managers
                 if (!Utility.DecryptAES(memberData.Password).Equals(memberInfo.Password))
                 {
                     return Tuple.Create(string.Empty, "密碼驗證失敗.");
+                }
+
+                Tuple<bool, string> updateMemebrLoginDateResult = await this.memberRepository.UpdateMemebrLoginDate(memberData.MemberID, DateTime.Now);
+                if (!string.IsNullOrEmpty(updateMemebrLoginDateResult.Item2))
+                {
+                    return Tuple.Create(string.Empty, updateMemebrLoginDateResult.Item2);
                 }
 
                 return Tuple.Create(memberData.MemberID, string.Empty);
@@ -371,132 +371,5 @@ namespace GoBike.Member.Service.Managers
         }
 
         #endregion 會員資料
-
-        #region 車輛資料
-
-        /// <summary>
-        /// 新增車輛
-        /// </summary>
-        /// <param name="bikeInfo">bikeInfo</param>
-        /// <returns>string</returns>
-        public async Task<string> AddBike(BikeInfoDto bikeInfo)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(bikeInfo.MemberID))
-                {
-                    return "會員編號無效.";
-                }
-
-                if (string.IsNullOrEmpty(bikeInfo.BuyDate))
-                {
-                    return "購買日期無效.";
-                }
-
-                if (bikeInfo.ManufactureYaer <= 0)
-                {
-                    return "車輛出廠年度無效.";
-                }
-
-                if (string.IsNullOrEmpty(bikeInfo.Model))
-                {
-                    return "型號無效.";
-                }
-
-                if (string.IsNullOrEmpty(bikeInfo.Photo))
-                {
-                    return "未上傳車輛照片.";
-                }
-
-                if (string.IsNullOrEmpty(bikeInfo.Size))
-                {
-                    return "尺寸無效.";
-                }
-
-                if (string.IsNullOrEmpty(bikeInfo.Type))
-                {
-                    return "車種無效.";
-                }
-
-                bool verifyMemberResult = await this.memberRepository.VerifyMemberList(new string[] { bikeInfo.MemberID });
-                if (!verifyMemberResult)
-                {
-                    return "無會員資料.";
-                }
-
-                BikeData bikeData = this.mapper.Map<BikeData>(bikeInfo);
-                DateTime createDate = DateTime.Now;
-                bikeData.BikeID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
-                bool isSuccess = await this.bikeRepository.CreateBikeData(bikeData);
-                if (!isSuccess)
-                {
-                    this.logger.LogError($"Add Bike Fail For Create Bike Data >>> Data:{JsonConvert.SerializeObject(bikeData)}");
-                    return "新增車輛失敗.";
-                }
-
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Add Bike Error >>> Data:{JsonConvert.SerializeObject(bikeInfo)}\n{ex}");
-                return "新增車輛發生錯誤.";
-            }
-        }
-
-        /// <summary>
-        /// 取得我的車輛資訊列表
-        /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
-        /// <returns>string</returns>
-        public async Task<Tuple<IEnumerable<BikeInfoDto>, string>> GetMyBikeInfoList(MemberInfoDto memberInfo)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(memberInfo.MemberID))
-                {
-                    return Tuple.Create<IEnumerable<BikeInfoDto>, string>(null, "會員編號無效.");
-                }
-
-                IEnumerable<BikeData> bikeDatas = await this.bikeRepository.GetBikeDataListOfMember(memberInfo.MemberID);
-                return Tuple.Create(this.mapper.Map<IEnumerable<BikeInfoDto>>(bikeDatas), string.Empty);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get My Bike Info List Error >>> MemberID:{memberInfo.MemberID}\n{ex}");
-                return Tuple.Create<IEnumerable<BikeInfoDto>, string>(null, "取得我的車輛資訊列表發生錯誤.");
-            }
-        }
-
-        /// <summary>
-        /// 移除車輛
-        /// </summary>
-        /// <param name="bikeInfo">bikeInfo</param>
-        /// <returns>string</returns>
-        public async Task<string> RemoveBike(BikeInfoDto bikeInfo)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(bikeInfo.BikeID))
-                {
-                    return "車輛編號無效.";
-                }
-
-                bool isSuccess = await this.bikeRepository.DeleteBikeData(bikeInfo.BikeID);
-                if (!isSuccess)
-                {
-                    this.logger.LogError($"Remove Bike Fail For Delete Bike Data >>> BikeID:{bikeInfo.BikeID}");
-                    return "移除車輛失敗.";
-                }
-
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Remove Bike Error >>> BikeID:{bikeInfo.BikeID}\n{ex}");
-                return "移除車輛發生錯誤.";
-            }
-        }
-
-        #endregion 車輛資料
     }
 }

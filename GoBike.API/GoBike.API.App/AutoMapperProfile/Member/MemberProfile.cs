@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GoBike.API.App.Models.Member;
-using GoBike.API.Service.Models.Member;
+using GoBike.API.Service.Models.Member.Data;
 
 namespace GoBike.API.App.AutoMapperProfile.Member
 {
@@ -8,8 +8,8 @@ namespace GoBike.API.App.AutoMapperProfile.Member
     {
         public MemberProfile()
         {
-            CreateMap<MemberInfoDto, MemberViewDto>().ReverseMap();
-            CreateMap<MemberInfoDto, MemberInteractiveViewDto>().ReverseMap();
+            CreateMap<MemberInfoDto, MemberSimpleViewDto>().ReverseMap();
+            CreateMap<MemberInfoDto, MemberDetailViewDto>().ReverseMap();
         }
     }
 }
