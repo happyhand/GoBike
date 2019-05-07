@@ -239,6 +239,44 @@ namespace GoBike.Team.Repository.Managers
             }
         }
 
+        /// <summary>
+        /// 驗證車隊資料 (By TeamLeaderID)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <returns>bool</returns>
+        public async Task<bool> VerifyTeamDataByTeamLeaderID(string memberID)
+        {
+            try
+            {
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamLeaderID", memberID);
+                return await this.teamDatas.CountDocumentsAsync(filter) > 0;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Team Data By Team Leader ID Error >>> MemberID:{memberID}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 驗證車隊資料 (By TeamName)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <returns>bool</returns>
+        public async Task<bool> VerifyTeamDataByTeamName(string teamName)
+        {
+            try
+            {
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamName", teamName);
+                return await this.teamDatas.CountDocumentsAsync(filter) > 0;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Team Data By Team Name Error >>> TeamName:{teamName}\n{ex}");
+                return false;
+            }
+        }
+
         #endregion 車隊資料
 
         #region 車隊互動資料

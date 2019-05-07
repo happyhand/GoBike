@@ -14,8 +14,8 @@ namespace GoBike.Team.API.Models
         public IEnumerable<TeamInfoDto> JoinTeamDatas { get; set; }
 
         /// <summary>
-        /// Gets or sets LeaderTeamDatas
+        /// Gets or sets LeaderTeamData
         /// </summary>
-        public IEnumerable<TeamInfoDto> LeaderTeamDatas { get; set; }
+        public TeamInfoDto LeaderTeamData { get; set; }
     }
 }

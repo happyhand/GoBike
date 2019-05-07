@@ -3,6 +3,48 @@
 namespace GoBike.API.Service.Models.Team.Data
 {
     /// <summary>
+    /// 車隊審核狀態
+    /// </summary>
+    public enum TeamExamineStatusType
+    {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 關閉
+        /// </summary>
+        Close = 1,
+
+        /// <summary>
+        /// 開啟
+        /// </summary>
+        Open = 2
+    }
+
+    /// <summary>
+    /// 車隊搜尋狀態
+    /// </summary>
+    public enum TeamSearchStatusType
+    {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 關閉
+        /// </summary>
+        Close = 1,
+
+        /// <summary>
+        /// 開啟
+        /// </summary>
+        Open = 2
+    }
+
+    /// <summary>
     /// 車隊資料
     /// </summary>
     public class TeamInfoDto
@@ -13,7 +55,7 @@ namespace GoBike.API.Service.Models.Team.Data
         public string TeamCoverPhoto { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamExamineStatus (0:close, 1:open)
+        /// Gets or sets TeamExamineStatus (1:close, 2:open)
         /// </summary>
         public int TeamExamineStatus { get; set; }
 
@@ -53,13 +95,13 @@ namespace GoBike.API.Service.Models.Team.Data
         public IEnumerable<string> TeamPlayerIDs { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamSearchStatus (0:close, 1:open)
+        /// Gets or sets TeamSearchStatus (1:close, 2:open)
         /// </summary>
         public int TeamSearchStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamViceLeaderID
+        /// Gets or sets TeamViceLeaderIDs
         /// </summary>
-        public string TeamViceLeaderID { get; set; }
+        public IEnumerable<string> TeamViceLeaderIDs { get; set; }
     }
 }

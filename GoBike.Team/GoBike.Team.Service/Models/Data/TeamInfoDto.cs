@@ -1,5 +1,4 @@
-﻿using GoBike.Team.Repository.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GoBike.Team.Service.Models.Data
 {
@@ -9,21 +8,12 @@ namespace GoBike.Team.Service.Models.Data
     public class TeamInfoDto
     {
         /// <summary>
-        /// 建構式
-        /// </summary>
-        public TeamInfoDto()
-        {
-            this.TeamExamineStatus = (int)TeamExamineStatusType.None;
-            this.TeamSearchStatus = (int)TeamSearchStatusType.None;
-        }
-
-        /// <summary>
         /// Gets or sets TeamCoverPhoto
         /// </summary>
         public string TeamCoverPhoto { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamExamineStatus (0:close, 1:open)
+        /// Gets or sets TeamExamineStatus (1:close, 2:open)
         /// </summary>
         public int TeamExamineStatus { get; set; }
 
@@ -63,13 +53,13 @@ namespace GoBike.Team.Service.Models.Data
         public IEnumerable<string> TeamPlayerIDs { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamSearchStatus (0:close, 1:open)
+        /// Gets or sets TeamSearchStatus (1:close, 2:open)
         /// </summary>
         public int TeamSearchStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamViceLeaderID
+        /// Gets or sets TeamViceLeaderIDs
         /// </summary>
-        public string TeamViceLeaderID { get; set; }
+        public IEnumerable<string> TeamViceLeaderIDs { get; set; }
     }
 }

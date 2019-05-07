@@ -1,4 +1,5 @@
 ﻿using GoBike.Team.Service.Models.Data;
+using System.Collections.Generic;
 
 namespace GoBike.Team.Service.Models.Command
 {
@@ -21,6 +22,11 @@ namespace GoBike.Team.Service.Models.Command
         /// Gets or sets TargetID
         /// </summary>
         public string TargetID { get; set; }
+
+        /// <summary>
+        /// Gets or sets TargetIDs
+        /// </summary>
+        public IEnumerable<string> TargetIDs { get; set; }
 
         /// <summary>
         /// Gets or sets TeamID

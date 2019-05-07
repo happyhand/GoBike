@@ -13,17 +13,17 @@ namespace GoBike.Team.Repository.Models
         /// <summary>
         /// 無設定
         /// </summary>
-        None = -1,
+        None = 0,
 
         /// <summary>
         /// 關閉
         /// </summary>
-        Close = 0,
+        Close = 1,
 
         /// <summary>
         /// 開啟
         /// </summary>
-        Open = 1
+        Open = 2
     }
 
     /// <summary>
@@ -34,17 +34,17 @@ namespace GoBike.Team.Repository.Models
         /// <summary>
         /// 無設定
         /// </summary>
-        None = -1,
+        None = 0,
 
         /// <summary>
         /// 關閉
         /// </summary>
-        Close = 0,
+        Close = 1,
 
         /// <summary>
         /// 開啟
         /// </summary>
-        Open = 1
+        Open = 2
     }
 
     /// <summary>

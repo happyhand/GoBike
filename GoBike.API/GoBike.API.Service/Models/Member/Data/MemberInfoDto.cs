@@ -3,6 +3,162 @@
 namespace GoBike.API.Service.Models.Member.Data
 {
     /// <summary>
+    /// 互動狀態資料
+    /// </summary>
+    public enum InteractiveStatusType
+    {
+        /// <summary>
+        /// 黑名單
+        /// </summary>
+        Black = -1,
+
+        /// <summary>
+        /// 無狀態
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 請求 - 等待確認
+        /// </summary>
+        Request = 1,
+
+        /// <summary>
+        /// 請求 - 處理確認
+        /// </summary>
+        RequestHandler = 2,
+
+        /// <summary>
+        /// 好友
+        /// </summary>
+        Friend = 3
+    }
+
+    /// <summary>
+    /// 車隊選單設定資料
+    /// </summary>
+    public enum TeamActionSettingType
+    {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 歷史公告
+        /// </summary>
+        HistoricalAnnouncement = 1,
+
+        /// <summary>
+        /// 邀請好友
+        /// </summary>
+        InviteFriend = 2,
+
+        /// <summary>
+        /// 發起活動
+        /// </summary>
+        HoldEvent = 4,
+
+        /// <summary>
+        /// 編輯資料
+        /// </summary>
+        EditData = 8,
+
+        /// <summary>
+        /// 發起公告
+        /// </summary>
+        SendAnnouncement = 16
+    }
+
+    /// <summary>
+    /// 車隊身分類型資料
+    /// </summary>
+    public enum TeamIdentityType
+    {
+        /// <summary>
+        /// 隊員
+        /// </summary>
+        Normal = 0,
+
+        /// <summary>
+        /// 副隊長
+        /// </summary>
+        ViceLeader = 1,
+
+        /// <summary>
+        /// 隊長
+        /// </summary>
+        Leader = 2
+    }
+
+    /// <summary>
+    /// 車隊加入設定資料
+    /// </summary>
+    public enum TeamJoinSettingType
+    {
+        /// <summary>
+        /// 取消邀請加入車隊
+        /// </summary>
+        CancelInviteJoin = -2,
+
+        /// <summary>
+        /// 拒絕加入車隊
+        /// </summary>
+        RejectJoin = -1,
+
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 允許加入車隊
+        /// </summary>
+        AllowJoin = 1,
+
+        /// <summary>
+        /// 邀請加入車隊
+        /// </summary>
+        InviteJoin = 2
+    }
+
+    /// <summary>
+    /// 車隊請離設定資料
+    /// </summary>
+    public enum TeamKickOutSettingType
+    {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 請離車隊
+        /// </summary>
+        KickOut = 1
+    }
+
+    /// <summary>
+    /// 車隊副隊長設定資料
+    /// </summary>
+    public enum TeamViceLeaderSettingType
+    {
+        /// <summary>
+        /// 取消副隊長
+        /// </summary>
+        Cancel = -1,
+
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 設為副隊長
+        /// </summary>
+        Appoint = 1
+    }
+
+    /// <summary>
     /// 會員資訊
     /// </summary>
     public class MemberInfoDto
@@ -83,8 +239,27 @@ namespace GoBike.API.Service.Models.Member.Data
         /// </summary>
         public int InteractiveStatus { get; set; }
 
+        #endregion 會員互動資料
+
+        #region 車隊設定資料
+
         /// <summary>
-        /// Gets or sets TeamJoinSetting (0:無設定，1:允許加入車隊，2:邀請加入車隊)
+        /// Gets or sets TeamActionSetting (0:無設定，1:歷史公告，2:邀請好友，4:發起活動，8:編輯資料，16:發起公告)
+        /// </summary>
+        public int TeamActionSetting { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamEventSetting (0:無設定，1:編輯資料)
+        /// </summary>
+        public int TeamEventSetting { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamIdentity (0:隊員，1:副隊長，2:隊長)
+        /// </summary>
+        public int TeamIdentity { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamJoinSetting (-2:取消邀請加入車隊，-1:拒絕加入車隊，0:無設定，1:允許加入車隊，2:邀請加入車隊)
         /// </summary>
         public int TeamJoinSetting { get; set; }
 
@@ -98,6 +273,6 @@ namespace GoBike.API.Service.Models.Member.Data
         /// </summary>
         public int TeamViceLeaderSetting { get; set; }
 
-        #endregion 會員互動資料
+        #endregion 車隊設定資料
     }
 }

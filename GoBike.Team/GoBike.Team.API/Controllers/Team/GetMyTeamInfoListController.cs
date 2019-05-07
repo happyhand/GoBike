@@ -48,10 +48,10 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetMyTeamInfoList(memberCommand);
+                Tuple<TeamInfoDto, IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetMyTeamInfoList(memberCommand);
                 if (string.IsNullOrEmpty(result.Item3))
                 {
-                    return Ok(new MyTeamInfoDto { LeaderTeamDatas = result.Item1, JoinTeamDatas = result.Item2 });
+                    return Ok(new MyTeamInfoDto { LeaderTeamData = result.Item1, JoinTeamDatas = result.Item2 });
                 }
 
                 return BadRequest(result.Item3);

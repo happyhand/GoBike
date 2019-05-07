@@ -32,7 +32,7 @@ namespace GoBike.Team.Service.Interface
         /// </summary>
         /// <param name="memberCommand">memberCommand</param>
         /// <returns>Tuple(TeamInfoDto, TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(MemberCommandDto memberCommand);
+        Task<Tuple<TeamInfoDto, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(MemberCommandDto memberCommand);
 
         /// <summary>
         /// 取得車隊資訊
@@ -46,9 +46,8 @@ namespace GoBike.Team.Service.Interface
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <param name="isExamine">isExamine</param>
-        /// <param name="isInvite">isInvite</param>
         /// <returns>string</returns>
-        Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine, bool isInvite);
+        Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine);
 
         /// <summary>
         /// 離開車隊
@@ -63,6 +62,13 @@ namespace GoBike.Team.Service.Interface
         /// <param name="teamInfo">teamInfo</param>
         /// <returns>string</returns>
         Task<string> Register(TeamInfoDto teamInfo);
+
+        /// <summary>
+        /// 拒絕加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> RejectJoinTeam(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 搜尋車隊資訊列表
@@ -94,8 +100,22 @@ namespace GoBike.Team.Service.Interface
         /// 申請加入車隊
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
-        /// <returns>Tuple(int, string)</returns>
+        /// <returns>string</returns>
         Task<string> ApplyForJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 取消申請加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> CancelApplyForJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 取消邀請加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> CancelInviteJoinTeam(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 取得申請請求列表

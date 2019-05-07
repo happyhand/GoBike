@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GoBike.API.App.Models.Member
+﻿namespace GoBike.API.App.Models.Member
 {
     /// <summary>
     /// 會員簡易資料
@@ -10,9 +8,9 @@ namespace GoBike.API.App.Models.Member
         #region 會員資料
 
         /// <summary>
-        /// Gets or sets LoginDate
+        /// Gets or sets LastOnlineTime
         /// </summary>
-        public DateTime LoginDate { get; set; }
+        public int LastOnlineTime { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID
@@ -38,8 +36,27 @@ namespace GoBike.API.App.Models.Member
         /// </summary>
         public int InteractiveStatus { get; set; }
 
+        #endregion 會員互動資料
+
+        #region 車隊設定資料
+
         /// <summary>
-        /// Gets or sets TeamJoinSetting (0:無設定，1:允許加入車隊，2:邀請加入車隊)
+        /// Gets or sets TeamActionSetting (0:無設定，1:歷史公告，2:邀請好友，4:發起活動，8:編輯資料，16:發起公告)
+        /// </summary>
+        public int TeamActionSetting { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamEventSetting (0:無設定，1:編輯資料)
+        /// </summary>
+        public int TeamEventSetting { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamIdentity (0:隊員，1:副隊長，2:隊長)
+        /// </summary>
+        public int TeamIdentity { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamJoinSetting (-2:取消邀請加入車隊，-1:拒絕加入車隊，0:無設定，1:允許加入車隊，2:邀請加入車隊)
         /// </summary>
         public int TeamJoinSetting { get; set; }
 
@@ -53,6 +70,6 @@ namespace GoBike.API.App.Models.Member
         /// </summary>
         public int TeamViceLeaderSetting { get; set; }
 
-        #endregion 會員互動資料
+        #endregion 車隊設定資料
     }
 }
