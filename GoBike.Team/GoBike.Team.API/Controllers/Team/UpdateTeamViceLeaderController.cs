@@ -10,7 +10,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 更新車隊副隊長
     /// </summary>
-    [Route("api/team/[controller]/[action]")]
+    [Route("api/Team/[controller]/[action]")]
     [ApiController]
     public class UpdateTeamViceLeaderController : ControllerBase
     {

@@ -11,7 +11,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 取得申請請求列表
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class GetApplyForRequestListController : ControllerBase
     {

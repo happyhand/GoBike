@@ -44,7 +44,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/member/[controller]")]
+        [Route("api/Member/[controller]")]
         public async Task<IActionResult> NormalLogin(MemberBaseCommandDto memberBaseCommand)
         {
             try
@@ -65,7 +65,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/member/[controller]/token")]
+        [Route("api/Member/[controller]/Token")]
         public async Task<IActionResult> TokenLogin(MemberBaseCommandDto memberBaseCommand)
         {
             try

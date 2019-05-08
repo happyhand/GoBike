@@ -12,7 +12,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 車隊編輯
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class EditDataController : ControllerBase
     {

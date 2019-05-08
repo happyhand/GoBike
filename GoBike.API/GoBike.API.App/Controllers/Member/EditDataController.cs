@@ -17,7 +17,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 會員編輯
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/Member/[controller]")]
     [ApiController]
     public class EditDataController : ApiController
     {

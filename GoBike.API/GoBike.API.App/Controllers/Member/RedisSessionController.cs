@@ -8,7 +8,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// Redis Session 測試
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/Member/[controller]")]
     [ApiController]
     public class RedisSessionController : ControllerBase
     {

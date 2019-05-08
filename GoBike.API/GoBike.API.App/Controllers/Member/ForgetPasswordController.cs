@@ -52,7 +52,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="verifierInfo">verifierInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/member/[controller]")]
+        [Route("api/Member/[controller]")]
         public async Task<IActionResult> GetVerifierCode(VerifierInfoDto verifierInfo)
         {
             try
@@ -81,7 +81,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="verifierInfo">verifierInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/member/[controller]/valid")]
+        [Route("api/Member/[controller]/Valid")]
         public async Task<IActionResult> ValidVerifierCode(VerifierInfoDto verifierInfo)
         {
             try

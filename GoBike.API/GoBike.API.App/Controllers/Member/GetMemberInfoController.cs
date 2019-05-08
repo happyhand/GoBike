@@ -18,7 +18,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 取得會員資訊
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/Member/[controller]")]
     [ApiController]
     public class GetMemberInfoController : ApiController
     {

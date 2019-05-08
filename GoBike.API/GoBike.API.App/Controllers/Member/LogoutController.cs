@@ -7,7 +7,7 @@ namespace GoBike.API.App.Controllers.Member
     /// <summary>
     /// 會員登出
     /// </summary>
-    [Route("api/member/[controller]")]
+    [Route("api/Member/[controller]")]
     [ApiController]
     public class LogoutController : ApiController
     {

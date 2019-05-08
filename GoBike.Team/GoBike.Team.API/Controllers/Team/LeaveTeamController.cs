@@ -10,7 +10,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 離開車隊
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class LeaveTeamController : ControllerBase
     {

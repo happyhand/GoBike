@@ -11,7 +11,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 取得車隊資訊
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class GetTeamInfoController : ControllerBase
     {

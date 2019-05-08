@@ -10,7 +10,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 申請加入車隊
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class ApplyForJoinTeamController : ControllerBase
     {

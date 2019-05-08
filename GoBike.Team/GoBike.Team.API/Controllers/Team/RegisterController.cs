@@ -11,7 +11,7 @@ namespace GoBike.Team.API.Controllers.Team
     /// <summary>
     /// 建立車隊
     /// </summary>
-    [Route("api/team/[controller]")]
+    [Route("api/Team/[controller]")]
     [ApiController]
     public class RegisterController : ControllerBase
     {
