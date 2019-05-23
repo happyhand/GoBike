@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using GoBike.API.App.Models.Member;
-using GoBike.API.Service.Models.Member.Data;
+using GoBike.API.Service.Models.Member.Command.Data;
+using GoBike.API.Service.Models.Member.View;
+using GoBike.API.Service.Models.Team.View;
 using System;
 
 namespace GoBike.API.App.AutoMapperProfile.Member
@@ -9,8 +10,9 @@ namespace GoBike.API.App.AutoMapperProfile.Member
     {
         public MemberProfile()
         {
-            CreateMap<MemberInfoDto, MemberSimpleViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
-            CreateMap<MemberInfoDto, MemberDetailViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
+            CreateMap<MemberInfoDto, MemberSimpleInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
+            CreateMap<MemberInfoDto, MemberCardInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
+            CreateMap<MemberInfoDto, TeamMemberInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
         }
 
         /// <summary>

@@ -21,20 +21,6 @@ namespace GoBike.Team.Service.Interface
         Task<Tuple<TeamInfoDto, string>> EditData(TeamCommandDto teamCommand);
 
         /// <summary>
-        /// 強制離開車隊
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        Task<string> ForceLeaveTeam(TeamCommandDto teamCommand);
-
-        /// <summary>
-        /// 取得我的車隊資訊列表
-        /// </summary>
-        /// <param name="memberCommand">memberCommand</param>
-        /// <returns>Tuple(TeamInfoDto, TeamInfoDtos, string)</returns>
-        Task<Tuple<TeamInfoDto, IEnumerable<TeamInfoDto>, string>> GetMyTeamInfoList(MemberCommandDto memberCommand);
-
-        /// <summary>
         /// 取得車隊資訊
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
@@ -42,19 +28,11 @@ namespace GoBike.Team.Service.Interface
         Task<Tuple<TeamInfoDto, string>> GetTeamInfo(TeamCommandDto teamCommand);
 
         /// <summary>
-        /// 加入車隊
+        /// 取得會員的車隊資訊列表
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
-        /// <param name="isExamine">isExamine</param>
-        /// <returns>string</returns>
-        Task<string> JoinTeam(TeamCommandDto teamCommand, bool isExamine);
-
-        /// <summary>
-        /// 離開車隊
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        Task<string> LeaveTeam(TeamCommandDto teamCommand);
+        /// <returns>Tuple(TeamInfoArray, string)</returns>
+        Task<Tuple<dynamic[], string>> GetTeamInfoListOfMember(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 建立車隊
@@ -64,33 +42,11 @@ namespace GoBike.Team.Service.Interface
         Task<string> Register(TeamInfoDto teamInfo);
 
         /// <summary>
-        /// 拒絕加入車隊
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        Task<string> RejectJoinTeam(TeamCommandDto teamCommand);
-
-        /// <summary>
-        /// 搜尋車隊資訊列表
+        /// 搜尋車隊
         /// </summary>
         /// <param name="teamSearchCommand">teamSearchCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, string>> SearchTeamInfoList(TeamSearchCommandDto teamSearchCommand);
-
-        /// <summary>
-        /// 更新車隊隊長
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        Task<string> UpdateTeamLeader(TeamCommandDto teamCommand);
-
-        /// <summary>
-        /// 更新車隊副隊長
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <param name="isAdd">isAdd</param>
-        /// <returns>string</returns>
-        Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand, bool isAdd);
+        Task<Tuple<IEnumerable<TeamInfoDto>, string>> SearchTeam(TeamSearchCommandDto teamSearchCommand);
 
         #endregion 車隊資料
 
@@ -118,18 +74,25 @@ namespace GoBike.Team.Service.Interface
         Task<string> CancelInviteJoinTeam(TeamCommandDto teamCommand);
 
         /// <summary>
-        /// 取得申請請求列表
+        /// 強制離開車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> ForceLeaveTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 取得申請加入名單
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(strings, string)</returns>
         Task<Tuple<IEnumerable<string>, string>> GetApplyForRequestList(TeamCommandDto teamCommand);
 
         /// <summary>
-        /// 取得邀請請求列表
+        /// 取得邀請加入名單
         /// </summary>
         /// <param name="memberCommand">memberCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(MemberCommandDto memberCommand);
+        Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 邀請加入車隊
@@ -137,6 +100,57 @@ namespace GoBike.Team.Service.Interface
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
         Task<string> InviteJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 邀請多人加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> InviteManyJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="isInvite">isInvite</param>
+        /// <returns>string</returns>
+        Task<string> JoinTeam(TeamCommandDto teamCommand, bool isInvite);
+
+        /// <summary>
+        /// 離開車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> LeaveTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 拒絕申請加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> RejectApplyForJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 拒絕邀請加入車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> RejectInviteJoinTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 更新車隊隊長
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> UpdateTeamLeader(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 更新車隊副隊長
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="isAdd">isAdd</param>
+        /// <returns>string</returns>
+        Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand, bool isAdd);
 
         #endregion 車隊互動資料
     }

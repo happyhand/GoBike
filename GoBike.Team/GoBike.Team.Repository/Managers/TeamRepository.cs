@@ -70,7 +70,19 @@ namespace GoBike.Team.Repository.Managers
             {
                 FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
                 DeleteResult result = await this.teamDatas.DeleteManyAsync(filter);
-                return result.IsAcknowledged && result.DeletedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Team Data Fail For IsAcknowledged >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Team Data Fail For IsAcknowledged >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -181,8 +193,8 @@ namespace GoBike.Team.Repository.Managers
         /// 更新車隊資料
         /// </summary>
         /// <param name="teamData">teamData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamData(TeamData teamData)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamData(TeamData teamData)
         {
             try
             {
@@ -190,20 +202,22 @@ namespace GoBike.Team.Repository.Managers
                 ReplaceOneResult result = await this.teamDatas.ReplaceOneAsync(filter, teamData);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新車隊資料.");
+                    this.logger.LogError($"Update Team Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(teamData)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "車隊資料未更改.");
+                    this.logger.LogError($"Update Team Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(teamData)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Team Data Error >>> Data:{JsonConvert.SerializeObject(teamData)}\n{ex}");
-                return Tuple.Create(false, "更新車隊資料發生錯誤.");
+                return false;
             }
         }
 
@@ -212,8 +226,8 @@ namespace GoBike.Team.Repository.Managers
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
         {
             try
             {
@@ -222,20 +236,22 @@ namespace GoBike.Team.Repository.Managers
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新車隊副隊長群.");
+                    this.logger.LogError($"Update Team Vice Leaders Fail For IsAcknowledged >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "車隊副隊長群未更改.");
+                    this.logger.LogError($"Update Team Vice Leaders Fail For ModifiedCount >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} ViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
-                return Tuple.Create(false, "更新車隊副隊長群發生錯誤.");
+                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
+                return false;
             }
         }
 
@@ -286,8 +302,8 @@ namespace GoBike.Team.Repository.Managers
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
@@ -296,20 +312,22 @@ namespace GoBike.Team.Repository.Managers
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新申請加入名單資料.");
+                    this.logger.LogError($"Update Team Apply For Join IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "申請加入名單資料未更改.");
+                    this.logger.LogError($"Update Team Apply For Join IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Team Apply For Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return Tuple.Create(false, "更新申請加入名單資料發生錯誤.");
+                return false;
             }
         }
 
@@ -318,8 +336,8 @@ namespace GoBike.Team.Repository.Managers
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
@@ -328,20 +346,22 @@ namespace GoBike.Team.Repository.Managers
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新車隊黑名單資料.");
+                    this.logger.LogError($"Update Team Blacklist Data Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "車隊黑名單資料未更改.");
+                    this.logger.LogError($"Update Team Blacklist Data Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return Tuple.Create(false, "更新車隊黑名單資料發生錯誤.");
+                this.logger.LogError($"Update Team Blacklist Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
             }
         }
 
@@ -350,8 +370,8 @@ namespace GoBike.Team.Repository.Managers
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
@@ -360,20 +380,22 @@ namespace GoBike.Team.Repository.Managers
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新車隊被列入黑名單資料.");
+                    this.logger.LogError($"Update Team Blacklisted Data Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "車隊被列入黑名單資料未更改.");
+                    this.logger.LogError($"Update Team Blacklisted Data Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return Tuple.Create(false, "更新車隊被列入黑名單資料發生錯誤.");
+                this.logger.LogError($"Update Team Blacklisted Data Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
             }
         }
 
@@ -382,8 +404,8 @@ namespace GoBike.Team.Repository.Managers
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
@@ -392,20 +414,22 @@ namespace GoBike.Team.Repository.Managers
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新邀請加入名單資料.");
+                    this.logger.LogError($"Update Team Invite Join IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "邀請加入名單資料未更改.");
+                    this.logger.LogError($"Update Team Invite Join IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Team Invite Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return Tuple.Create(false, "更新邀請加入名單資料發生錯誤.");
+                return false;
             }
         }
 

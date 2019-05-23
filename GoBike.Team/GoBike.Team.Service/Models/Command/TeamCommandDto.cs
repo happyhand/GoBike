@@ -24,7 +24,7 @@ namespace GoBike.Team.Service.Models.Command
         public string TargetID { get; set; }
 
         /// <summary>
-        /// Gets or sets TargetIDs
+        /// Gets or sets TargetID
         /// </summary>
         public IEnumerable<string> TargetIDs { get; set; }
 

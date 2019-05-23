@@ -34,9 +34,10 @@ namespace GoBike.API.Core.Resource
         public static string ByteToHex(byte[] comByte)
         {
             StringBuilder builder = new StringBuilder(comByte.Length * 3);
-
             foreach (byte data in comByte)
+            {
                 builder.Append(Convert.ToString(data, 16).PadLeft(2, '0').PadRight(3, ' '));
+            }
 
             return builder.ToString().ToUpper().Replace(" ", string.Empty);
         }
@@ -87,11 +88,11 @@ namespace GoBike.API.Core.Resource
         public static byte[] HexToByte(string data)
         {
             data = data.Replace(" ", string.Empty);
-
             byte[] comBuffer = new byte[data.Length / 2];
-
             for (int i = 0; i < data.Length; i += 2)
+            {
                 comBuffer[i / 2] = (byte)Convert.ToByte(data.Substring(i, 2), 16);
+            }
 
             return comBuffer;
         }
@@ -108,10 +109,12 @@ namespace GoBike.API.Core.Resource
         /// <returns>HttpResponseMessage</returns>
         public static async Task<HttpResponseMessage> ApiGet(string domain, string apiUrl)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri($"http://{domain}/");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            return await client.GetAsync(apiUrl);
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri($"http://{domain}/");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                return await client.GetAsync(apiUrl);
+            }
         }
 
         /// <summary>
@@ -123,11 +126,13 @@ namespace GoBike.API.Core.Resource
         /// <returns>HttpResponseMessage</returns>
         public static async Task<HttpResponseMessage> ApiPost(string domain, string apiUrl, string postData)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri($"http://{domain}/");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            StringContent content = new StringContent(postData, Encoding.UTF8, "application/json");
-            return await client.PostAsync(apiUrl, content);
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri($"http://{domain}/");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                StringContent content = new StringContent(postData, Encoding.UTF8, "application/json");
+                return await client.PostAsync(apiUrl, content);
+            }
         }
 
         /// <summary>
@@ -140,23 +145,25 @@ namespace GoBike.API.Core.Resource
         public static async Task<HttpResponseMessage> ApiPost(string domain, string apiUrl, IFormFileCollection files)
         {
             //// 建立 HttpClient
-            HttpClient client = new HttpClient();
-            //// 設定站台 url (api url)
-            client.BaseAddress = new Uri($"http://{domain}/");
-            //// 讀取 Request 中的檔案，並轉換成 byte 型式
-            byte[] dataBytes;
-            MultipartFormDataContent multiContent = new MultipartFormDataContent();
-            foreach (IFormFile file in files)
+            using (HttpClient client = new HttpClient())
             {
-                using (BinaryReader binaryReader = new BinaryReader(file.OpenReadStream()))
+                //// 設定站台 url (api url)
+                client.BaseAddress = new Uri($"http://{domain}/");
+                //// 讀取 Request 中的檔案，並轉換成 byte 型式
+                byte[] dataBytes;
+                MultipartFormDataContent multiContent = new MultipartFormDataContent();
+                foreach (IFormFile file in files)
                 {
-                    dataBytes = binaryReader.ReadBytes((int)file.OpenReadStream().Length);
-                    ByteArrayContent bytes = new ByteArrayContent(dataBytes);
-                    multiContent.Add(bytes, "file", file.FileName);
+                    using (BinaryReader binaryReader = new BinaryReader(file.OpenReadStream()))
+                    {
+                        dataBytes = binaryReader.ReadBytes((int)file.OpenReadStream().Length);
+                        ByteArrayContent bytes = new ByteArrayContent(dataBytes);
+                        multiContent.Add(bytes, "file", file.FileName);
+                    }
                 }
+                //// 呼叫 api 並接收回應
+                return await client.PostAsync(apiUrl, multiContent);
             }
-            //// 呼叫 api 並接收回應
-            return await client.PostAsync(apiUrl, multiContent);
         }
 
         #endregion API 串接

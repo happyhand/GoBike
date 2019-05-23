@@ -164,5 +164,11 @@ namespace GoBike.Team.Repository.Models
         /// </summary>
         [BsonElement("TeamViceLeaderIDs")]
         public IEnumerable<string> TeamViceLeaderIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamNewsDate
+        /// </summary>
+        [BsonElement("TeamNewsDate")]
+        public DateTime TeamNewsDate { get; set; }
     }
 }

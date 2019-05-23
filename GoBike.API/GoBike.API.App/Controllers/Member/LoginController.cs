@@ -1,8 +1,5 @@
-﻿using GoBike.API.Core.Applibs;
-using GoBike.API.Core.Resource;
-using GoBike.API.Service.Interface.Member;
+﻿using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member.Command;
-using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -49,8 +46,13 @@ namespace GoBike.API.App.Controllers.Member
         {
             try
             {
-                ResponseResultDto responseResult = await this.memberService.Login(memberBaseCommand.Email, memberBaseCommand.Password);
-                return this.ResponseResultHandler(responseResult);
+                ResponseResultDto responseResult = await this.memberService.Login(this.HttpContext, memberBaseCommand.Email, memberBaseCommand.Password);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
+                }
+
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
@@ -70,31 +72,19 @@ namespace GoBike.API.App.Controllers.Member
         {
             try
             {
-                ResponseResultDto responseResult = await this.memberService.Login(memberBaseCommand.Token);
-                return this.ResponseResultHandler(responseResult);
+                ResponseResultDto responseResult = await this.memberService.Login(this.HttpContext, memberBaseCommand.Token);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
+                }
+
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Token Login Error >>> Token:{memberBaseCommand.Token}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
-        }
-
-        /// <summary>
-        /// 處理回應資料
-        /// </summary>
-        /// <param name="responseResult">responseResult</param>
-        /// <returns>IActionResult</returns>
-        private IActionResult ResponseResultHandler(ResponseResultDto responseResult)
-        {
-            if (responseResult.Ok)
-            {
-                MemberInfoDto memberInfo = responseResult.Data as MemberInfoDto;
-                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberInfo.MemberID);
-                return Ok(memberInfo.Token);
-            }
-
-            return BadRequest(responseResult.Data);
         }
     }
 }

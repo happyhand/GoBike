@@ -1,15 +1,11 @@
-﻿using AutoMapper;
-using GoBike.API.App.Filters;
-using GoBike.API.App.Models.Member;
+﻿using GoBike.API.App.Filters;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -28,11 +24,6 @@ namespace GoBike.API.App.Controllers.Member
         private readonly ILogger<GetMemberInfoController> logger;
 
         /// <summary>
-        /// mapper
-        /// </summary>
-        private readonly IMapper mapper;
-
-        /// <summary>
         /// memberService
         /// </summary>
         private readonly IMemberService memberService;
@@ -43,10 +34,9 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
-        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMapper mapper, IMemberService memberService)
+        public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
         {
             this.logger = logger;
-            this.mapper = mapper;
             this.memberService = memberService;
         }
 
@@ -58,13 +48,13 @@ namespace GoBike.API.App.Controllers.Member
         [CheckLoginActionFilter(true)]
         public async Task<IActionResult> Get()
         {
-            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResult = await this.memberService.GetMemberInfo(memberID, null);
+                ResponseResultDto responseResult = await this.memberService.GetMemberInfo(new MemberBaseCommandDto() { MemberID = memberID });
                 if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberDetailViewDto>(responseResult.Data));
+                    return Ok(responseResult.Data);
                 }
 
                 return BadRequest(responseResult.Data);
@@ -79,26 +69,26 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="targetData">targetData</param>
+        /// <param name="memberSearchCommand">memberSearchCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberBaseCommandDto targetData)
+        public async Task<IActionResult> Post(MemberSearchCommandDto memberSearchCommand)
         {
-            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResult = await this.memberService.GetMemberInfo(memberID, targetData);
+                ResponseResultDto responseResult = await this.memberService.InquireMemberInfo(memberID, memberSearchCommand);
                 if (responseResult.Ok)
                 {
-                    return Ok(this.mapper.Map<MemberDetailViewDto>(responseResult.Data));
+                    return Ok(responseResult.Data);
                 }
 
                 return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID} TargetData:{JsonConvert.SerializeObject(targetData)}\n{ex}");
+                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberID} SearchKey:{memberSearchCommand.SearchKey}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
         }

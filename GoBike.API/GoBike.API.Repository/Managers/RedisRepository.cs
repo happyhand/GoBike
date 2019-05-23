@@ -35,7 +35,12 @@ namespace GoBike.API.Repository.Managers
         public RedisRepository(ILogger<RedisRepository> logger)
         {
             this.logger = logger;
-            ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(AppSettingHelper.Appsetting.RedisConnection);
+            Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
+            {
+                return ConnectionMultiplexer.Connect(AppSettingHelper.Appsetting.RedisConnection);
+            });
+
+            ConnectionMultiplexer connectionMultiplexer = lazyConnection.Value;
             this.database = connectionMultiplexer.GetDatabase(1);
             this.redisServer = connectionMultiplexer.GetServer(AppSettingHelper.Appsetting.RedisConnection);
         }

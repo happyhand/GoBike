@@ -6,6 +6,7 @@ using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace GoBike.API.App.Controllers.Member
         [CheckLoginActionFilter(true)]
         public async Task<IActionResult> Post()
         {
-            string memberID = HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             IFormFileCollection files = this.Request.Form.Files;
             try
             {
@@ -62,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Upload Photo Error >>> MemberID:{memberID} Files Count:{(files == null ? "None" : files.Count.ToString())}\n{ex}");
+                this.logger.LogError($"Upload Photo Error >>> MemberID:{memberID} Files:{JsonConvert.SerializeObject(files)}\n{ex}");
                 return BadRequest("上傳頭像發生錯誤.");
             }
         }

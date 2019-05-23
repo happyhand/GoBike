@@ -75,7 +75,19 @@ namespace GoBike.Member.Repository.Managers
             {
                 FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
                 DeleteResult result = await this.memberDatas.DeleteManyAsync(filter);
-                return result.IsAcknowledged && result.DeletedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Memebr Data Fail For IsAcknowledged >>> MemberID:{memberID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Memebr Data Fail For DeletedCount >>> MemberID:{memberID}");
+                    return false;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -87,8 +99,8 @@ namespace GoBike.Member.Repository.Managers
         /// <summary>
         /// 取得會員序號
         /// </summary>
-        /// <returns>long</returns>
-        public async Task<Tuple<long, string>> GetMemberSerialNumber()
+        /// <returns>string</returns>
+        public async Task<string> GetMemberSerialNumber()
         {
             try
             {
@@ -101,12 +113,12 @@ namespace GoBike.Member.Repository.Managers
                 var filter = Builders<SerialNumberData>.Filter.Eq("SequenceName", "MemberID");
                 var update = Builders<SerialNumberData>.Update.Inc("SequenceValue", 1);
                 SerialNumberData result = await this.serialNumberDatas.FindOneAndUpdateAsync(filter, update);
-                return Tuple.Create(result.SequenceValue, string.Empty);
+                return result.SequenceValue.ToString();
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Serial Number Error\n{ex}");
-                return Tuple.Create<long, string>(-1, "取得會員序號發生錯誤.");
+                return string.Empty;
             }
         }
 
@@ -190,8 +202,8 @@ namespace GoBike.Member.Repository.Managers
         /// 更新會員資料
         /// </summary>
         /// <param name="memberData">memberData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateMemebrData(MemberData memberData)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateMemebrData(MemberData memberData)
         {
             try
             {
@@ -199,20 +211,22 @@ namespace GoBike.Member.Repository.Managers
                 ReplaceOneResult result = await this.memberDatas.ReplaceOneAsync(filter, memberData);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新會員資料.");
+                    this.logger.LogError($"Update Memebr Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(memberData)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "會員資料未更改.");
+                    this.logger.LogError($"Update Memebr Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(memberData)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Memebr Data Error >>> Data:{JsonConvert.SerializeObject(memberData)}\n{ex}");
-                return Tuple.Create(false, "更新會員資料發生錯誤.");
+                return false;
             }
         }
 
@@ -221,8 +235,8 @@ namespace GoBike.Member.Repository.Managers
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="loginDate">loginDate</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateMemebrLoginDate(string memberID, DateTime loginDate)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateMemebrLoginDate(string memberID, DateTime loginDate)
         {
             try
             {
@@ -231,20 +245,22 @@ namespace GoBike.Member.Repository.Managers
                 UpdateResult result = await this.memberDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新會員登入日期資料.");
+                    this.logger.LogError($"Update Memebr Login Date Fail For IsAcknowledged >>> MemberID:{memberID} LoginDate:{loginDate.ToString()}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "會員登入日期資料未更改.");
+                    this.logger.LogError($"Update Memebr Login Date Fail For ModifiedCount >>> MemberID:{memberID} LoginDate:{loginDate.ToString()}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Memebr Login Date Error >>> MemberID:{memberID} LoginDate:{loginDate}\n{ex}");
-                return Tuple.Create(false, "更新會員登入日期資料發生錯誤.");
+                return false;
             }
         }
 

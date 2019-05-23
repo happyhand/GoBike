@@ -1,6 +1,7 @@
 ﻿using GoBike.Member.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace GoBike.Member.API.Controllers
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberIDs">memberIDs</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         public async Task<IActionResult> Post(IEnumerable<string> memberIDs)
@@ -55,7 +56,7 @@ namespace GoBike.Member.API.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Verify Member Error >>> MemberIDs:{memberIDs}\n{ex}");
+                this.logger.LogError($"Verify Member Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return BadRequest("驗證會員發生錯誤.");
             }
         }

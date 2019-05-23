@@ -4,7 +4,7 @@ using GoBike.API.Repository.Interface;
 using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Response;
-using GoBike.API.Service.Models.Verifier;
+using GoBike.API.Service.Models.Verifier.Command;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -43,13 +43,13 @@ namespace GoBike.API.Service.Managers.Verifier
         /// <summary>
         /// 取得驗證碼
         /// </summary>
-        /// <param name="verifierInfo">verifierInfo</param>
+        /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>string</returns>
-        public async Task<string> GetVerifierCode(VerifierInfoDto verifierInfo)
+        public async Task<string> GetVerifierCode(VerifierCommandDto verifierCommand)
         {
             try
             {
-                string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierInfo.Type}-{verifierInfo.Email}-*";
+                string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierCommand.Type}-{verifierCommand.Email}-*";
                 string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
                 if (!string.IsNullOrEmpty(cacheKey))
                 {
@@ -58,7 +58,7 @@ namespace GoBike.API.Service.Managers.Verifier
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Verifier Code Error >>> Type:{verifierInfo.Type} Email:{verifierInfo.Email}\n{ex}");
+                this.logger.LogError($"Get Verifier Code Error >>> Type:{verifierCommand.Type} Email:{verifierCommand.Email}\n{ex}");
                 return string.Empty;
             }
 
@@ -68,13 +68,13 @@ namespace GoBike.API.Service.Managers.Verifier
         /// <summary>
         /// 驗證碼是否有效
         /// </summary>
-        /// <param name="verifierInfo">verifierInfo</param>
+        /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>bool</returns>
-        public async Task<bool> IsValidVerifierCode(VerifierInfoDto verifierInfo)
+        public async Task<bool> IsValidVerifierCode(VerifierCommandDto verifierCommand)
         {
             try
             {
-                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierInfo.Type}-{verifierInfo.Email}-{verifierInfo.VerifierCode}";
+                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierCommand.Type}-{verifierCommand.Email}-{verifierCommand.VerifierCode}";
                 string data = await this.redisRepository.GetCache(cacheKey);
                 if (string.IsNullOrEmpty(data))
                 {
@@ -85,7 +85,7 @@ namespace GoBike.API.Service.Managers.Verifier
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Is Valid Verifier Code Error >>> Type:{verifierInfo.Type} Email:{verifierInfo.Email} VerifierCode:{verifierInfo.VerifierCode}\n{ex}");
+                this.logger.LogError($"Is Valid Verifier Code Error >>> Type:{verifierCommand.Type} Email:{verifierCommand.Email} VerifierCode:{verifierCommand.VerifierCode}\n{ex}");
                 return false;
             }
         }
@@ -93,12 +93,12 @@ namespace GoBike.API.Service.Managers.Verifier
         /// <summary>
         /// 發送驗證碼
         /// </summary>
-        /// <param name="verifierInfo">verifierInfo</param>
+        /// <param name="verifierCommand">verifierCommand</param>
         /// <param name="emailContext">emailContext</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> SendVerifierCode(VerifierInfoDto verifierInfo, EmailContext emailContext)
+        public async Task<ResponseResultDto> SendVerifierCode(VerifierCommandDto verifierCommand, EmailContext emailContext)
         {
-            if (string.IsNullOrEmpty(verifierInfo.Email))
+            if (string.IsNullOrEmpty(verifierCommand.Email))
             {
                 return new ResponseResultDto()
                 {
@@ -113,14 +113,14 @@ namespace GoBike.API.Service.Managers.Verifier
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierInfo.Type}-{verifierInfo.Email}-{verifierInfo.VerifierCode}";
-                    bool isSetCache = await this.redisRepository.SetCache(cacheKey, verifierInfo.VerifierCode, new TimeSpan(0, 10, 0));
+                    string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{verifierCommand.Type}-{verifierCommand.Email}-{verifierCommand.VerifierCode}";
+                    bool isSetCache = await this.redisRepository.SetCache(cacheKey, verifierCommand.VerifierCode, new TimeSpan(0, 10, 0));
                     if (isSetCache)
                     {
                         return new ResponseResultDto()
                         {
                             Ok = true,
-                            Data = verifierInfo.VerifierCode
+                            Data = "發送驗證碼成功."
                         };
                     }
 
@@ -139,7 +139,7 @@ namespace GoBike.API.Service.Managers.Verifier
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Verifier Code Error >>> Type:{verifierInfo.Type} Email:{verifierInfo.Email} VerifierCode:{verifierInfo.VerifierCode}\n{ex}");
+                this.logger.LogError($"Send Verifier Code Error >>> Type:{verifierCommand.Type} Email:{verifierCommand.Email} VerifierCode:{verifierCommand.VerifierCode} EmailContext:{JsonConvert.SerializeObject(emailContext)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,

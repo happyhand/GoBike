@@ -1,5 +1,4 @@
 ﻿using GoBike.Team.Repository.Models;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -66,16 +65,16 @@ namespace GoBike.Team.Repository.Interface
         /// 更新車隊資料
         /// </summary>
         /// <param name="teamData">teamData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamData(TeamData teamData);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamData(TeamData teamData);
 
         /// <summary>
         /// 更新車隊副隊長群
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
 
         /// <summary>
         /// 驗證車隊資料 (By TeamLeaderID)
@@ -100,32 +99,32 @@ namespace GoBike.Team.Repository.Interface
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
         /// 更新車隊黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamBlacklistData(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
         /// 更新車隊被列入黑名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamBlacklistedData(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
         /// 更新邀請加入名單資料
         /// </summary>
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
 
         #endregion 車隊互動資料
     }

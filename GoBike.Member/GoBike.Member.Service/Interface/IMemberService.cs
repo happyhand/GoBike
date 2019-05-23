@@ -14,9 +14,9 @@ namespace GoBike.Member.Service.Interface
         /// 會員編輯
         /// </summary>
         /// <param name="memberInfo">memberInfo</param>
-        /// <param name="IsStrictPassword">IsStrictPassword</param>
+        /// <param name="isStrictPassword">isStrictPassword</param>
         /// <returns>Tuple(MemberInfoDto, string)</returns>
-        Task<Tuple<MemberInfoDto, string>> EditData(MemberInfoDto memberInfo, bool IsStrictPassword);
+        Task<Tuple<MemberInfoDto, string>> EditData(MemberInfoDto memberInfo, bool isStrictPassword);
 
         /// <summary>
         /// 取得會員資訊

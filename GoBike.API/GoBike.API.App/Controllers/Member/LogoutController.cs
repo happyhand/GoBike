@@ -34,7 +34,7 @@ namespace GoBike.API.App.Controllers.Member
         {
             try
             {
-                HttpContext.Session.Clear();
+                this.HttpContext.Session.Clear();
                 return Ok("會員已登出.");
             }
             catch (Exception ex)

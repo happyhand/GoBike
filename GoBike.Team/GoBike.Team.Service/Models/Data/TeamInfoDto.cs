@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GoBike.Team.Service.Models.Data
 {
@@ -8,9 +9,34 @@ namespace GoBike.Team.Service.Models.Data
     public class TeamInfoDto
     {
         /// <summary>
+        /// Gets or sets TeamApplyForJoinIDs
+        /// </summary>
+        public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamBlacklistedIDs
+        /// </summary>
+        public IEnumerable<string> TeamBlacklistedIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamBlacklistIDs
+        /// </summary>
+        public IEnumerable<string> TeamBlacklistIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamCoverPhoto
         /// </summary>
         public string TeamCoverPhoto { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamCreateDate
+        /// </summary>
+        public DateTime TeamCreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamEventIDs
+        /// </summary>
+        public IEnumerable<string> TeamEventIDs { get; set; }
 
         /// <summary>
         /// Gets or sets TeamExamineStatus (1:close, 2:open)
@@ -26,6 +52,11 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets TeamInfo
         /// </summary>
         public string TeamInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamInviteJoinIDs
+        /// </summary>
+        public IEnumerable<string> TeamInviteJoinIDs { get; set; }
 
         /// <summary>
         /// Gets or sets TeamLeaderID
@@ -53,6 +84,11 @@ namespace GoBike.Team.Service.Models.Data
         public IEnumerable<string> TeamPlayerIDs { get; set; }
 
         /// <summary>
+        /// Gets or sets TeamSaveDeadline
+        /// </summary>
+        public DateTime TeamSaveDeadline { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamSearchStatus (1:close, 2:open)
         /// </summary>
         public int TeamSearchStatus { get; set; }
@@ -61,5 +97,10 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets TeamViceLeaderIDs
         /// </summary>
         public IEnumerable<string> TeamViceLeaderIDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamNewsDate
+        /// </summary>
+        public DateTime TeamNewsDate { get; set; }
     }
 }

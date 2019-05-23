@@ -3,9 +3,13 @@ using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Repository.Interface;
 using GoBike.API.Repository.Managers;
+using GoBike.API.Service.Interface.Interactive;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Interface.Team;
 using GoBike.API.Service.Interface.Verifier;
+using GoBike.API.Service.Managers.Interactive;
 using GoBike.API.Service.Managers.Member;
+using GoBike.API.Service.Managers.Team;
 using GoBike.API.Service.Managers.Verifier;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -73,6 +77,8 @@ namespace GoBike.API.App
         private void DependencyInjectionHandler(IServiceCollection services)
         {
             services.AddSingleton<IMemberService, MemberService>();
+            services.AddSingleton<IInteractiveService, InteractiveService>();
+            services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<IVerifierService, VerifierService>();
             services.AddSingleton<IRedisRepository, RedisRepository>();
         }

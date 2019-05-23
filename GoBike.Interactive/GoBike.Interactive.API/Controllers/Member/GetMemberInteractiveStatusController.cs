@@ -38,7 +38,7 @@ namespace GoBike.Interactive.API.Controllers.Member
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="interactiveInfo">interactiveInfo</param>
+        /// <param name="interactiveCommand">interactiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         public async Task<IActionResult> Post(InteractiveCommandDto interactiveCommand)

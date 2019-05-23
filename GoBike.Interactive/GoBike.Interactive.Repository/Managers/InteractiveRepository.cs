@@ -68,7 +68,19 @@ namespace GoBike.Interactive.Repository.Managers
             {
                 FilterDefinition<InteractiveData> filter = Builders<InteractiveData>.Filter.Eq("MemberID", memberID);
                 DeleteResult result = await this.interactiveDatas.DeleteManyAsync(filter);
-                return result.IsAcknowledged && result.DeletedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Interactive Data Fail For IsAcknowledged >>> MemberID:{memberID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Interactive Data Fail For DeletedCount >>> MemberID:{memberID}");
+                    return false;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -101,8 +113,8 @@ namespace GoBike.Interactive.Repository.Managers
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="blacklistIDs">blacklistIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs)
         {
             try
             {
@@ -111,20 +123,22 @@ namespace GoBike.Interactive.Repository.Managers
                 UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新黑名單.");
+                    this.logger.LogError($"Update Blacklist Fail For IsAcknowledged >>> MemberID:{memberID} BlacklistIDs:{JsonConvert.SerializeObject(blacklistIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "黑名單未更改.");
+                    this.logger.LogError($"Update Blacklist Fail For ModifiedCount >>> MemberID:{memberID} BlacklistIDs:{JsonConvert.SerializeObject(blacklistIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Blacklist Error >>> MemberID:{memberID} BlacklistIDs:{JsonConvert.SerializeObject(blacklistIDs)}\n{ex}");
-                return Tuple.Create(false, "更新黑名單發生錯誤.");
+                return false;
             }
         }
 
@@ -133,8 +147,8 @@ namespace GoBike.Interactive.Repository.Managers
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="friendListIDs">friendListIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs)
         {
             try
             {
@@ -143,20 +157,22 @@ namespace GoBike.Interactive.Repository.Managers
                 UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新好友名單.");
+                    this.logger.LogError($"Update Friend List Fail For IsAcknowledged >>> MemberID:{memberID} FriendListIDs:{JsonConvert.SerializeObject(friendListIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "好友名單未更改.");
+                    this.logger.LogError($"Update Friend List Fail For ModifiedCount >>> MemberID:{memberID} FriendListIDs:{JsonConvert.SerializeObject(friendListIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Friend List Error >>> MemberID:{memberID} FriendListIDs:{JsonConvert.SerializeObject(friendListIDs)}\n{ex}");
-                return Tuple.Create(false, "更新好友名單發生錯誤.");
+                return false;
             }
         }
 
@@ -164,8 +180,8 @@ namespace GoBike.Interactive.Repository.Managers
         /// 更新互動資料
         /// </summary>
         /// <param name="interactiveData">interactiveData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateInteractiveData(InteractiveData interactiveData)
         {
             try
             {
@@ -173,20 +189,22 @@ namespace GoBike.Interactive.Repository.Managers
                 ReplaceOneResult result = await this.interactiveDatas.ReplaceOneAsync(filter, interactiveData);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新互動資料.");
+                    this.logger.LogError($"Update Interactive Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(interactiveData)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "互動資料未更改.");
+                    this.logger.LogError($"Update Interactive Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(interactiveData)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Interactive Data Error >>> Data:{JsonConvert.SerializeObject(interactiveData)}\n{ex}");
-                return Tuple.Create(false, "更新互動資料發生錯誤.");
+                return false;
             }
         }
 
@@ -195,8 +213,8 @@ namespace GoBike.Interactive.Repository.Managers
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="requestListIDs">requestListIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        public async Task<Tuple<bool, string>> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs)
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs)
         {
             try
             {
@@ -205,20 +223,22 @@ namespace GoBike.Interactive.Repository.Managers
                 UpdateResult result = await this.interactiveDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    return Tuple.Create(false, "無法更新請求名單.");
+                    this.logger.LogError($"Update Request List Fail For IsAcknowledged >>> MemberID:{memberID} RequestListIDs:{JsonConvert.SerializeObject(requestListIDs)}");
+                    return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    return Tuple.Create(false, "請求名單未更改.");
+                    this.logger.LogError($"Update Request List Fail For ModifiedCount >>> MemberID:{memberID} RequestListIDs:{JsonConvert.SerializeObject(requestListIDs)}");
+                    return false;
                 }
 
-                return Tuple.Create(true, string.Empty);
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Request List Error >>> MemberID:{memberID} RequestListIDs:{JsonConvert.SerializeObject(requestListIDs)}\n{ex}");
-                return Tuple.Create(false, "更新請求名單發生錯誤.");
+                return false;
             }
         }
     }

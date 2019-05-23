@@ -1,6 +1,6 @@
 ﻿using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Response;
-using GoBike.API.Service.Models.Verifier;
+using GoBike.API.Service.Models.Verifier.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,14 +39,14 @@ namespace GoBike.API.App.Controllers.Verifier
         /// <summary>
         /// POST
         /// </summary>
-        /// <param name="verifierInfoDto">verifierInfoDto</param>
+        /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(VerifierInfoDto verifierInfoDto)
+        public async Task<IActionResult> Post(VerifierCommandDto verifierCommand)
         {
             try
             {
-                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(verifierInfoDto, null);
+                ResponseResultDto responseResultDto = await this.verifierService.SendVerifierCode(verifierCommand, null);
                 if (responseResultDto.Ok)
                 {
                     return Ok(responseResultDto.Data);
@@ -56,7 +56,7 @@ namespace GoBike.API.App.Controllers.Verifier
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Send Token Verifier Error >>> Email:{verifierInfoDto.Email}\n{ex}");
+                this.logger.LogError($"Send Token Verifier Error >>> Email:{verifierCommand.Email}\n{ex}");
                 return BadRequest("取得會員資訊發生錯誤.");
             }
         }

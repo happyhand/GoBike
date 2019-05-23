@@ -1,5 +1,4 @@
 ﻿using GoBike.Interactive.Repository.Models;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,30 +35,30 @@ namespace GoBike.Interactive.Repository.Interface
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="blacklistIDs">blacklistIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateBlacklist(string memberID, IEnumerable<string> blacklistIDs);
 
         /// <summary>
         /// 更新好友名單
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="friendListIDs">friendListIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateFriendList(string memberID, IEnumerable<string> friendListIDs);
 
         /// <summary>
         /// 更新互動資料
         /// </summary>
         /// <param name="interactiveData">interactiveData</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateInteractiveData(InteractiveData interactiveData);
+        /// <returns>bool</returns>
+        Task<bool> UpdateInteractiveData(InteractiveData interactiveData);
 
         /// <summary>
         /// 更新請求名單
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <param name="requestListIDs">requestListIDs</param>
-        /// <returns>Tuple(bool, string)</returns>
-        Task<Tuple<bool, string>> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs);
+        /// <returns>bool</returns>
+        Task<bool> UpdateRequestList(string memberID, IEnumerable<string> requestListIDs);
     }
 }
