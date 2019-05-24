@@ -39,7 +39,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// GET
+        /// 取得我的車隊資訊
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpPost]

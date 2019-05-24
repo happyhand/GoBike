@@ -32,7 +32,6 @@ namespace GoBike.API.App.Controllers.Member
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="mapper">mapper</param>
         /// <param name="memberService">memberService</param>
         public GetMemberInfoController(ILogger<GetMemberInfoController> logger, IMemberService memberService)
         {
@@ -41,7 +40,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// GET
+        /// 取得會員本身資訊
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]
@@ -67,7 +66,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// 取得其他會員資訊
         /// </summary>
         /// <param name="memberSearchCommand">memberSearchCommand</param>
         /// <returns>IActionResult</returns>

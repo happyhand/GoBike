@@ -47,7 +47,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST - 請求產生驗證碼
+        /// 忘記密碼 - 請求產生驗證碼
         /// </summary>
         /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>IActionResult</returns>
@@ -76,9 +76,9 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// Post - 驗證驗證碼並重設密碼
+        /// 忘記密碼 - 驗證驗證碼並重設密碼
         /// </summary>
-        /// <param name="verifierInfo">verifierInfo</param>
+        /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/Member/[controller]/VerifierCode")]

@@ -18,13 +18,13 @@ namespace GoBike.API.Service.Models.Team.View
         public string TeamName { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamPhoto
-        /// </summary>
-        public string TeamPhoto { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamNewsDate
         /// </summary>
         public DateTime TeamNewsDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamPhoto
+        /// </summary>
+        public string TeamPhoto { get; set; }
     }
 }

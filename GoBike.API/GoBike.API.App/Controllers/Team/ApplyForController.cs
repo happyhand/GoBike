@@ -40,7 +40,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 取消申請加入車隊
+        /// 車隊申請功能 - 取消申請加入車隊
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>
@@ -68,7 +68,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 申請加入車隊
+        /// 車隊申請功能 - 申請加入車隊
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>
@@ -96,7 +96,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 拒絕申請加入車隊
+        /// 車隊申請功能 - 拒絕申請加入車隊
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>

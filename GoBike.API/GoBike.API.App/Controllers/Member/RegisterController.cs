@@ -37,7 +37,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// 會員註冊
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>

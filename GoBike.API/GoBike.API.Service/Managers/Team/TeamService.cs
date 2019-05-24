@@ -331,26 +331,6 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
-        /// 車隊隊員身分權限處理
-        /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
-        /// <param name="targetID">targetID</param>
-        /// <param name="teamMemberInfoViews">teamMemberInfoViews</param>
-        private void TeamMemberIdentityAuthorityHandler(TeamInfoDto teamInfo, string targetID, IEnumerable<TeamMemberInfoViewDto> teamMemberInfoViews)
-        {
-            string teamLeaderID = teamInfo.TeamLeaderID;
-            IEnumerable<string> teamViceLeaderIDs = teamInfo.TeamViceLeaderIDs;
-            IEnumerable<string> teamPlayerIDs = teamInfo.TeamPlayerIDs;
-            int targetIdentity = this.GetTeamIndetity(teamInfo, targetID);
-            foreach (TeamMemberInfoViewDto teamMemberInfoView in teamMemberInfoViews)
-            {
-                teamMemberInfoView.TeamIdentity = this.GetTeamIndetity(teamInfo, teamMemberInfoView.MemberID);
-                teamMemberInfoView.TeamKickOutSetting = this.GetTeamKickOutSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
-                teamMemberInfoView.TeamViceLeaderSetting = this.GetTeamViceLeaderSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
-            }
-        }
-
-        /// <summary>
         /// 取得車隊身分
         /// </summary>
         /// <param name="teamInfo">teamInfo</param>
@@ -423,6 +403,26 @@ namespace GoBike.API.Service.Managers.Team
                     }
                 default:
                     return (int)TeamViceLeaderSettingType.None;
+            }
+        }
+
+        /// <summary>
+        /// 車隊隊員身分權限處理
+        /// </summary>
+        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="targetID">targetID</param>
+        /// <param name="teamMemberInfoViews">teamMemberInfoViews</param>
+        private void TeamMemberIdentityAuthorityHandler(TeamInfoDto teamInfo, string targetID, IEnumerable<TeamMemberInfoViewDto> teamMemberInfoViews)
+        {
+            string teamLeaderID = teamInfo.TeamLeaderID;
+            IEnumerable<string> teamViceLeaderIDs = teamInfo.TeamViceLeaderIDs;
+            IEnumerable<string> teamPlayerIDs = teamInfo.TeamPlayerIDs;
+            int targetIdentity = this.GetTeamIndetity(teamInfo, targetID);
+            foreach (TeamMemberInfoViewDto teamMemberInfoView in teamMemberInfoViews)
+            {
+                teamMemberInfoView.TeamIdentity = this.GetTeamIndetity(teamInfo, teamMemberInfoView.MemberID);
+                teamMemberInfoView.TeamKickOutSetting = this.GetTeamKickOutSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
+                teamMemberInfoView.TeamViceLeaderSetting = this.GetTeamViceLeaderSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
             }
         }
 

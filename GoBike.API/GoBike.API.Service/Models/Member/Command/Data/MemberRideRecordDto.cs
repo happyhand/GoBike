@@ -13,9 +13,9 @@ namespace GoBike.API.Service.Models.Member.Command.Data
         public DateTime RecordDate { get; set; }
 
         /// <summary>
-        /// Gets or sets RideSecond
+        /// Gets or sets RideHeight
         /// </summary>
-        public long RideTime { get; set; }
+        public long RideDistance { get; set; }
 
         /// <summary>
         /// Gets or sets RideHeight
@@ -23,9 +23,9 @@ namespace GoBike.API.Service.Models.Member.Command.Data
         public long RideHeight { get; set; }
 
         /// <summary>
-        /// Gets or sets RideHeight
+        /// Gets or sets RideSecond
         /// </summary>
-        public long RideDistance { get; set; }
+        public long RideTime { get; set; }
 
         //// TODO
     }

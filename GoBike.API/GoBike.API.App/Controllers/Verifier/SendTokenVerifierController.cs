@@ -37,7 +37,7 @@ namespace GoBike.API.App.Controllers.Verifier
         }
 
         /// <summary>
-        /// POST
+        /// 發送驗證碼
         /// </summary>
         /// <param name="verifierCommand">verifierCommand</param>
         /// <returns>IActionResult</returns>

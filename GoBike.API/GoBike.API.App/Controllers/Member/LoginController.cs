@@ -36,7 +36,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST - 一般登入
+        /// 會員登入 - 一般登入
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -62,7 +62,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST - Token 登入
+        /// 會員登入 - Token 登入
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>

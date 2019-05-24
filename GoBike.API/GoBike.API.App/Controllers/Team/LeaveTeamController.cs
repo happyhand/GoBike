@@ -39,20 +39,19 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 強制離開車隊
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/Team/[controller]")]
+        [Route("api/Team/[controller]/Force")]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(TeamInteractiveCommandDto teamInteractiveCommand)
+        public async Task<IActionResult> Force(TeamInteractiveCommandDto teamInteractiveCommand)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            teamInteractiveCommand.MemberID = memberID;
             try
             {
-                ResponseResultDto responseResult = await this.teamService.LeaveTeam(teamInteractiveCommand);
+                ResponseResultDto responseResult = await this.teamService.ForceLeaveTeam(memberID, teamInteractiveCommand);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);
@@ -68,19 +67,20 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 離開車隊
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/Team/[controller]/Force")]
+        [Route("api/Team/[controller]")]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Force(TeamInteractiveCommandDto teamInteractiveCommand)
+        public async Task<IActionResult> Post(TeamInteractiveCommandDto teamInteractiveCommand)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            teamInteractiveCommand.MemberID = memberID;
             try
             {
-                ResponseResultDto responseResult = await this.teamService.ForceLeaveTeam(memberID, teamInteractiveCommand);
+                ResponseResultDto responseResult = await this.teamService.LeaveTeam(teamInteractiveCommand);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);

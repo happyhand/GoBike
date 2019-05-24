@@ -13,21 +13,21 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Interactive
 {
     /// <summary>
-    /// 加入好友請求
+    /// 好友請求功能
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class FriendRequestController : ApiController
     {
         /// <summary>
-        /// logger
-        /// </summary>
-        private readonly ILogger<FriendRequestController> logger;
-
-        /// <summary>
         /// interactiveService
         /// </summary>
         private readonly IInteractiveService interactiveService;
+
+        /// <summary>
+        /// logger
+        /// </summary>
+        private readonly ILogger<FriendRequestController> logger;
 
         /// <summary>
         /// 建構式
@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 加入好友請求
+        /// 好友請求功能 - 加入好友請求
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -68,7 +68,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 刪除加入好友請求
+        /// 好友請求功能 - 刪除加入好友請求
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -95,7 +95,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// GET - 取得加入好友請求名單
+        /// 好友請求功能 - 取得加入好友請求名單
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]

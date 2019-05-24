@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// 會員編輯
         /// </summary>
         /// <param name="memberInfo">memberInfo</param>
         /// <returns>IActionResult</returns>

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
 
 namespace GoBike.API.App
 {
@@ -44,6 +46,17 @@ namespace GoBike.API.App
             app.UseHttpsRedirection();
             //app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
             app.UseSession();
+
+            #region Swagger
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "GoBike API");
+            });
+
+            #endregion Swagger
+
             app.UseMvc();
         }
 
@@ -55,6 +68,7 @@ namespace GoBike.API.App
             this.ConfigurationHandler(services);
             this.SessionHandler(services);
             this.DependencyInjectionHandler(services);
+            this.SwaggerHandler(services);
             //services.AddCors(options =>
             //{
             //    // CorsPolicy 是自訂的 Policy 名稱
@@ -68,12 +82,20 @@ namespace GoBike.API.App
             //});
         }
 
+        /// <summary>
+        /// Config 處理器
+        /// </summary>
+        /// <param name="services">services</param>
         private void ConfigurationHandler(IServiceCollection services)
         {
             AppSettingHelper.Appsetting = Configuration.Get<AppSettingHelper>();
             CommonFlagHelper.CommonFlag = Configuration.Get<CommonFlagHelper>();
         }
 
+        /// <summary>
+        /// Service 處理器
+        /// </summary>
+        /// <param name="services">services</param>
         private void DependencyInjectionHandler(IServiceCollection services)
         {
             services.AddSingleton<IMemberService, MemberService>();
@@ -83,6 +105,10 @@ namespace GoBike.API.App
             services.AddSingleton<IRedisRepository, RedisRepository>();
         }
 
+        /// <summary>
+        /// Session 處理器
+        /// </summary>
+        /// <param name="services">services</param>
         private void SessionHandler(IServiceCollection services)
         {
             services.AddDistributedRedisCache(o =>
@@ -95,6 +121,21 @@ namespace GoBike.API.App
                 options.Cookie.Name = "Produce Session";
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.SameSite = SameSiteMode.None;
+            });
+        }
+
+        /// <summary>
+        /// Swagger 處理器
+        /// </summary>
+        /// <param name="services">services</param>
+        private void SwaggerHandler(IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "GoBike API", Version = "v1" });
+                var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+                var xmlPath = Path.Combine(basePath, "GoBike.API.Swagger.xml");
+                c.IncludeXmlComments(xmlPath);
             });
         }
     }

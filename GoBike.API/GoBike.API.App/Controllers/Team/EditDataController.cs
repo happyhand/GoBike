@@ -42,9 +42,9 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 車隊編輯
         /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
+        /// <param name="teamInfo">teamInfo</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]

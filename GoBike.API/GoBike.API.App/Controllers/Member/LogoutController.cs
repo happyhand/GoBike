@@ -26,7 +26,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// GET
+        /// 會員登出
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]

@@ -1,0 +1,843 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GoBike.API.App</name>
+    </assembly>
+    <members>
+        <member name="M:GoBike.API.App.AutoMapperProfile.Member.MemberProfile.CalculationLastOnlineTimeToHour(System.DateTime)">
+            <summary>
+            計算最後上線時間
+            </summary>
+            <param name="loginDate">loginDate</param>
+            <returns>int</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.ApiController">
+            <summary>
+            Base API
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.ApiController.BadRequest(System.Object)">
+            <summary>
+            執行 BadRequest 回覆加密
+            </summary>
+            <param name="error">error</param>
+            <returns>BadRequestObjectResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.ApiController.Ok(System.Object)">
+            <summary>
+            執行 OK 回覆加密
+            </summary>
+            <param name="value">value</param>
+            <returns>OkObjectResult</returns>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Development.CallApiController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Development.CallApiController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Development.CallApiController})">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Interactive.BlacklistController">
+            <summary>
+            黑名單功能
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.BlacklistController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.BlacklistController.interactiveService">
+            <summary>
+            interactiveService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.BlacklistController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Interactive.BlacklistController},GoBike.API.Service.Interface.Interactive.IInteractiveService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="interactiveService">interactiveService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.BlacklistController.Add(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 加入黑名單
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.BlacklistController.Delete(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 刪除黑名單
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.BlacklistController.Get">
+            <summary>
+            GET - 取得黑名單
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Interactive.FriendController">
+            <summary>
+            好友功能
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.FriendController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.FriendController.interactiveService">
+            <summary>
+            interactiveService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Interactive.FriendController},GoBike.API.Service.Interface.Interactive.IInteractiveService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="interactiveService">interactiveService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendController.Add(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 加入好友
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendController.Delete(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 刪除好友
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendController.Get">
+            <summary>
+            GET - 取得好友名單
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendController.Reject(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 拒絕加入好友
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Interactive.FriendRequestController">
+            <summary>
+            加入好友請求
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.FriendRequestController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Interactive.FriendRequestController.interactiveService">
+            <summary>
+            interactiveService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendRequestController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Interactive.FriendRequestController},GoBike.API.Service.Interface.Interactive.IInteractiveService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="interactiveService">interactiveService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendRequestController.Add(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 加入好友請求
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendRequestController.Delete(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 刪除加入好友請求
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Interactive.FriendRequestController.Get">
+            <summary>
+            GET - 取得加入好友請求名單
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.EditDataController">
+            <summary>
+            會員編輯
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.EditDataController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.EditDataController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.EditDataController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.EditDataController},GoBike.API.Service.Interface.Member.IMemberService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="memberService">memberService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.EditDataController.Post(GoBike.API.Service.Models.Member.Command.Data.MemberInfoDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="memberInfo">memberInfo</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.ForgetPasswordController">
+            <summary>
+            忘記密碼
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.ForgetPasswordController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.ForgetPasswordController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.ForgetPasswordController.verifierService">
+            <summary>
+            verifierService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.ForgetPasswordController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.ForgetPasswordController},GoBike.API.Service.Interface.Member.IMemberService,GoBike.API.Service.Interface.Verifier.IVerifierService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="memberService">memberService</param>
+            <param name="verifierService">verifierService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.ForgetPasswordController.GetVerifierCode(GoBike.API.Service.Models.Verifier.Command.VerifierCommandDto)">
+            <summary>
+            POST - 請求產生驗證碼
+            </summary>
+            <param name="verifierCommand">verifierCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.ForgetPasswordController.ResetPassword(GoBike.API.Service.Models.Verifier.Command.VerifierCommandDto)">
+            <summary>
+            Post - 驗證驗證碼並重設密碼
+            </summary>
+            <param name="verifierInfo">verifierInfo</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.GetMemberInfoController">
+            <summary>
+            取得會員資訊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.GetMemberInfoController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.GetMemberInfoController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.GetMemberInfoController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.GetMemberInfoController},GoBike.API.Service.Interface.Member.IMemberService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="mapper">mapper</param>
+            <param name="memberService">memberService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.GetMemberInfoController.Get">
+            <summary>
+            GET
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.GetMemberInfoController.Post(GoBike.API.Service.Models.Member.Command.MemberSearchCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="memberSearchCommand">memberSearchCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.LoginController">
+            <summary>
+            會員登入
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.LoginController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.LoginController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.LoginController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.LoginController},GoBike.API.Service.Interface.Member.IMemberService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="memberService">memberService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.LoginController.NormalLogin(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - 一般登入
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.LoginController.TokenLogin(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST - Token 登入
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.LogoutController">
+            <summary>
+            會員登出
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.LogoutController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.LogoutController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.LoginController})">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.LogoutController.Get">
+            <summary>
+            GET
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.RedisSessionController">
+            <summary>
+            Redis Session 測試
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.RedisSessionController.Get">
+            <summary>
+            GET
+            </summary>
+            <returns>string</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.RegisterController">
+            <summary>
+            會員註冊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.RegisterController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.RegisterController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.RegisterController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.RegisterController},GoBike.API.Service.Interface.Member.IMemberService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="memberService">memberService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.RegisterController.Post(GoBike.API.Service.Models.Member.Command.MemberBaseCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="memberBaseCommand">memberBaseCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Member.UploadPhotoController">
+            <summary>
+            上傳頭像
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.UploadPhotoController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Member.UploadPhotoController.memberService">
+            <summary>
+            memberService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.UploadPhotoController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Member.UploadPhotoController},GoBike.API.Service.Interface.Member.IMemberService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="memberService">memberService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Member.UploadPhotoController.Post">
+            <summary>
+            POST
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.ApplyForController">
+            <summary>
+            車隊申請功能
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.ApplyForController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.ApplyForController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.ApplyForController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.ApplyForController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.ApplyForController.Cancel(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 取消申請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.ApplyForController.Join(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 申請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.ApplyForController.Reject(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 拒絕申請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.EditDataController">
+            <summary>
+            車隊編輯
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.EditDataController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.EditDataController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.EditDataController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.EditDataController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.EditDataController.GetApplyForRequestList(GoBike.API.Service.Models.Team.Command.Data.TeamInfoDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamCommand">teamCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.GetMyTeamInfoController">
+            <summary>
+            取得我的車隊資訊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.GetMyTeamInfoController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.GetMyTeamInfoController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.GetMyTeamInfoController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.GetMyTeamInfoController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.GetMyTeamInfoController.Get">
+            <summary>
+            GET
+            </summary>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.GetTeamDetailInfoController">
+            <summary>
+            取得車隊明細資訊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.GetTeamDetailInfoController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.GetTeamDetailInfoController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.GetTeamDetailInfoController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.GetTeamDetailInfoController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.GetTeamDetailInfoController.Post(GoBike.API.Service.Models.Team.Command.TeamCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamCommand">teamCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.InviteController">
+            <summary>
+            車隊邀請功能
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.InviteController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.InviteController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.InviteController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.InviteController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.InviteController.Cancel(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 取消邀請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.InviteController.Join(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 邀請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.InviteController.ManyJoin(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 邀請多人加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.InviteController.Reject(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 拒絕邀請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.JoinTeamController">
+            <summary>
+            加入車隊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.JoinTeamController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.JoinTeamController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.JoinTeamController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.JoinTeamController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.JoinTeamController.AllowJoin(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 允許加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.JoinTeamController.InviteJoin(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 邀請加入車隊
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.LeaveTeamController">
+            <summary>
+            離開車隊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.LeaveTeamController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.LeaveTeamController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.LeaveTeamController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.LeaveTeamController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.LeaveTeamController.Post(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamCommand">teamCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.LeaveTeamController.Force(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamCommand">teamCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.RegisterController">
+            <summary>
+            建立車隊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.RegisterController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.RegisterController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.RegisterController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.RegisterController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.RegisterController.Post(GoBike.API.Service.Models.Team.Command.Data.TeamInfoDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamInfo">teamInfo</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.SearchTeamController">
+            <summary>
+            建立車隊
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.SearchTeamController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.SearchTeamController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.SearchTeamController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.SearchTeamController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.SearchTeamController.Post(GoBike.API.Service.Models.Team.Command.TeamSearchCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamInfo">teamInfo</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.UpdateTeamLeaderController">
+            <summary>
+            更新車隊隊長
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.UpdateTeamLeaderController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.UpdateTeamLeaderController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.UpdateTeamLeaderController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.UpdateTeamLeaderController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.UpdateTeamLeaderController.Post(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController">
+            <summary>
+            更新車隊副隊長
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController.teamService">
+            <summary>
+            teamService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController},GoBike.API.Service.Interface.Team.ITeamService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="teamService">teamService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController.Add(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 新增
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Team.UpdateTeamViceLeaderController.Remove(GoBike.API.Service.Models.Team.Command.TeamInteractiveCommandDto)">
+            <summary>
+            POST - 移除
+            </summary>
+            <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Controllers.Verifier.SendTokenVerifierController">
+            <summary>
+            發送驗證碼
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Verifier.SendTokenVerifierController.logger">
+            <summary>
+            logger
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Controllers.Verifier.SendTokenVerifierController.verifierService">
+            <summary>
+            verifierService
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Verifier.SendTokenVerifierController.#ctor(Microsoft.Extensions.Logging.ILogger{GoBike.API.App.Controllers.Verifier.SendTokenVerifierController},GoBike.API.Service.Interface.Verifier.IVerifierService)">
+            <summary>
+            建構式
+            </summary>
+            <param name="logger">logger</param>
+            <param name="verifierService">verifierService</param>
+        </member>
+        <member name="M:GoBike.API.App.Controllers.Verifier.SendTokenVerifierController.Post(GoBike.API.Service.Models.Verifier.Command.VerifierCommandDto)">
+            <summary>
+            POST
+            </summary>
+            <param name="verifierCommand">verifierCommand</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="T:GoBike.API.App.Filters.CheckLoginActionFilter">
+            <summary>
+            登入狀態檢測
+            </summary>
+        </member>
+        <member name="F:GoBike.API.App.Filters.CheckLoginActionFilter.loginFlag">
+            <summary>
+            loginFlag
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Filters.CheckLoginActionFilter.#ctor">
+            <summary>
+            建構式
+            </summary>
+        </member>
+        <member name="M:GoBike.API.App.Filters.CheckLoginActionFilter.#ctor(System.Boolean)">
+            <summary>
+            建構式
+            </summary>
+            <param name="loginFlag">loginFlag</param>
+        </member>
+        <member name="M:GoBike.API.App.Filters.CheckLoginActionFilter.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
+            <summary>
+            檢測篩檢
+            </summary>
+            <param name="context">context</param>
+            <param name="next">next</param>
+            <returns>Task</returns>
+        </member>
+    </members>
+</doc>

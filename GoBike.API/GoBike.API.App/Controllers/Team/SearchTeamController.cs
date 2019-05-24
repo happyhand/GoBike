@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Team
 {
     /// <summary>
-    /// 建立車隊
+    /// 搜尋車隊
     /// </summary>
     [Route("api/Team/[controller]")]
     [ApiController]
@@ -40,9 +40,9 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 搜尋車隊
         /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="teamSearchCommand">teamSearchCommand</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]

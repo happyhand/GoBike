@@ -40,7 +40,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 新增
+        /// 更新車隊副隊長 - 新增
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>
@@ -67,7 +67,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST - 移除
+        /// 更新車隊副隊長 - 移除
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>IActionResult</returns>

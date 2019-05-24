@@ -20,14 +20,14 @@ namespace GoBike.API.App.Controllers.Interactive
     public class BlacklistController : ApiController
     {
         /// <summary>
-        /// logger
-        /// </summary>
-        private readonly ILogger<BlacklistController> logger;
-
-        /// <summary>
         /// interactiveService
         /// </summary>
         private readonly IInteractiveService interactiveService;
+
+        /// <summary>
+        /// logger
+        /// </summary>
+        private readonly ILogger<BlacklistController> logger;
 
         /// <summary>
         /// 建構式
@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 加入黑名單
+        /// 黑名單功能 - 加入黑名單
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -68,7 +68,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 刪除黑名單
+        /// 黑名單功能 - 刪除黑名單
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -95,7 +95,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// GET - 取得黑名單
+        /// 黑名單功能 - 取得黑名單
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]

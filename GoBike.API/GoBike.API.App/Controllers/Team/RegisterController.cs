@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 建立車隊
         /// </summary>
         /// <param name="teamInfo">teamInfo</param>
         /// <returns>IActionResult</returns>

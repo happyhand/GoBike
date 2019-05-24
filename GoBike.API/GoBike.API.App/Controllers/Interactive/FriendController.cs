@@ -20,14 +20,14 @@ namespace GoBike.API.App.Controllers.Interactive
     public class FriendController : ApiController
     {
         /// <summary>
-        /// logger
-        /// </summary>
-        private readonly ILogger<FriendController> logger;
-
-        /// <summary>
         /// interactiveService
         /// </summary>
         private readonly IInteractiveService interactiveService;
+
+        /// <summary>
+        /// logger
+        /// </summary>
+        private readonly ILogger<FriendController> logger;
 
         /// <summary>
         /// 建構式
@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 加入好友
+        /// 好友功能 - 加入好友
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -68,7 +68,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 刪除好友
+        /// 好友功能 - 刪除好友
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>
@@ -95,7 +95,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// GET - 取得好友名單
+        /// 好友功能 - 取得好友名單
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]
@@ -121,7 +121,7 @@ namespace GoBike.API.App.Controllers.Interactive
         }
 
         /// <summary>
-        /// POST - 拒絕加入好友
+        /// 好友功能 - 拒絕加入好友
         /// </summary>
         /// <param name="memberBaseCommand">memberBaseCommand</param>
         /// <returns>IActionResult</returns>

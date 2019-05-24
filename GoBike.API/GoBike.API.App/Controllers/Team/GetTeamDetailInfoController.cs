@@ -40,7 +40,7 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
-        /// POST
+        /// 取得車隊明細資訊
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>IActionResult</returns>

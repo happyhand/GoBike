@@ -74,6 +74,11 @@ namespace GoBike.API.Service.Models.Team.Command.Data
         public string TeamName { get; set; }
 
         /// <summary>
+        /// Gets or sets TeamNewsDate
+        /// </summary>
+        public DateTime TeamNewsDate { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamPhoto
         /// </summary>
         public string TeamPhoto { get; set; }
@@ -97,10 +102,5 @@ namespace GoBike.API.Service.Models.Team.Command.Data
         /// Gets or sets TeamViceLeaderIDs
         /// </summary>
         public IEnumerable<string> TeamViceLeaderIDs { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamNewsDate
-        /// </summary>
-        public DateTime TeamNewsDate { get; set; }
     }
 }

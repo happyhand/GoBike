@@ -42,7 +42,7 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// POST
+        /// 上傳頭像
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpPost]

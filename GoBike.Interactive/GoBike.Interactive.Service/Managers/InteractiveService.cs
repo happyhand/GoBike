@@ -636,39 +636,6 @@ namespace GoBike.Interactive.Service.Managers
         }
 
         /// <summary>
-        /// 驗證互動指令資料
-        /// </summary>
-        /// <param name="interactiveCommand">interactiveCommand</param>
-        /// <param name="isVerifyInitiator">isVerifyInitiator</param>
-        /// <param name="isVerifyReceiver">isVerifyReceiver</param>
-        /// <returns>bool</returns>
-        private bool VerifyInteractiveCommand(InteractiveCommandDto interactiveCommand, bool isVerifyInitiator, bool isVerifyReceiver)
-        {
-            if (interactiveCommand == null)
-            {
-                return false;
-            }
-
-            if (isVerifyInitiator)
-            {
-                if (string.IsNullOrEmpty(interactiveCommand.InitiatorID))
-                {
-                    return false;
-                }
-            }
-
-            if (isVerifyReceiver)
-            {
-                if (string.IsNullOrEmpty(interactiveCommand.ReceiverID))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// 驗證成為好友資格
         /// </summary>
         /// <param name="initiatorData">initiatorData</param>
@@ -733,6 +700,39 @@ namespace GoBike.Interactive.Service.Managers
             {
                 this.logger.LogError($"Verify Friend Request Qualification Error For Receiver FriendListIDs >>> InitiatorID:{initiatorData.MemberID} ReceiverID:{receiverData.MemberID}");
                 return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 驗證互動指令資料
+        /// </summary>
+        /// <param name="interactiveCommand">interactiveCommand</param>
+        /// <param name="isVerifyInitiator">isVerifyInitiator</param>
+        /// <param name="isVerifyReceiver">isVerifyReceiver</param>
+        /// <returns>bool</returns>
+        private bool VerifyInteractiveCommand(InteractiveCommandDto interactiveCommand, bool isVerifyInitiator, bool isVerifyReceiver)
+        {
+            if (interactiveCommand == null)
+            {
+                return false;
+            }
+
+            if (isVerifyInitiator)
+            {
+                if (string.IsNullOrEmpty(interactiveCommand.InitiatorID))
+                {
+                    return false;
+                }
+            }
+
+            if (isVerifyReceiver)
+            {
+                if (string.IsNullOrEmpty(interactiveCommand.ReceiverID))
+                {
+                    return false;
+                }
             }
 
             return true;
