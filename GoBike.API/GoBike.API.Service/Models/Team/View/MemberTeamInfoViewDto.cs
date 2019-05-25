@@ -25,9 +25,14 @@ namespace GoBike.API.Service.Models.Team.View
         #region TODO
 
         /// <summary>
-        /// Gets or sets EventList
+        /// Gets or sets JoinedEventList
         /// </summary>
-        public IEnumerable<dynamic> EventList { get; set; }
+        public IEnumerable<dynamic> JoinedEventList { get; set; }
+
+        /// <summary>
+        /// Gets or sets notYetJoinEventList
+        /// </summary>
+        public IEnumerable<dynamic> notYetJoinEventList { get; set; }
 
         #endregion TODO
     }

@@ -14,7 +14,7 @@ namespace GoBike.API.Service.Models.Team.View
         public IEnumerable<MemberSimpleInfoViewDto> ApplyForRequestList { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamActionSetting (0:無設定，1:歷史公告，2:邀請好友，4:發起活動，8:編輯資料，16:發起公告)
+        /// Gets or sets TeamActionSetting
         /// </summary>
         public int TeamActionSetting { get; set; }
 
@@ -31,9 +31,9 @@ namespace GoBike.API.Service.Models.Team.View
         public IEnumerable<dynamic> EventList { get; set; }
 
         /// <summary>
-        /// Gets or sets newAnnouncement
+        /// Gets or sets NewAnnouncement
         /// </summary>
-        public dynamic newAnnouncement { get; set; }
+        public dynamic NewAnnouncement { get; set; }
 
         #endregion TODO
     }

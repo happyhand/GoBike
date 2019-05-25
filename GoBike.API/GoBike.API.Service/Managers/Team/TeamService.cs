@@ -104,14 +104,16 @@ namespace GoBike.API.Service.Managers.Team
                     memberTeamInfoView.LeaderTeam = this.mapper.Map<TeamSimpleInfoViewDto>(datas[0]);
                     memberTeamInfoView.TeamList = this.mapper.Map<IEnumerable<TeamSimpleInfoViewDto>>(datas[1]);
                     //// TODO 車隊活動
-                    memberTeamInfoView.EventList = new List<dynamic>();
+                    memberTeamInfoView.JoinedEventList = new List<dynamic>();
+                    memberTeamInfoView.notYetJoinEventList = new List<dynamic>();
                 }
                 else
                 {
                     this.logger.LogError($"Get My Team Info Fail For Get Team Info List Of Member >>> MemberID:{membrID} Message:{getTeamInfoListOfMemberHttpResponseMessageResult.Content.ReadAsAsync<string>()}");
                     memberTeamInfoView.LeaderTeam = null;
                     memberTeamInfoView.TeamList = new List<TeamSimpleInfoViewDto>();
-                    memberTeamInfoView.EventList = new List<dynamic>();
+                    memberTeamInfoView.JoinedEventList = new List<dynamic>();
+                    memberTeamInfoView.notYetJoinEventList = new List<dynamic>();
                 }
 
                 //// 取得邀請加入列表
@@ -171,18 +173,17 @@ namespace GoBike.API.Service.Managers.Team
                 //// 取得車隊隊員會員資訊列表
                 postData = JsonConvert.SerializeObject(teamInfo.TeamPlayerIDs);
                 httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/List", postData);
-                if (!httpResponseMessage.IsSuccessStatusCode)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    return new ResponseResultDto()
-                    {
-                        Ok = false,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                    };
+                    IEnumerable<TeamMemberInfoViewDto> teamMemberInfoViews = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamMemberInfoViewDto>>();
+                    this.TeamMemberIdentityAuthorityHandler(teamInfo, teamCommand.TargetID, teamMemberInfoViews);
+                    teamDetailInfoView.TeamMemberList = teamMemberInfoViews;
                 }
-
-                IEnumerable<TeamMemberInfoViewDto> teamMemberInfoViews = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamMemberInfoViewDto>>();
-                this.TeamMemberIdentityAuthorityHandler(teamInfo, teamCommand.TargetID, teamMemberInfoViews);
-                teamDetailInfoView.TeamMemberList = teamMemberInfoViews;
+                else
+                {
+                    this.logger.LogError($"Get Team Detail Info Fail For Get Member Info List >>> MemberIDs:{JsonConvert.SerializeObject(teamInfo.TeamPlayerIDs)} Message:{httpResponseMessage.Content.ReadAsAsync<string>()}");
+                    teamDetailInfoView.TeamMemberList = new List<TeamMemberInfoViewDto>();
+                }
 
                 //// 取得申請加入車隊會員資訊列表
                 if (teamInfo.TeamLeaderID.Equals(teamCommand.TargetID) || teamInfo.TeamViceLeaderIDs.Contains(teamCommand.TargetID))
@@ -205,7 +206,7 @@ namespace GoBike.API.Service.Managers.Team
                 }
 
                 //// TODO 取得最新公告
-                teamDetailInfoView.newAnnouncement = new { };
+                teamDetailInfoView.NewAnnouncement = new { };
                 //// TODO 取得活動列表
                 teamDetailInfoView.EventList = new List<string>();
                 return new ResponseResultDto()
@@ -307,7 +308,7 @@ namespace GoBike.API.Service.Managers.Team
                                 + (int)TeamActionSettingType.HoldEvent
                                 + (int)TeamActionSettingType.EditData
                                 + (int)TeamActionSettingType.InviteFriend
-                                + (int)TeamActionSettingType.SendAnnouncement
+                                + (int)TeamActionSettingType.PublishAnnouncement
                                 + (int)TeamActionSettingType.Transfer
                                 + (int)TeamActionSettingType.Disband;
             }
@@ -318,13 +319,17 @@ namespace GoBike.API.Service.Managers.Team
                                + (int)TeamActionSettingType.Leave
                                + (int)TeamActionSettingType.EditData
                                + (int)TeamActionSettingType.InviteFriend
-                               + (int)TeamActionSettingType.SendAnnouncement;
+                               + (int)TeamActionSettingType.PublishAnnouncement;
             }
             else if (teamInfo.TeamPlayerIDs.Contains(memberID))
             {
                 teamActionFlag = (int)TeamActionSettingType.HistoricalAnnouncement
                               + (int)TeamActionSettingType.HoldEvent
                               + (int)TeamActionSettingType.Leave;
+            }
+            else
+            {
+                teamActionFlag = (int)TeamActionSettingType.ApplyForJoin;
             }
 
             return teamActionFlag;

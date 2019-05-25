@@ -132,7 +132,7 @@ namespace GoBike.API.App
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "GoBike API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info { Title = "GoBike API", Version = "v1", Description = "apigobike.zapto.org:18592" });
                 var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
                 var xmlPath = Path.Combine(basePath, "GoBike.API.Swagger.xml");
                 c.IncludeXmlComments(xmlPath);

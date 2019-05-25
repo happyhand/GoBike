@@ -1,10 +1,11 @@
 ﻿namespace GoBike.API.Core.Resource.Enum
 {
     /// <summary>
-    /// 車隊選單設定資料
-    /// 隊長   :歷史公告、發起公告、發起活動、邀請好友、編輯資料、移交隊長、解散車隊
-    /// 副隊長 :歷史公告、發起公告、發起活動、邀請好友、編輯資料、離開車隊
-    /// 隊員   :歷史公告、發起活動、離開車隊
+    /// 車隊可執行指令設定資料
+    /// 隊長   :歷史公告、發起公告、編輯公告、刪除公告、發起活動、編輯活動、邀請好友、編輯資料、移交隊長、解散車隊
+    /// 副隊長 :歷史公告、發起公告、編輯公告、刪除公告、發起活動、編輯活動、邀請好友、編輯資料、離開車隊
+    /// 隊員   :歷史公告、發起活動、離開車隊、編輯活動(活動發起人)
+    /// 非隊員 :申請加入
     /// </summary>
     public enum TeamActionSettingType
     {
@@ -14,44 +15,64 @@
         None = 0,
 
         /// <summary>
-        /// 歷史公告
-        /// </summary>
-        HistoricalAnnouncement = 1,
-
-        /// <summary>
-        /// 發起活動
-        /// </summary>
-        HoldEvent = 2,
-
-        /// <summary>
-        /// 離開車隊
-        /// </summary>
-        Leave = 4,
-
-        /// <summary>
         /// 編輯資料
         /// </summary>
-        EditData = 8,
+        EditData = 1,
+
+        /// <summary>
+        /// 申請加入
+        /// </summary>
+        ApplyForJoin = 2,
 
         /// <summary>
         /// 邀請好友
         /// </summary>
-        InviteFriend = 16,
+        InviteFriend = 4,
 
         /// <summary>
-        /// 發起公告
+        /// 歷史公告
         /// </summary>
-        SendAnnouncement = 32,
+        HistoricalAnnouncement = 8,
+
+        /// <summary>
+        /// 發佈公告
+        /// </summary>
+        PublishAnnouncement = 16,
+
+        /// <summary>
+        /// 編輯公告
+        /// </summary>
+        EditAnnouncement = 32,
+
+        /// <summary>
+        /// 刪除公告
+        /// </summary>
+        RemoveAnnouncement = 64,
+
+        /// <summary>
+        /// 發起活動
+        /// </summary>
+        HoldEvent = 128,
+
+        /// <summary>
+        /// 編輯活動
+        /// </summary>
+        EditEvent = 256,
 
         /// <summary>
         /// 移交隊長
         /// </summary>
-        Transfer = 64,
+        Transfer = 512,
 
         /// <summary>
         /// 解散車隊
         /// </summary>
-        Disband = 128
+        Disband = 1024,
+
+        /// <summary>
+        /// 離開車隊
+        /// </summary>
+        Leave = 2048
     }
 
     /// <summary>
