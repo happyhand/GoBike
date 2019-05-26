@@ -78,7 +78,7 @@ namespace GoBike.Team.Repository.Managers
 
                 if (result.DeletedCount == 0)
                 {
-                    this.logger.LogError($"Delete Team Data Fail For IsAcknowledged >>> TeamID:{teamID}");
+                    this.logger.LogError($"Delete Team Data Fail For DeletedCount >>> TeamID:{teamID}");
                     return false;
                 }
 

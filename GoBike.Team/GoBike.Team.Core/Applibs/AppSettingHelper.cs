@@ -43,6 +43,11 @@
             public class CollectionSetting
             {
                 /// <summary>
+                /// Gets or sets Announcement
+                /// </summary>
+                public string Announcement { get; set; }
+
+                /// <summary>
                 /// Gets or sets Event
                 /// </summary>
                 public string Event { get; set; }

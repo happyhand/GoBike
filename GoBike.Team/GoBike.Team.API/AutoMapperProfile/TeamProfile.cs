@@ -9,6 +9,7 @@ namespace GoBike.Team.API.AutoMapperProfile
         public TeamProfile()
         {
             CreateMap<TeamData, TeamInfoDto>().ReverseMap();
+            CreateMap<AnnouncementData, AnnouncementInfoDto>().ReverseMap();
         }
     }
 }

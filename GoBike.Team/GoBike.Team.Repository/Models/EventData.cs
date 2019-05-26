@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace GoBike.Team.Repository.Models
 {
     /// <summary>
-    /// 車隊活動資料
+    /// 活動資料
     /// </summary>
     public class EventData
     {

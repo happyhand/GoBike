@@ -20,6 +20,11 @@ namespace GoBike.Team.Service.Managers
     public class TeamService : ITeamService
     {
         /// <summary>
+        /// announcementRepository
+        /// </summary>
+        private readonly IAnnouncementRepository announcementRepository;
+
+        /// <summary>
         /// eventRepository
         /// </summary>
         private readonly IEventRepository eventRepository;
@@ -46,13 +51,28 @@ namespace GoBike.Team.Service.Managers
         /// <param name="mapper">mapper</param>
         /// <param name="teamRepository">teamRepository</param>
         /// <param name="eventRepository">eventRepository</param>
-        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IEventRepository eventRepository)
+        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IAnnouncementRepository announcementRepository, IEventRepository eventRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.teamRepository = teamRepository;
+            this.announcementRepository = announcementRepository;
             this.eventRepository = eventRepository;
         }
+
+        #region 共用資料
+
+        /// <summary>
+        /// 取得流水號 ID
+        /// </summary>
+        /// <param name="createDate">createDate</param>
+        /// <returns>string</returns>
+        private string GetSerialID(DateTime createDate)
+        {
+            return $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
+        }
+
+        #endregion 共用資料
 
         #region 車隊資料
 
@@ -65,10 +85,10 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, true);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, true, false);
                 if (!verifyTeamCommandResult)
                 {
-                    this.logger.LogError($"Edit Data Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} Data:{JsonConvert.SerializeObject(teamCommand.Data)}");
+                    this.logger.LogError($"Edit Data Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TeamInfo:{JsonConvert.SerializeObject(teamCommand.TeamInfo)}");
                     return Tuple.Create<TeamInfoDto, string>(null, "車隊編輯失敗.");
                 }
 
@@ -85,7 +105,7 @@ namespace GoBike.Team.Service.Managers
                     return Tuple.Create<TeamInfoDto, string>(null, "車隊編輯失敗.");
                 }
 
-                string updateTeamDataHandlerReault = await this.UpdateTeamDataHandler(teamCommand.Data, teamData);
+                string updateTeamDataHandlerReault = await this.UpdateTeamDataHandler(teamCommand.TeamInfo, teamData);
                 if (!string.IsNullOrEmpty(updateTeamDataHandlerReault))
                 {
                     return Tuple.Create<TeamInfoDto, string>(null, updateTeamDataHandlerReault);
@@ -115,7 +135,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Get Team Info Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -296,7 +316,7 @@ namespace GoBike.Team.Service.Managers
 
             DateTime createDate = DateTime.Now;
             TeamData teamData = this.mapper.Map<TeamData>(teamInfo);
-            teamData.TeamID = $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
+            teamData.TeamID = this.GetSerialID(createDate);
             teamData.TeamCreateDate = createDate;
             teamData.TeamSaveDeadline = createDate.AddDays(60);
             teamData.TeamViceLeaderIDs = new List<string>();
@@ -356,9 +376,10 @@ namespace GoBike.Team.Service.Managers
         /// <param name="isVerifyExaminer">isVerifyExaminer</param>
         /// <param name="isVerifyTarget">isVerifyTarget</param>
         /// <param name="isVerifyTargets">isVerifyTargets</param>
-        /// <param name="isVerifyData">isVerifyData</param>
+        /// <param name="isVerifyTeamInfo">isVerifyTeamInfo</param>
+        /// <param name="isVerifyAnnouncementInfo">isVerifyAnnouncementInfo</param>
         /// <returns>bool</returns>
-        private bool VerifyTeamCommand(TeamCommandDto teamCommand, bool isVerifyExaminer, bool isVerifyTarget, bool isVerifyTargets, bool isVerifyData)
+        private bool VerifyTeamCommand(TeamCommandDto teamCommand, bool isVerifyExaminer, bool isVerifyTarget, bool isVerifyTargets, bool isVerifyTeamInfo, bool isVerifyAnnouncementInfo)
         {
             if (teamCommand == null)
             {
@@ -394,9 +415,17 @@ namespace GoBike.Team.Service.Managers
                 }
             }
 
-            if (isVerifyData)
+            if (isVerifyTeamInfo)
             {
-                if (teamCommand.Data == null)
+                if (teamCommand.TeamInfo == null)
+                {
+                    return false;
+                }
+            }
+
+            if (isVerifyAnnouncementInfo)
+            {
+                if (teamCommand.AnnouncementInfo == null)
                 {
                     return false;
                 }
@@ -492,7 +521,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -546,7 +575,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Cancel Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -587,7 +616,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Cancel Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -640,7 +669,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Force Leave Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -689,7 +718,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Get Apply For Request List Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
@@ -752,7 +781,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -811,7 +840,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, true, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, true, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Invite Many Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetIDs:{JsonConvert.SerializeObject(teamCommand.TargetIDs)}");
@@ -868,7 +897,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, !isInvite, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, !isInvite, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID} IsInvite:{isInvite}");
@@ -942,7 +971,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Leave Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -994,7 +1023,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Reject Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -1047,7 +1076,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Reject Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -1088,7 +1117,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Update Team Leader Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -1147,7 +1176,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Update Team Vice Leader Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -1221,5 +1250,83 @@ namespace GoBike.Team.Service.Managers
         }
 
         #endregion 車隊互動資料
+
+        #region 公告資料
+
+        /// <summary>
+        /// 發佈公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        public async Task<string> PublishAnnouncement(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Publish Announcement Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}");
+                    return "發佈公告失敗.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                Tuple<AnnouncementData, string> createAnnouncementDataResult = this.CreateAnnouncementData(teamCommand.TeamID, teamCommand.ExaminerID, teamCommand.AnnouncementInfo);
+                if (!string.IsNullOrEmpty(createAnnouncementDataResult.Item2))
+                {
+                    return createAnnouncementDataResult.Item2;
+                }
+
+                AnnouncementData announcementData = createAnnouncementDataResult.Item1;
+                bool isSuccess = await this.announcementRepository.CreateAnnouncementData(announcementData);
+                if (!isSuccess)
+                {
+                    return "發佈公告失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Publish Announcement Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}\n{ex}");
+                return "發佈公告發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 創建新公告資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="publisherID">publisherID</param>
+        /// <param name="announcementInfo">announcementInfo</param>
+        /// <returns>Tuple(AnnouncementData, string)</returns>
+        private Tuple<AnnouncementData, string> CreateAnnouncementData(string teamID, string publisherID, AnnouncementInfoDto announcementInfo)
+        {
+            if (string.IsNullOrEmpty(announcementInfo.Context))
+            {
+                return Tuple.Create<AnnouncementData, string>(null, "無公告內容.");
+            }
+
+            if (announcementInfo.LimitDate == 0)
+            {
+                return Tuple.Create<AnnouncementData, string>(null, "公告天數無效.");
+            }
+
+            DateTime createDate = DateTime.Now;
+            AnnouncementData announcementData = this.mapper.Map<AnnouncementData>(announcementInfo);
+            announcementData.AnnouncementID = this.GetSerialID(createDate);
+            announcementData.TeamID = teamID;
+            announcementData.MemberID = publisherID;
+            announcementData.CreateDate = createDate;
+            announcementData.SaveDeadline = createDate.AddDays(announcementInfo.LimitDate);
+            announcementData.HaveSeenPlayerIDs = new List<string>();
+            return Tuple.Create<AnnouncementData, string>(announcementData, string.Empty);
+        }
+
+        #endregion 公告資料
     }
 }
