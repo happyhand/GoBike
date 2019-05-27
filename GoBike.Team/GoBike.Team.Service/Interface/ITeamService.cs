@@ -153,16 +153,5 @@ namespace GoBike.Team.Service.Interface
         Task<string> UpdateTeamViceLeader(TeamCommandDto teamCommand, bool isAdd);
 
         #endregion 車隊互動資料
-
-        #region 公告資料
-
-        /// <summary>
-        /// 發佈公告
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        Task<string> PublishAnnouncement(TeamCommandDto teamCommand);
-
-        #endregion 公告資料
     }
 }

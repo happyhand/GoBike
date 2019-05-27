@@ -17,13 +17,8 @@ namespace GoBike.Team.Service.Managers
     /// <summary>
     /// 車隊服務
     /// </summary>
-    public class TeamService : ITeamService
+    public class TeamService : TeamCommonService, ITeamService
     {
-        /// <summary>
-        /// announcementRepository
-        /// </summary>
-        private readonly IAnnouncementRepository announcementRepository;
-
         /// <summary>
         /// eventRepository
         /// </summary>
@@ -51,28 +46,13 @@ namespace GoBike.Team.Service.Managers
         /// <param name="mapper">mapper</param>
         /// <param name="teamRepository">teamRepository</param>
         /// <param name="eventRepository">eventRepository</param>
-        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IAnnouncementRepository announcementRepository, IEventRepository eventRepository)
+        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository, IEventRepository eventRepository) : base(logger)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.teamRepository = teamRepository;
-            this.announcementRepository = announcementRepository;
             this.eventRepository = eventRepository;
         }
-
-        #region 共用資料
-
-        /// <summary>
-        /// 取得流水號 ID
-        /// </summary>
-        /// <param name="createDate">createDate</param>
-        /// <returns>string</returns>
-        private string GetSerialID(DateTime createDate)
-        {
-            return $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
-        }
-
-        #endregion 共用資料
 
         #region 車隊資料
 
@@ -367,120 +347,6 @@ namespace GoBike.Team.Service.Managers
                 teamData.TeamExamineStatus = teamInfo.TeamExamineStatus;
 
             return string.Empty;
-        }
-
-        /// <summary>
-        /// 驗證車隊指令資料
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <param name="isVerifyExaminer">isVerifyExaminer</param>
-        /// <param name="isVerifyTarget">isVerifyTarget</param>
-        /// <param name="isVerifyTargets">isVerifyTargets</param>
-        /// <param name="isVerifyTeamInfo">isVerifyTeamInfo</param>
-        /// <param name="isVerifyAnnouncementInfo">isVerifyAnnouncementInfo</param>
-        /// <returns>bool</returns>
-        private bool VerifyTeamCommand(TeamCommandDto teamCommand, bool isVerifyExaminer, bool isVerifyTarget, bool isVerifyTargets, bool isVerifyTeamInfo, bool isVerifyAnnouncementInfo)
-        {
-            if (teamCommand == null)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(teamCommand.TeamID))
-            {
-                return false;
-            }
-
-            if (isVerifyExaminer)
-            {
-                if (string.IsNullOrEmpty(teamCommand.ExaminerID))
-                {
-                    return false;
-                }
-            }
-
-            if (isVerifyTarget)
-            {
-                if (string.IsNullOrEmpty(teamCommand.TargetID))
-                {
-                    return false;
-                }
-            }
-
-            if (isVerifyTargets)
-            {
-                if (teamCommand.TargetIDs == null || teamCommand.TargetIDs.Count() == 0)
-                {
-                    return false;
-                }
-            }
-
-            if (isVerifyTeamInfo)
-            {
-                if (teamCommand.TeamInfo == null)
-                {
-                    return false;
-                }
-            }
-
-            if (isVerifyAnnouncementInfo)
-            {
-                if (teamCommand.AnnouncementInfo == null)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// 驗證車隊審查者權限
-        /// </summary>
-        /// <param name="teamData">teamData</param>
-        /// <param name="examinerID">examinerID</param>
-        /// <param name="isSupreme">isSupreme</param>
-        /// <param name="isVerifyTarget">isVerifyTarget</param>
-        /// <param name="targetID">targetID</param>
-        /// <returns>bool</returns>
-        private bool VerifyTeamExaminerAuthority(TeamData teamData, string examinerID, bool isSupreme, bool isVerifyTarget, string targetID)
-        {
-            if (string.IsNullOrEmpty(examinerID))
-            {
-                return false;
-            }
-
-            if (isSupreme)
-            {
-                if (!examinerID.Equals(teamData.TeamLeaderID))
-                {
-                    return false;
-                }
-            }
-
-            if (!teamData.TeamLeaderID.Equals(examinerID) && !teamData.TeamViceLeaderIDs.Contains(examinerID))
-            {
-                return false;
-            }
-
-            if (isVerifyTarget)
-            {
-                if (string.IsNullOrEmpty(targetID))
-                {
-                    return false;
-                }
-
-                if (examinerID.Equals(targetID))
-                {
-                    return false;
-                }
-                if (targetID.Equals(teamData.TeamLeaderID))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -1250,83 +1116,5 @@ namespace GoBike.Team.Service.Managers
         }
 
         #endregion 車隊互動資料
-
-        #region 公告資料
-
-        /// <summary>
-        /// 發佈公告
-        /// </summary>
-        /// <param name="teamCommand">teamCommand</param>
-        /// <returns>string</returns>
-        public async Task<string> PublishAnnouncement(TeamCommandDto teamCommand)
-        {
-            try
-            {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true);
-                if (!verifyTeamCommandResult)
-                {
-                    this.logger.LogError($"Publish Announcement Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}");
-                    return "發佈公告失敗.";
-                }
-
-                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
-                if (teamData == null)
-                {
-                    return "車隊不存在.";
-                }
-
-                Tuple<AnnouncementData, string> createAnnouncementDataResult = this.CreateAnnouncementData(teamCommand.TeamID, teamCommand.ExaminerID, teamCommand.AnnouncementInfo);
-                if (!string.IsNullOrEmpty(createAnnouncementDataResult.Item2))
-                {
-                    return createAnnouncementDataResult.Item2;
-                }
-
-                AnnouncementData announcementData = createAnnouncementDataResult.Item1;
-                bool isSuccess = await this.announcementRepository.CreateAnnouncementData(announcementData);
-                if (!isSuccess)
-                {
-                    return "發佈公告失敗.";
-                }
-
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Publish Announcement Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}\n{ex}");
-                return "發佈公告發生錯誤.";
-            }
-        }
-
-        /// <summary>
-        /// 創建新公告資料
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="publisherID">publisherID</param>
-        /// <param name="announcementInfo">announcementInfo</param>
-        /// <returns>Tuple(AnnouncementData, string)</returns>
-        private Tuple<AnnouncementData, string> CreateAnnouncementData(string teamID, string publisherID, AnnouncementInfoDto announcementInfo)
-        {
-            if (string.IsNullOrEmpty(announcementInfo.Context))
-            {
-                return Tuple.Create<AnnouncementData, string>(null, "無公告內容.");
-            }
-
-            if (announcementInfo.LimitDate == 0)
-            {
-                return Tuple.Create<AnnouncementData, string>(null, "公告天數無效.");
-            }
-
-            DateTime createDate = DateTime.Now;
-            AnnouncementData announcementData = this.mapper.Map<AnnouncementData>(announcementInfo);
-            announcementData.AnnouncementID = this.GetSerialID(createDate);
-            announcementData.TeamID = teamID;
-            announcementData.MemberID = publisherID;
-            announcementData.CreateDate = createDate;
-            announcementData.SaveDeadline = createDate.AddDays(announcementInfo.LimitDate);
-            announcementData.HaveSeenPlayerIDs = new List<string>();
-            return Tuple.Create<AnnouncementData, string>(announcementData, string.Empty);
-        }
-
-        #endregion 公告資料
     }
 }
