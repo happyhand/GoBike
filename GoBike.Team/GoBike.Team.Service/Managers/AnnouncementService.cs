@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GoBike.Team.Core.Resource;
 using GoBike.Team.Repository.Interface;
 using GoBike.Team.Repository.Models;
 using GoBike.Team.Service.Interface;
@@ -103,6 +104,50 @@ namespace GoBike.Team.Service.Managers
         }
 
         /// <summary>
+        /// 刪除車隊所有公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        public async Task<string> DeleteAnnouncementListOfTeam(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Delete Announcement List Of Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
+                    return "刪除車隊所有公告失敗.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                bool verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, true, false, string.Empty);
+                if (!verifyTeamExaminerAuthorityResult)
+                {
+                    this.logger.LogError($"Delete Announcement List Of Team Fail For Verify Team Examiner Authority >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
+                    return "刪除車隊所有公告失敗.";
+                }
+
+                bool deleteAnnouncementDataListOfTeamResult = await this.announcementRepository.DeleteAnnouncementDataListOfTeam(teamCommand.TeamID);
+                if (!deleteAnnouncementDataListOfTeamResult)
+                {
+                    return "刪除車隊所有公告失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Announcement List Of Team Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}\n{ex}");
+                return "刪除車隊所有公告發生錯誤.";
+            }
+        }
+
+        /// <summary>
         /// 編輯公告
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
@@ -154,6 +199,8 @@ namespace GoBike.Team.Service.Managers
                     return "公告資料更新失敗.";
                 }
 
+                //// 無須對【已閱公告名單資料】作審查，不應影響原功能
+                bool updateHaveSeenAnnouncementPlayerIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, new List<string>());
                 return string.Empty;
             }
             catch (Exception ex)
@@ -191,6 +238,13 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 IEnumerable<AnnouncementData> announcementDatas = await this.announcementRepository.GetAnnouncementDataListOfTeam(teamData.TeamID);
+                bool updateHaveSeenAnnouncementPlayerIDsResult = Utility.UpdateListHandler(teamData.HaveSeenAnnouncementPlayerIDs, teamCommand.TargetID, true);
+                if (updateHaveSeenAnnouncementPlayerIDsResult)
+                {
+                    //// 無須對【已閱公告名單資料】作審查，不應影響原功能
+                    bool result = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, teamData.HaveSeenAnnouncementPlayerIDs);
+                }
+
                 return Tuple.Create(this.mapper.Map<IEnumerable<AnnouncementInfoDto>>(announcementDatas), string.Empty);
             }
             catch (Exception ex)
@@ -242,6 +296,8 @@ namespace GoBike.Team.Service.Managers
                     return "發佈公告失敗.";
                 }
 
+                //// 無須對【已閱公告名單資料】作審查，不應影響原功能
+                bool updateHaveSeenAnnouncementPlayerIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, new List<string>());
                 return string.Empty;
             }
             catch (Exception ex)

@@ -89,6 +89,38 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
+        /// 刪除車隊所有公告資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>bool</returns>
+        public async Task<bool> DeleteAnnouncementDataListOfTeam(string teamID)
+        {
+            try
+            {
+                FilterDefinition<AnnouncementData> filter = Builders<AnnouncementData>.Filter.Eq("TeamID", teamID);
+                DeleteResult result = await this.announcementDatas.DeleteManyAsync(filter);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Announcement Data List Of Team Fail For IsAcknowledged >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Announcement Data List Of Team Fail For DeletedCount >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Announcement Data List Of Team Error >>> TeamID:{teamID}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 取得公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
@@ -154,40 +186,6 @@ namespace GoBike.Team.Repository.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Announcement Data Error >>> Data:{JsonConvert.SerializeObject(announcementData)}\n{ex}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 更新已閱公告名單資料
-        /// </summary>
-        /// <param name="announcementID">announcementID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateHaveSeenPlayers(string announcementID, IEnumerable<string> memberIDs)
-        {
-            try
-            {
-                FilterDefinition<AnnouncementData> filter = Builders<AnnouncementData>.Filter.Eq("AnnouncementID", announcementID);
-                UpdateDefinition<AnnouncementData> update = Builders<AnnouncementData>.Update.Set(data => data.HaveSeenPlayerIDs, memberIDs);
-                UpdateResult result = await this.announcementDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    this.logger.LogError($"Update Have Seen Players Fail For IsAcknowledged >>> AnnouncementID:{announcementID} HaveSeenPlayerIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    this.logger.LogError($"Update Have Seen Players Fail For ModifiedCount >>> AnnouncementID:{announcementID} HaveSeenPlayerIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Update Have Seen Players Error >>> AnnouncementID:{announcementID} HaveSeenPlayerIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return false;
             }
         }

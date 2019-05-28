@@ -47,6 +47,34 @@ namespace GoBike.API.Service.Managers.Team
         #region 車隊資料
 
         /// <summary>
+        /// 解散車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DisbandTeam(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/DisbandTeam", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Disband Team Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "解散車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 車隊編輯
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>

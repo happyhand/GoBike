@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace GoBike.Team.Service.Models.Data
 {
@@ -22,11 +21,6 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets CreateDate
         /// </summary>
         public DateTime CreateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets HaveSeenPlayerIDs
-        /// </summary>
-        public IEnumerable<string> HaveSeenPlayerIDs { get; set; }
 
         /// <summary>
         /// Gets or sets LimitDate

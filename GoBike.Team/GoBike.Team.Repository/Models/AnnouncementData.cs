@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
 
 namespace GoBike.Team.Repository.Models
 {
@@ -27,12 +26,6 @@ namespace GoBike.Team.Repository.Models
         /// </summary>
         [BsonElement("CreateDate")]
         public DateTime CreateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets HaveSeenPlayerIDs
-        /// </summary>
-        [BsonElement("HaveSeenPlayerIDs")]
-        public IEnumerable<string> HaveSeenPlayerIDs { get; set; }
 
         /// <summary>
         /// Gets or sets Id

@@ -62,6 +62,15 @@ namespace GoBike.Team.Repository.Interface
         Task<IEnumerable<TeamData>> GetTeamDataListOfMember(string memberID);
 
         /// <summary>
+        /// 更新已閱公告名單資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateHaveSeenAnnouncementPlayerIDs(string teamID, IEnumerable<string> memberIDs)
+
+
+        /// <summary>
         /// 更新車隊資料
         /// </summary>
         /// <param name="teamData">teamData</param>

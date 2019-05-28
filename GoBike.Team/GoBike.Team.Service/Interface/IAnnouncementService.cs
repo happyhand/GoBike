@@ -19,6 +19,13 @@ namespace GoBike.Team.Service.Interface
         Task<string> DeleteAnnouncement(TeamCommandDto teamCommand);
 
         /// <summary>
+        /// 刪除車隊所有公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> DeleteAnnouncementListOfTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
         /// 編輯公告
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>

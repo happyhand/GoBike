@@ -57,6 +57,50 @@ namespace GoBike.Team.Service.Managers
         #region 車隊資料
 
         /// <summary>
+        /// 解散車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        public async Task<string> DisbandTeam(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Disband Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
+                    return "解散車隊失敗.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                bool verifyTeamExaminerAuthorityResult = this.VerifyTeamExaminerAuthority(teamData, teamCommand.ExaminerID, true, false, string.Empty);
+                if (!verifyTeamExaminerAuthorityResult)
+                {
+                    this.logger.LogError($"Disband Team Fail For Verify Team Examiner Authority >>> TeamID:{teamCommand.TeamID}  ExaminerID:{teamCommand.ExaminerID}");
+                    return "解散車隊失敗.";
+                }
+
+                bool deleteTeamDataResult = await this.teamRepository.DeleteTeamData(teamData.TeamID);
+                if (!deleteTeamDataResult)
+                {
+                    return "解散車隊失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Disband Team Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}\n{ex}");
+                return "解散車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
         /// 車隊編輯
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>

@@ -13,6 +13,13 @@ namespace GoBike.API.Service.Interface.Team
         #region 車隊資料
 
         /// <summary>
+        /// 解散車隊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DisbandTeam(TeamCommandDto teamCommand);
+
+        /// <summary>
         /// 車隊編輯
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>

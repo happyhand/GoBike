@@ -53,6 +53,12 @@ namespace GoBike.Team.Repository.Models
     public class TeamData
     {
         /// <summary>
+        /// Gets or sets HaveSeenAnnouncementPlayerIDs
+        /// </summary>
+        [BsonElement("HaveSeenAnnouncementPlayerIDs")]
+        public IEnumerable<string> HaveSeenAnnouncementPlayerIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets Id
         /// </summary>
         public ObjectId Id { get; set; }

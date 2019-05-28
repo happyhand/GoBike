@@ -24,6 +24,13 @@ namespace GoBike.Team.Repository.Interface
         Task<bool> DeleteAnnouncementData(string announcementID);
 
         /// <summary>
+        /// 刪除車隊所有公告資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>bool</returns>
+        Task<bool> DeleteAnnouncementDataListOfTeam(string teamID);
+
+        /// <summary>
         /// 取得公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
@@ -43,13 +50,5 @@ namespace GoBike.Team.Repository.Interface
         /// <param name="announcementData">announcementData</param>
         /// <returns>bool</returns>
         Task<bool> UpdateAnnouncementData(AnnouncementData announcementData);
-
-        /// <summary>
-        /// 更新已閱公告名單資料
-        /// </summary>
-        /// <param name="announcementID">announcementID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateHaveSeenPlayers(string announcementID, IEnumerable<string> memberIDs);
     }
 }

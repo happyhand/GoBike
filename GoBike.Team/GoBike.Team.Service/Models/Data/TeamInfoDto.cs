@@ -9,6 +9,11 @@ namespace GoBike.Team.Service.Models.Data
     public class TeamInfoDto
     {
         /// <summary>
+        /// Gets or sets HaveSeenAnnouncementPlayerIDs
+        /// </summary>
+        public IEnumerable<string> HaveSeenAnnouncementPlayerIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamApplyForJoinIDs
         /// </summary>
         public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
