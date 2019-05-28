@@ -333,7 +333,6 @@ namespace GoBike.Team.Service.Managers
             announcementData.MemberID = publisherID;
             announcementData.CreateDate = createDate;
             announcementData.SaveDeadline = createDate.AddDays(announcementInfo.LimitDate); //// TODO 公告存在天數更新
-            announcementData.HaveSeenPlayerIDs = new List<string>();
             return Tuple.Create<AnnouncementData, string>(announcementData, string.Empty);
         }
 
@@ -353,7 +352,6 @@ namespace GoBike.Team.Service.Managers
 
             announcementData.Context = announcementInfo.Context;
             announcementData.LimitDate = announcementInfo.LimitDate;
-            (announcementData.HaveSeenPlayerIDs as List<string>).Clear();
             //// TODO 公告存在天數更新
             return string.Empty;
         }
