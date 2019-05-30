@@ -18,24 +18,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class InviteController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<InviteController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public InviteController(ILogger<InviteController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public InviteController(ILogger<InviteController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.CancelInviteJoinTeam(teamCommand);
+                string result = await this.interactiveService.CancelInviteJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("取消邀請加入車隊成功.");
@@ -73,7 +73,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.teamService.GetInviteRequestList(teamCommand);
+                Tuple<IEnumerable<TeamInfoDto>, string> result = await this.interactiveService.GetInviteRequestList(teamCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -98,7 +98,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.InviteJoinTeam(teamCommand);
+                string result = await this.interactiveService.InviteJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("邀請加入車隊成功.");
@@ -123,7 +123,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.InviteManyJoinTeam(teamCommand);
+                string result = await this.interactiveService.InviteManyJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("邀請多人加入車隊成功.");
@@ -148,7 +148,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.RejectInviteJoinTeam(teamCommand);
+                string result = await this.interactiveService.RejectInviteJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("拒絕邀請加入車隊成功.");

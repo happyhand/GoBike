@@ -59,6 +59,8 @@ namespace GoBike.Team
         private void DependencyInjectionHandler(IServiceCollection services)
         {
             services.AddSingleton<ITeamService, TeamService>();
+            services.AddSingleton<IInteractiveService, InteractiveService>();
+            services.AddSingleton<IAnnouncementService, AnnouncementService>();
             services.AddSingleton<ITeamRepository, TeamRepository>();
             services.AddSingleton<IEventRepository, EventRepository>();
         }

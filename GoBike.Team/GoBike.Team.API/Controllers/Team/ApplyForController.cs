@@ -16,24 +16,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class ApplyForController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<ApplyForController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public ApplyForController(ILogger<ApplyForController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public ApplyForController(ILogger<ApplyForController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.CancelApplyForJoinTeam(teamCommand);
+                string result = await this.interactiveService.CancelApplyForJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("取消申請加入車隊成功.");
@@ -71,7 +71,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                Tuple<IEnumerable<string>, string> result = await this.teamService.GetApplyForRequestList(teamCommand);
+                Tuple<IEnumerable<string>, string> result = await this.interactiveService.GetApplyForRequestList(teamCommand);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -96,7 +96,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.ApplyForJoinTeam(teamCommand);
+                string result = await this.interactiveService.ApplyForJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("申請加入車隊成功.");
@@ -121,7 +121,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.RejectApplyForJoinTeam(teamCommand);
+                string result = await this.interactiveService.RejectApplyForJoinTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("拒絕申請加入車隊成功.");

@@ -15,24 +15,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class ForceLeaveTeamController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<ForceLeaveTeamController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public ForceLeaveTeamController(ILogger<ForceLeaveTeamController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public ForceLeaveTeamController(ILogger<ForceLeaveTeamController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.ForceLeaveTeam(teamCommand);
+                string result = await this.interactiveService.ForceLeaveTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("強制離開車隊成功.");

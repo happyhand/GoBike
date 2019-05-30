@@ -15,24 +15,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class LeaveTeamController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<LeaveTeamController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public LeaveTeamController(ILogger<LeaveTeamController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public LeaveTeamController(ILogger<LeaveTeamController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.LeaveTeam(teamCommand);
+                string result = await this.interactiveService.LeaveTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("離開車隊成功.");

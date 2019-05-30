@@ -15,24 +15,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class UpdateTeamLeaderController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<UpdateTeamLeaderController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public UpdateTeamLeaderController(ILogger<UpdateTeamLeaderController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public UpdateTeamLeaderController(ILogger<UpdateTeamLeaderController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.UpdateTeamLeader(teamCommand);
+                string result = await this.interactiveService.UpdateTeamLeader(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("更新車隊隊長成功.");

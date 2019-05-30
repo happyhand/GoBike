@@ -15,24 +15,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class JoinTeamController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<JoinTeamController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public JoinTeamController(ILogger<JoinTeamController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public JoinTeamController(ILogger<JoinTeamController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, false);
+                string result = await this.interactiveService.JoinTeam(teamCommand, false);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("允許加入車隊成功.");
@@ -70,7 +70,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.JoinTeam(teamCommand, true);
+                string result = await this.interactiveService.JoinTeam(teamCommand, true);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("邀請加入車隊成功.");

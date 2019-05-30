@@ -15,24 +15,24 @@ namespace GoBike.Team.API.Controllers.Team
     public class UpdateTeamViceLeaderController : ControllerBase
     {
         /// <summary>
+        /// interactiveService
+        /// </summary>
+        private readonly IInteractiveService interactiveService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<UpdateTeamViceLeaderController> logger;
 
         /// <summary>
-        /// teamService
-        /// </summary>
-        private readonly ITeamService teamService;
-
-        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
-        /// <param name="teamService">teamService</param>
-        public UpdateTeamViceLeaderController(ILogger<UpdateTeamViceLeaderController> logger, ITeamService teamService)
+        /// <param name="interactiveService">interactiveService</param>
+        public UpdateTeamViceLeaderController(ILogger<UpdateTeamViceLeaderController> logger, IInteractiveService interactiveService)
         {
             this.logger = logger;
-            this.teamService = teamService;
+            this.interactiveService = interactiveService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.UpdateTeamViceLeader(teamCommand, true);
+                string result = await this.interactiveService.UpdateTeamViceLeader(teamCommand, true);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("新增車隊副隊長成功.");
@@ -70,7 +70,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.teamService.UpdateTeamViceLeader(teamCommand, false);
+                string result = await this.interactiveService.UpdateTeamViceLeader(teamCommand, false);
                 if (string.IsNullOrEmpty(result))
                 {
                     return Ok("移除車隊副隊長成功.");
