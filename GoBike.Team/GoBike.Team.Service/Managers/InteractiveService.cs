@@ -84,7 +84,6 @@ namespace GoBike.Team.Service.Managers
                 bool updateTeamInviteJoinIDsResult = Utility.UpdateListHandler(teamData.TeamInviteJoinIDs, teamCommand.TargetID, false);
                 if (updateTeamPlayerIDsResult || updateTeamInviteJoinIDsResult)
                 {
-                    teamData.TeamNewsDate = DateTime.Now;
                     bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
                     if (!updateTeamDataResult)
                     {

@@ -1,5 +1,4 @@
-﻿using GoBike.API.Service.Models.Member.View;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GoBike.API.Service.Models.Team.View
 {
@@ -9,9 +8,19 @@ namespace GoBike.API.Service.Models.Team.View
     public class TeamDetailInfoViewDto : TeamInfoViewDto
     {
         /// <summary>
-        /// Gets or sets ApplyForRequestList
+        /// Gets or sets AnnouncementUpdateType
         /// </summary>
-        public IEnumerable<MemberSimpleInfoViewDto> ApplyForRequestList { get; set; }
+        public int AnnouncementUpdateType { get; set; }
+
+        /// <summary>
+        /// Gets or sets ApplyForUpdateType
+        /// </summary>
+        public int ApplyForUpdateType { get; set; }
+
+        /// <summary>
+        /// Gets or sets EventUpdateType
+        /// </summary>
+        public int EventUpdateType { get; set; }
 
         /// <summary>
         /// Gets or sets TeamActionSetting
@@ -29,11 +38,6 @@ namespace GoBike.API.Service.Models.Team.View
         /// Gets or sets EventList
         /// </summary>
         public IEnumerable<dynamic> EventList { get; set; }
-
-        /// <summary>
-        /// Gets or sets NewAnnouncement
-        /// </summary>
-        public dynamic NewAnnouncement { get; set; }
 
         #endregion TODO
     }

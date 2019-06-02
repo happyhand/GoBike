@@ -142,12 +142,6 @@ namespace GoBike.Team.Repository.Models
         public string TeamName { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamNewsDate
-        /// </summary>
-        [BsonElement("TeamNewsDate")]
-        public DateTime TeamNewsDate { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamPhoto
         /// </summary>
         [BsonElement("TeamPhoto")]

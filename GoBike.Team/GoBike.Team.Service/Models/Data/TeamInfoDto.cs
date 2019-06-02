@@ -79,11 +79,6 @@ namespace GoBike.Team.Service.Models.Data
         public string TeamName { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamNewsDate
-        /// </summary>
-        public DateTime TeamNewsDate { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamPhoto
         /// </summary>
         public string TeamPhoto { get; set; }

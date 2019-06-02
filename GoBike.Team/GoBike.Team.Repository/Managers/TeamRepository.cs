@@ -154,24 +154,6 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得會員的邀請加入車隊列表資料
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>TeamDatas</returns>
-        public async Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID)
-        {
-            try
-            {
-                return await this.teamDatas.Find(data => data.TeamInviteJoinIDs.Contains(memberID)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Team Data List Of Invite Join Error >>> MemberID:{memberID}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 取得會員的車隊列表資料
         /// </summary>
         /// <param name="memberID">memberID</param>
@@ -256,40 +238,6 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 更新車隊副隊長群
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
-        {
-            try
-            {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderIDs, teamViceLeaderIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    this.logger.LogError($"Update Team Vice Leaders Fail For IsAcknowledged >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
-                    return false;
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    this.logger.LogError($"Update Team Vice Leaders Fail For ModifiedCount >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
-                return false;
-            }
-        }
-
-        /// <summary>
         /// 驗證車隊資料 (By TeamLeaderID)
         /// </summary>
         /// <param name="teamName">teamName</param>
@@ -330,6 +278,24 @@ namespace GoBike.Team.Repository.Managers
         #endregion 車隊資料
 
         #region 車隊互動資料
+
+        /// <summary>
+        /// 取得會員的邀請加入車隊列表資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID)
+        {
+            try
+            {
+                return await this.teamDatas.Find(data => data.TeamInviteJoinIDs.Contains(memberID)).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List Of Invite Join Error >>> MemberID:{memberID}\n{ex}");
+                return null;
+            }
+        }
 
         /// <summary>
         /// 更新申請加入名單資料
@@ -463,6 +429,40 @@ namespace GoBike.Team.Repository.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Team Invite Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新車隊副隊長群
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
+        {
+            try
+            {
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderIDs, teamViceLeaderIDs);
+                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Update Team Vice Leaders Fail For IsAcknowledged >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    return false;
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    this.logger.LogError($"Update Team Vice Leaders Fail For ModifiedCount >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
                 return false;
             }
         }

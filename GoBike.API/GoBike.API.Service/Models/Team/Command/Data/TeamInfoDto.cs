@@ -9,6 +9,11 @@ namespace GoBike.API.Service.Models.Team.Command.Data
     public class TeamInfoDto
     {
         /// <summary>
+        /// Gets or sets HaveSeenAnnouncementPlayerIDs
+        /// </summary>
+        public IEnumerable<string> HaveSeenAnnouncementPlayerIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamApplyForJoinIDs
         /// </summary>
         public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
@@ -72,11 +77,6 @@ namespace GoBike.API.Service.Models.Team.Command.Data
         /// Gets or sets TeamName
         /// </summary>
         public string TeamName { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamNewsDate
-        /// </summary>
-        public DateTime TeamNewsDate { get; set; }
 
         /// <summary>
         /// Gets or sets TeamPhoto

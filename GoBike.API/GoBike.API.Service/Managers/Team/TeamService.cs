@@ -3,7 +3,6 @@ using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Core.Resource.Enum;
 using GoBike.API.Service.Interface.Team;
-using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Team.Command;
 using GoBike.API.Service.Models.Team.Command.Data;
@@ -213,28 +212,12 @@ namespace GoBike.API.Service.Managers.Team
                     teamDetailInfoView.TeamMemberList = new List<TeamMemberInfoViewDto>();
                 }
 
-                //// 取得申請加入車隊會員資訊列表
-                if (teamInfo.TeamLeaderID.Equals(teamCommand.TargetID) || teamInfo.TeamViceLeaderIDs.Contains(teamCommand.TargetID))
-                {
-                    postData = JsonConvert.SerializeObject(teamInfo.TeamApplyForJoinIDs);
-                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/List", postData);
-                    if (httpResponseMessage.IsSuccessStatusCode)
-                    {
-                        teamDetailInfoView.ApplyForRequestList = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberSimpleInfoViewDto>>();
-                    }
-                    else
-                    {
-                        this.logger.LogError($"Get Team Detail Info Fail For Get Apply For Member Info >>> MemberIDs:{JsonConvert.SerializeObject(teamInfo.TeamApplyForJoinIDs)} Message:{httpResponseMessage.Content.ReadAsAsync<string>()}");
-                        teamDetailInfoView.ApplyForRequestList = new List<MemberSimpleInfoViewDto>();
-                    }
-                }
-                else
-                {
-                    teamDetailInfoView.ApplyForRequestList = new List<MemberSimpleInfoViewDto>();
-                }
-
-                //// TODO 取得最新公告
-                teamDetailInfoView.NewAnnouncement = new { };
+                //// 取得公告最新更新時間
+                teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
+                //// 取得申請加入處理狀態
+                teamDetailInfoView.ApplyForUpdateType = teamInfo.TeamApplyForJoinIDs.Any() ? (int)TeamApplyForUpdateType.WaitHandler : (int)TeamApplyForUpdateType.None;
+                //// TODO 取得活動最新更新時間
+                teamDetailInfoView.EventUpdateType = (int)TeamAnnouncementUpdateType.None;
                 //// TODO 取得活動列表
                 teamDetailInfoView.EventList = new List<string>();
                 return new ResponseResultDto()
@@ -329,25 +312,30 @@ namespace GoBike.API.Service.Managers.Team
         /// <returns></returns>
         private int GetTeamActionFlag(TeamInfoDto teamInfo, string memberID)
         {
+            //// TODO 活動命令
             int teamActionFlag = 0;
             if (teamInfo.TeamLeaderID.Equals(memberID))
             {
                 teamActionFlag = (int)TeamActionSettingType.HistoricalAnnouncement
-                                + (int)TeamActionSettingType.HoldEvent
-                                + (int)TeamActionSettingType.EditData
-                                + (int)TeamActionSettingType.InviteFriend
                                 + (int)TeamActionSettingType.PublishAnnouncement
+                                + (int)TeamActionSettingType.EditAnnouncement
+                                + (int)TeamActionSettingType.RemoveAnnouncement
+                                + (int)TeamActionSettingType.HoldEvent
+                                + (int)TeamActionSettingType.InviteFriend
+                                + (int)TeamActionSettingType.EditData
                                 + (int)TeamActionSettingType.Transfer
                                 + (int)TeamActionSettingType.Disband;
             }
             else if (teamInfo.TeamViceLeaderIDs.Contains(memberID))
             {
                 teamActionFlag = (int)TeamActionSettingType.HistoricalAnnouncement
+                               + (int)TeamActionSettingType.PublishAnnouncement
+                               + (int)TeamActionSettingType.EditAnnouncement
+                               + (int)TeamActionSettingType.RemoveAnnouncement
                                + (int)TeamActionSettingType.HoldEvent
-                               + (int)TeamActionSettingType.Leave
-                               + (int)TeamActionSettingType.EditData
                                + (int)TeamActionSettingType.InviteFriend
-                               + (int)TeamActionSettingType.PublishAnnouncement;
+                               + (int)TeamActionSettingType.EditData
+                               + (int)TeamActionSettingType.Leave;
             }
             else if (teamInfo.TeamPlayerIDs.Contains(memberID))
             {

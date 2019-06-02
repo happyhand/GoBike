@@ -332,8 +332,8 @@ namespace GoBike.Team.Service.Managers
             announcementData.TeamID = teamID;
             announcementData.MemberID = publisherID;
             announcementData.CreateDate = createDate;
-            announcementData.SaveDeadline = createDate.AddDays(announcementInfo.LimitDate); //// TODO 公告存在天數更新
-            return Tuple.Create<AnnouncementData, string>(announcementData, string.Empty);
+            announcementData.SaveDeadline = createDate.AddDays(announcementInfo.LimitDate);
+            return Tuple.Create(announcementData, string.Empty);
         }
 
         /// <summary>
@@ -347,12 +347,10 @@ namespace GoBike.Team.Service.Managers
             if (string.IsNullOrEmpty(announcementInfo.Context))
                 return "無公告內容.";
 
-            if (announcementInfo.LimitDate == 0)
-                return "公告天數無效.";
-
+            //// 禁止更改公告存在天數
             announcementData.Context = announcementInfo.Context;
-            announcementData.LimitDate = announcementInfo.LimitDate;
-            //// TODO 公告存在天數更新
+            //// TODO 確認建立時間是否跟著更改
+            //announcementData.CreateDate = DateTime.Now;
             return string.Empty;
         }
     }

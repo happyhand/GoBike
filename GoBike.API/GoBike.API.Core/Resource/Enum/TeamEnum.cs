@@ -82,6 +82,38 @@
     }
 
     /// <summary>
+    /// 車隊更新【已閱最新公告】狀態
+    /// </summary>
+    public enum TeamAnnouncementUpdateType
+    {
+        /// <summary>
+        /// 無資料
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 已閱
+        /// </summary>
+        Read = 1
+    }
+
+    /// <summary>
+    /// 車隊更新【尚有未處理的會員申請】狀態
+    /// </summary>
+    public enum TeamApplyForUpdateType
+    {
+        /// <summary>
+        /// 無資料
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 待處理
+        /// </summary>
+        WaitHandler = 1
+    }
+
+    /// <summary>
     /// 車隊活動設定資料
     /// </summary>
     public enum TeamEventSettingType
@@ -95,6 +127,22 @@
         /// 編輯資料
         /// </summary>
         Edit = 1
+    }
+
+    /// <summary>
+    /// 車隊更新【已閱最新活動】狀態
+    /// </summary>
+    public enum TeamEventUpdateType
+    {
+        /// <summary>
+        /// 無資料
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 已閱
+        /// </summary>
+        Read = 1
     }
 
     /// <summary>

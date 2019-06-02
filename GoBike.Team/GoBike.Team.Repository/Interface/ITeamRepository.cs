@@ -48,13 +48,6 @@ namespace GoBike.Team.Repository.Interface
         Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict);
 
         /// <summary>
-        /// 取得會員的邀請加入車隊列表資料
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>TeamDatas</returns>
-        Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID);
-
-        /// <summary>
         /// 取得會員的車隊列表資料
         /// </summary>
         /// <param name="memberID">memberID</param>
@@ -77,14 +70,6 @@ namespace GoBike.Team.Repository.Interface
         Task<bool> UpdateTeamData(TeamData teamData);
 
         /// <summary>
-        /// 更新車隊副隊長群
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
-
-        /// <summary>
         /// 驗證車隊資料 (By TeamLeaderID)
         /// </summary>
         /// <param name="teamName">teamName</param>
@@ -101,6 +86,13 @@ namespace GoBike.Team.Repository.Interface
         #endregion 車隊資料
 
         #region 車隊互動資料
+
+        /// <summary>
+        /// 取得會員的邀請加入車隊列表資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID);
 
         /// <summary>
         /// 更新申請加入名單資料
@@ -133,6 +125,14 @@ namespace GoBike.Team.Repository.Interface
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>bool</returns>
         Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
+
+        /// <summary>
+        /// 更新車隊副隊長群
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
 
         #endregion 車隊互動資料
     }
