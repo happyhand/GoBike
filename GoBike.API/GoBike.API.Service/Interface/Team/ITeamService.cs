@@ -84,9 +84,25 @@ namespace GoBike.API.Service.Interface.Team
         /// <summary>
         /// 強制離開車隊
         /// </summary>
+        /// <param name="examinerID">examinerID</param>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> ForceLeaveTeam(string examinerID, TeamInteractiveCommandDto teamInteractiveCommand);
+
+        /// <summary>
+        /// 取得申請加入名單
+        /// </summary>
+        /// <param name="examinerID">examinerID</param>
+        /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetApplyForRequestList(string examinerID, TeamInteractiveCommandDto teamInteractiveCommand);
+
+        /// <summary>
+        /// 取得邀請加入名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetInviteRequestList(string memberID);
 
         /// <summary>
         /// 邀請加入車隊

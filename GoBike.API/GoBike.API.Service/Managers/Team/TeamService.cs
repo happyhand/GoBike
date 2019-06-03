@@ -3,6 +3,7 @@ using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Core.Resource.Enum;
 using GoBike.API.Service.Interface.Team;
+using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Team.Command;
 using GoBike.API.Service.Models.Team.Command.Data;
@@ -128,8 +129,11 @@ namespace GoBike.API.Service.Managers.Team
                 if (getTeamInfoListOfMemberHttpResponseMessageResult.IsSuccessStatusCode)
                 {
                     dynamic[] datas = await getTeamInfoListOfMemberHttpResponseMessageResult.Content.ReadAsAsync<dynamic[]>();
-                    memberTeamInfoView.LeaderTeam = this.mapper.Map<TeamSimpleInfoViewDto>(datas[0]);
-                    memberTeamInfoView.TeamList = this.mapper.Map<IEnumerable<TeamSimpleInfoViewDto>>(datas[1]);
+                    TeamInfoDto leaderTeam = datas[0];
+                    IEnumerable<TeamInfoDto> teamList = datas[1];
+                    memberTeamInfoView.LeaderTeam = this.TransformTeamSimpleInfo(leaderTeam, membrID);
+                    memberTeamInfoView.TeamList = teamList.Select(teamInfo => this.TransformTeamSimpleInfo(teamInfo, membrID));
+
                     //// TODO 車隊活動
                     memberTeamInfoView.JoinedEventList = new List<dynamic>();
                     memberTeamInfoView.notYetJoinEventList = new List<dynamic>();
@@ -147,12 +151,13 @@ namespace GoBike.API.Service.Managers.Team
                 HttpResponseMessage getInviteListHttpResponseMessageResult = await getInviteListHttpResponseMessage;
                 if (getTeamInfoListOfMemberHttpResponseMessageResult.IsSuccessStatusCode)
                 {
-                    memberTeamInfoView.InviteJoinList = await getTeamInfoListOfMemberHttpResponseMessageResult.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>();
+                    IEnumerable<TeamSimpleInfoViewDto> teamSimpleInfoViews = await getTeamInfoListOfMemberHttpResponseMessageResult.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>();
+                    memberTeamInfoView.InviteJoinUpdateType = teamSimpleInfoViews.Any() ? (int)InviteJoinUpdateType.WaitHandler : (int)InviteJoinUpdateType.None;
                 }
                 else
                 {
                     this.logger.LogError($"Get My Team Info Fail For Get Invite List >>> MemberID:{membrID} Message:{getTeamInfoListOfMemberHttpResponseMessageResult.Content.ReadAsAsync<string>()}");
-                    memberTeamInfoView.InviteJoinList = new List<TeamSimpleInfoViewDto>();
+                    memberTeamInfoView.InviteJoinUpdateType = (int)InviteJoinUpdateType.None;
                 }
 
                 return new ResponseResultDto()
@@ -215,7 +220,7 @@ namespace GoBike.API.Service.Managers.Team
                 //// 取得公告最新更新時間
                 teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
                 //// 取得申請加入處理狀態
-                teamDetailInfoView.ApplyForUpdateType = teamInfo.TeamApplyForJoinIDs.Any() ? (int)TeamApplyForUpdateType.WaitHandler : (int)TeamApplyForUpdateType.None;
+                teamDetailInfoView.ApplyForUpdateType = this.GetTeamApplyForUpdateType(teamInfo, teamCommand.TargetID);
                 //// TODO 取得活動最新更新時間
                 teamDetailInfoView.EventUpdateType = (int)TeamAnnouncementUpdateType.None;
                 //// TODO 取得活動列表
@@ -322,6 +327,7 @@ namespace GoBike.API.Service.Managers.Team
                                 + (int)TeamActionSettingType.RemoveAnnouncement
                                 + (int)TeamActionSettingType.HoldEvent
                                 + (int)TeamActionSettingType.InviteFriend
+                                + (int)TeamActionSettingType.ExamineJoin
                                 + (int)TeamActionSettingType.EditData
                                 + (int)TeamActionSettingType.Transfer
                                 + (int)TeamActionSettingType.Disband;
@@ -334,6 +340,7 @@ namespace GoBike.API.Service.Managers.Team
                                + (int)TeamActionSettingType.RemoveAnnouncement
                                + (int)TeamActionSettingType.HoldEvent
                                + (int)TeamActionSettingType.InviteFriend
+                               + (int)TeamActionSettingType.ExamineJoin
                                + (int)TeamActionSettingType.EditData
                                + (int)TeamActionSettingType.Leave;
             }
@@ -349,6 +356,19 @@ namespace GoBike.API.Service.Managers.Team
             }
 
             return teamActionFlag;
+        }
+
+        /// <summary>
+        /// 取得車隊【尚有未處理的會員申請】更新狀態
+        /// </summary>
+        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>int</returns>
+        private int GetTeamApplyForUpdateType(TeamInfoDto teamInfo, string memberID)
+        {
+            int teamIndetity = this.GetTeamIndetity(teamInfo, memberID);
+            bool isExaminer = teamIndetity == (int)TeamIdentityType.Leader || teamIndetity == (int)TeamIdentityType.ViceLeader;
+            return isExaminer && teamInfo.TeamApplyForJoinIDs.Any() ? (int)TeamApplyForUpdateType.WaitHandler : (int)TeamApplyForUpdateType.None;
         }
 
         /// <summary>
@@ -447,6 +467,32 @@ namespace GoBike.API.Service.Managers.Team
             }
         }
 
+        /// <summary>
+        /// 轉換車隊簡易資訊可視資料
+        /// </summary>
+        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamSimpleInfoViewDto</returns>
+        private TeamSimpleInfoViewDto TransformTeamSimpleInfo(TeamInfoDto teamInfo, string memberID)
+        {
+            TeamSimpleInfoViewDto teamSimpleInfoView = this.mapper.Map<TeamSimpleInfoViewDto>(teamInfo);
+            bool hasNews = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(memberID);
+            if (!hasNews)
+            {
+                int applyForUpdateType = this.GetTeamApplyForUpdateType(teamInfo, memberID);
+                hasNews = applyForUpdateType == (int)TeamApplyForUpdateType.WaitHandler;
+            }
+
+            if (!hasNews)
+            {
+                //// TODO 檢查活動
+                hasNews = false;
+            }
+
+            teamSimpleInfoView.hasNews = hasNews ? (int)TeamHasNewsType.News : (int)TeamHasNewsType.None;
+            return teamSimpleInfoView;
+        }
+
         #endregion 車隊資料
 
         #region 車隊互動資料
@@ -539,6 +585,7 @@ namespace GoBike.API.Service.Managers.Team
         /// <summary>
         /// 強制離開車隊
         /// </summary>
+        /// <param name="examinerID">examinerID</param>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> ForceLeaveTeam(string examinerID, TeamInteractiveCommandDto teamInteractiveCommand)
@@ -560,6 +607,88 @@ namespace GoBike.API.Service.Managers.Team
                 {
                     Ok = false,
                     Data = "強制離開車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得申請加入名單
+        /// </summary>
+        /// <param name="examinerID">examinerID</param>
+        /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetApplyForRequestList(string examinerID, TeamInteractiveCommandDto teamInteractiveCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new TeamCommandDto() { TeamID = teamInteractiveCommand.TeamID, ExaminerID = examinerID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/ApplyFor/Get", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    IEnumerable<string> memberIDs = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>();
+                    postData = JsonConvert.SerializeObject(memberIDs);
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo/List", postData);
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        IEnumerable<MemberSimpleInfoViewDto> memberSimpleInfoViews = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberSimpleInfoViewDto>>();
+                        return new ResponseResultDto()
+                        {
+                            Ok = true,
+                            Data = memberSimpleInfoViews
+                        };
+                    }
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Apply For Request List Error >>> TeamID:{teamInteractiveCommand.TeamID} ExaminerID:{examinerID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得申請加入名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得邀請加入名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetInviteRequestList(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new TeamCommandDto() { TargetID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/Invite/Get", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Invite Request List Error >>> TargetID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得邀請加入名單發生錯誤."
                 };
             }
         }

@@ -284,7 +284,7 @@ namespace GoBike.Team.Service.Managers
         /// <summary>
         /// 取得邀請加入名單
         /// </summary>
-        /// <param name="memberCommand">memberCommand</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
         public async Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(TeamCommandDto teamCommand)
         {

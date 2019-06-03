@@ -49,7 +49,7 @@ namespace GoBike.Team.Service.Interface
         /// <summary>
         /// 取得邀請加入名單
         /// </summary>
-        /// <param name="memberCommand">memberCommand</param>
+        /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(TeamInfoDtos, string)</returns>
         Task<Tuple<IEnumerable<TeamInfoDto>, string>> GetInviteRequestList(TeamCommandDto teamCommand);
 

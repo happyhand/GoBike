@@ -68,6 +68,32 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
+        /// 車隊邀請功能 - 取得邀請加入名單
+        /// </summary>
+        /// <returns>IActionResult</returns>
+        [HttpGet]
+        [CheckLoginActionFilter(true)]
+        public async Task<IActionResult> Get()
+        {
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            try
+            {
+                ResponseResultDto responseResult = await this.teamService.GetInviteRequestList(memberID);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
+                }
+
+                return BadRequest(responseResult.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Invite Request List Error >>> MemberID:{memberID}\n{ex}");
+                return BadRequest("取得邀請加入名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 車隊邀請功能 - 邀請加入車隊
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>

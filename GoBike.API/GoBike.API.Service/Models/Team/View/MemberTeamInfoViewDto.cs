@@ -8,9 +8,9 @@ namespace GoBike.API.Service.Models.Team.View
     public class MemberTeamInfoViewDto
     {
         /// <summary>
-        /// Gets or sets TeamID
+        /// Gets or sets InviteJoinUpdateType
         /// </summary>
-        public IEnumerable<TeamSimpleInfoViewDto> InviteJoinList { get; set; }
+        public int InviteJoinUpdateType { get; set; }
 
         /// <summary>
         /// Gets or sets LeaderTeam

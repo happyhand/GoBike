@@ -1,9 +1,25 @@
 ﻿namespace GoBike.API.Core.Resource.Enum
 {
     /// <summary>
+    /// 會員更新【尚有未處理的車隊邀請】狀態
+    /// </summary>
+    public enum InviteJoinUpdateType
+    {
+        /// <summary>
+        /// 無資料
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 待處理
+        /// </summary>
+        WaitHandler = 1
+    }
+
+    /// <summary>
     /// 車隊可執行指令設定資料
-    /// 隊長         :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、編輯資料、移交隊長、解散車隊
-    /// 副隊長       :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、編輯資料、離開車隊
+    /// 隊長         :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、審核加入、編輯資料、移交隊長、解散車隊
+    /// 副隊長       :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、審核加入、編輯資料、離開車隊
     /// 隊員         :歷史公告、發起活動、離開車隊
     /// 活動發起人    :編輯活動、刪除活動
     /// 非隊員       :申請加入
@@ -31,54 +47,59 @@
         InviteFriend = 4,
 
         /// <summary>
+        /// 審核加入
+        /// </summary>
+        ExamineJoin = 8,
+
+        /// <summary>
         /// 歷史公告
         /// </summary>
-        HistoricalAnnouncement = 8,
+        HistoricalAnnouncement = 16,
 
         /// <summary>
         /// 發佈公告
         /// </summary>
-        PublishAnnouncement = 16,
+        PublishAnnouncement = 32,
 
         /// <summary>
         /// 編輯公告
         /// </summary>
-        EditAnnouncement = 32,
+        EditAnnouncement = 64,
 
         /// <summary>
         /// 刪除公告
         /// </summary>
-        RemoveAnnouncement = 64,
+        RemoveAnnouncement = 128,
 
         /// <summary>
         /// 發起活動
         /// </summary>
-        HoldEvent = 128,
+        HoldEvent = 256,
 
         /// <summary>
         /// 編輯活動
         /// </summary>
-        EditEvent = 256,
+        EditEvent = 512,
 
         /// <summary>
         /// 移除活動
         /// </summary>
-        RemoveEvent = 512,
+        RemoveEvent = 1024,
 
         /// <summary>
         /// 移交隊長
         /// </summary>
-        Transfer = 1024,
+        Transfer = 2048,
 
         /// <summary>
         /// 解散車隊
         /// </summary>
-        Disband = 2048,
+        Disband = 4096,
 
         /// <summary>
         /// 離開車隊
         /// </summary>
-        Leave = 4096
+        Leave = 8192
     }
 
     /// <summary>
@@ -164,6 +185,22 @@
         /// 開啟
         /// </summary>
         Open = 2
+    }
+
+    /// <summary>
+    /// 車隊最新訊息狀態資料
+    /// </summary>
+    public enum TeamHasNewsType
+    {
+        /// <summary>
+        /// 無資料
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 待處理
+        /// </summary>
+        News = 1
     }
 
     /// <summary>

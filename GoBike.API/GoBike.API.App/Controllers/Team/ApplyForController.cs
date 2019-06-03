@@ -68,6 +68,33 @@ namespace GoBike.API.App.Controllers.Team
         }
 
         /// <summary>
+        /// 車隊申請功能 - 取得申請加入名單
+        /// </summary>
+        /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [CheckLoginActionFilter(true)]
+        public async Task<IActionResult> Get(TeamInteractiveCommandDto teamInteractiveCommand)
+        {
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            try
+            {
+                ResponseResultDto responseResult = await this.teamService.GetApplyForRequestList(memberID, teamInteractiveCommand);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
+                }
+
+                return BadRequest(responseResult.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Apply For Request List Error >>> TeamID:{teamInteractiveCommand.TeamID} ExaminerID:{memberID}\n{ex}");
+                return BadRequest("取得申請加入名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 車隊申請功能 - 申請加入車隊
         /// </summary>
         /// <param name="teamInteractiveCommand">teamInteractiveCommand</param>

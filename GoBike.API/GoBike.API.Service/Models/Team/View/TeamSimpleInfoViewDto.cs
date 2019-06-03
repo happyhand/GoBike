@@ -1,12 +1,15 @@
-﻿using System;
-
-namespace GoBike.API.Service.Models.Team.View
+﻿namespace GoBike.API.Service.Models.Team.View
 {
     /// <summary>
     /// 車隊簡易資訊可視資料
     /// </summary>
     public class TeamSimpleInfoViewDto
     {
+        /// <summary>
+        /// Gets or sets hasNews
+        /// </summary>
+        public int hasNews { get; set; }
+
         /// <summary>
         /// Gets or sets TeamID
         /// </summary>
@@ -16,11 +19,6 @@ namespace GoBike.API.Service.Models.Team.View
         /// Gets or sets TeamName
         /// </summary>
         public string TeamName { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamNewsDate
-        /// </summary>
-        public DateTime TeamNewsDate { get; set; }
 
         /// <summary>
         /// Gets or sets TeamPhoto
