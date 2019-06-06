@@ -103,6 +103,22 @@
     }
 
     /// <summary>
+    /// 車隊公告設定資料
+    /// </summary>
+    public enum TeamAnnouncementSettingType
+    {
+        /// <summary>
+        /// 無設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 可執行動作
+        /// </summary>
+        Action = 1
+    }
+
+    /// <summary>
     /// 車隊更新【已閱最新公告】狀態
     /// </summary>
     public enum TeamAnnouncementUpdateType

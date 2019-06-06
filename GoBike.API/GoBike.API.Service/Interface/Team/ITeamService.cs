@@ -169,5 +169,37 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> UpdateTeamViceLeader(string examinerID, TeamInteractiveCommandDto teamInteractiveCommand, bool isAdd);
 
         #endregion 車隊互動資料
+
+        #region 車隊公告資料
+
+        /// <summary>
+        /// 刪除公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DeleteAnnouncement(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 編輯公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditAnnouncement(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 取得公告列表
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetAnnouncementList(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 發佈公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> PublishAnnouncement(TeamCommandDto teamCommand);
+
+        #endregion 車隊公告資料
     }
 }

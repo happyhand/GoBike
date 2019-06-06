@@ -200,7 +200,8 @@ namespace GoBike.API.Service.Managers.Team
 
                 TeamInfoDto teamInfo = await httpResponseMessage.Content.ReadAsAsync<TeamInfoDto>();
                 TeamDetailInfoViewDto teamDetailInfoView = this.mapper.Map<TeamDetailInfoViewDto>(teamInfo);
-                //// 車隊身分行為設定
+                //// 車隊身分設定
+                teamDetailInfoView.TeamIdentity = this.GetTeamIdentity(teamInfo, teamCommand.TargetID);
                 teamDetailInfoView.TeamActionSetting = this.GetTeamActionFlag(teamInfo, teamCommand.TargetID);
                 //// 取得車隊隊員會員資訊列表
                 postData = JsonConvert.SerializeObject(teamInfo.TeamPlayerIDs);
@@ -217,14 +218,29 @@ namespace GoBike.API.Service.Managers.Team
                     teamDetailInfoView.TeamMemberList = new List<TeamMemberInfoViewDto>();
                 }
 
-                //// 取得公告最新更新時間
-                teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
-                //// 取得申請加入處理狀態
-                teamDetailInfoView.ApplyForUpdateType = this.GetTeamApplyForUpdateType(teamInfo, teamCommand.TargetID);
-                //// TODO 取得活動最新更新時間
-                teamDetailInfoView.EventUpdateType = (int)TeamAnnouncementUpdateType.None;
-                //// TODO 取得活動列表
-                teamDetailInfoView.EventList = new List<string>();
+                if (teamDetailInfoView.TeamIdentity == (int)TeamIdentityType.None)
+                {
+                    teamDetailInfoView.AnnouncementUpdateType = (int)TeamAnnouncementUpdateType.None;
+                    teamDetailInfoView.ApplyForUpdateType = (int)TeamApplyForUpdateType.None;
+                    teamDetailInfoView.EventUpdateType = (int)TeamEventUpdateType.None;
+                    teamDetailInfoView.EventList = new List<string>();
+                }
+                else
+                {
+                    if (teamDetailInfoView.TeamIdentity == (int)TeamIdentityType.Leader || teamDetailInfoView.TeamIdentity == (int)TeamIdentityType.ViceLeader)
+                    {
+                        //// 取得【尚有未處理的會員申請】更新狀態
+                        teamDetailInfoView.ApplyForUpdateType = teamInfo.TeamApplyForJoinIDs.Any() ? (int)TeamApplyForUpdateType.WaitHandler : (int)TeamApplyForUpdateType.None;
+                    }
+
+                    //// 取得【已閱最新公告】更新狀態
+                    teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
+                    //// TODO 取得【已閱最新活動】更新狀態
+                    teamDetailInfoView.EventUpdateType = (int)TeamAnnouncementUpdateType.None;
+                    //// TODO 取得活動列表
+                    teamDetailInfoView.EventList = new List<string>();
+                }
+
                 return new ResponseResultDto()
                 {
                     Ok = true,
@@ -359,25 +375,12 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
-        /// 取得車隊【尚有未處理的會員申請】更新狀態
-        /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>int</returns>
-        private int GetTeamApplyForUpdateType(TeamInfoDto teamInfo, string memberID)
-        {
-            int teamIndetity = this.GetTeamIndetity(teamInfo, memberID);
-            bool isExaminer = teamIndetity == (int)TeamIdentityType.Leader || teamIndetity == (int)TeamIdentityType.ViceLeader;
-            return isExaminer && teamInfo.TeamApplyForJoinIDs.Any() ? (int)TeamApplyForUpdateType.WaitHandler : (int)TeamApplyForUpdateType.None;
-        }
-
-        /// <summary>
         /// 取得車隊身分
         /// </summary>
         /// <param name="teamInfo">teamInfo</param>
         /// <param name="memberID">memberID</param>
         /// <returns></returns>
-        private int GetTeamIndetity(TeamInfoDto teamInfo, string memberID)
+        private int GetTeamIdentity(TeamInfoDto teamInfo, string memberID)
         {
             if (teamInfo.TeamLeaderID.Equals(memberID))
             {
@@ -458,10 +461,10 @@ namespace GoBike.API.Service.Managers.Team
             string teamLeaderID = teamInfo.TeamLeaderID;
             IEnumerable<string> teamViceLeaderIDs = teamInfo.TeamViceLeaderIDs;
             IEnumerable<string> teamPlayerIDs = teamInfo.TeamPlayerIDs;
-            int targetIdentity = this.GetTeamIndetity(teamInfo, targetID);
+            int targetIdentity = this.GetTeamIdentity(teamInfo, targetID);
             foreach (TeamMemberInfoViewDto teamMemberInfoView in teamMemberInfoViews)
             {
-                teamMemberInfoView.TeamIdentity = this.GetTeamIndetity(teamInfo, teamMemberInfoView.MemberID);
+                teamMemberInfoView.TeamIdentity = this.GetTeamIdentity(teamInfo, teamMemberInfoView.MemberID);
                 teamMemberInfoView.TeamKickOutSetting = this.GetTeamKickOutSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
                 teamMemberInfoView.TeamViceLeaderSetting = this.GetTeamViceLeaderSetFlag(targetIdentity, teamMemberInfoView.TeamIdentity);
             }
@@ -479,8 +482,11 @@ namespace GoBike.API.Service.Managers.Team
             bool hasNews = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(memberID);
             if (!hasNews)
             {
-                int applyForUpdateType = this.GetTeamApplyForUpdateType(teamInfo, memberID);
-                hasNews = applyForUpdateType == (int)TeamApplyForUpdateType.WaitHandler;
+                int teamIdentity = this.GetTeamIdentity(teamInfo, memberID);
+                if (teamIdentity == (int)TeamIdentityType.Leader || teamIdentity == (int)TeamIdentityType.ViceLeader)
+                {
+                    hasNews = teamInfo.TeamApplyForJoinIDs.Any();
+                }
             }
 
             if (!hasNews)
@@ -928,5 +934,151 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         #endregion 車隊互動資料
+
+        #region 車隊公告資料
+
+        /// <summary>
+        /// 刪除公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteAnnouncement(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/Announcement/Delete", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Announcement Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementID:{(teamCommand.AnnouncementInfo != null ? teamCommand.AnnouncementInfo.AnnouncementID : "Null")}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除公告發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 編輯公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> EditAnnouncement(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/Announcement/Edit", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Edit Announcement Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} Data:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "編輯公告發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得公告列表
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetAnnouncementList(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/Announcement/Get", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    IEnumerable<TeamAnnouncementInfoViewDto> teamAnnouncementInfoViews = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamAnnouncementInfoViewDto>>();
+                    //// 取得車隊資訊
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/GetTeamInfo", postData);
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        TeamInfoDto teamInfo = await httpResponseMessage.Content.ReadAsAsync<TeamInfoDto>();
+                        int teamIdentity = this.GetTeamIdentity(teamInfo, teamCommand.TargetID);
+                        foreach (TeamAnnouncementInfoViewDto teamAnnouncementInfoView in teamAnnouncementInfoViews)
+                        {
+                            teamAnnouncementInfoView.TeamAnnouncementUpdateType = (teamIdentity == (int)TeamIdentityType.Leader || teamIdentity == (int)TeamIdentityType.ViceLeader) ? (int)TeamAnnouncementSettingType.Action : (int)TeamAnnouncementSettingType.None;
+                        }
+                    }
+                    else
+                    {
+                        this.logger.LogError($"Get Team Info Fail For Get Announcement List >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} Message:{httpResponseMessage.Content.ReadAsAsync<string>()}");
+                        foreach (TeamAnnouncementInfoViewDto teamAnnouncementInfoView in teamAnnouncementInfoViews)
+                        {
+                            teamAnnouncementInfoView.TeamAnnouncementUpdateType = (int)TeamAnnouncementSettingType.None;
+                        }
+                    }
+
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamAnnouncementInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Announcement List Error >>> TemaID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得公告列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 發佈公告
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> PublishAnnouncement(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamCommand);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/Announcement/Publish", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Publish Announcement Error >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} Data:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "發佈公告發生錯誤."
+                };
+            }
+        }
+
+        #endregion 車隊公告資料
     }
 }

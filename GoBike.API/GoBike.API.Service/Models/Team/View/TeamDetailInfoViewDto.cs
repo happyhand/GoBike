@@ -28,6 +28,11 @@ namespace GoBike.API.Service.Models.Team.View
         public int TeamActionSetting { get; set; }
 
         /// <summary>
+        /// Gets or sets TeamIdentity
+        /// </summary>
+        public int TeamIdentity { get; set; }
+
+        /// <summary>
         /// Gets or sets MemberList
         /// </summary>
         public IEnumerable<TeamMemberInfoViewDto> TeamMemberList { get; set; }

@@ -51,7 +51,7 @@ namespace GoBike.API.App.Controllers.Team
         public async Task<IActionResult> GetApplyForRequestList(TeamInfoDto teamInfo)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            TeamCommandDto teamCommand = new TeamCommandDto() { TeamID = teamInfo.TeamID, ExaminerID = memberID, Data = teamInfo };
+            TeamCommandDto teamCommand = new TeamCommandDto() { TeamID = teamInfo.TeamID, ExaminerID = memberID, TeamInfo = teamInfo };
             try
             {
                 ResponseResultDto responseResult = await this.teamService.EditData(teamCommand);

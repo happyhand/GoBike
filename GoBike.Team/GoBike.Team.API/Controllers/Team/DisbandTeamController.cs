@@ -52,7 +52,7 @@ namespace GoBike.Team.API.Controllers.Team
         {
             try
             {
-                string result = await this.announcementService.DeleteAnnouncement(teamCommand);
+                string result = await this.announcementService.DeleteAnnouncementListOfTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
                     result = await this.teamService.DisbandTeam(teamCommand);
