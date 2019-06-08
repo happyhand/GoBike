@@ -62,7 +62,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Disband Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
@@ -106,7 +106,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, true, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, true, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Edit Data Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TeamInfo:{JsonConvert.SerializeObject(teamCommand.TeamInfo)}");
@@ -156,7 +156,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Get Team Info Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");

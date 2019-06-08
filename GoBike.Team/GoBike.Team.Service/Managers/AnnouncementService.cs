@@ -63,7 +63,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Delete Announcement Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementID:{(teamCommand.AnnouncementInfo != null ? teamCommand.AnnouncementInfo.AnnouncementID : "Null")}");
@@ -112,7 +112,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Delete Announcement List Of Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
@@ -156,7 +156,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Edit Announcement Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}");
@@ -219,7 +219,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Get Announcement List Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -263,7 +263,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, true, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Publish Announcement Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} AnnouncementInfo:{JsonConvert.SerializeObject(teamCommand.AnnouncementInfo)}");

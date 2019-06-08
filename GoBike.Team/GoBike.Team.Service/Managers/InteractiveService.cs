@@ -56,7 +56,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -109,7 +109,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Cancel Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -150,7 +150,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Cancel Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -203,7 +203,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Force Leave Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -252,7 +252,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Get Apply For Request List Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID}");
@@ -315,7 +315,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -374,7 +374,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, true, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, false, true, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Invite Many Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetIDs:{JsonConvert.SerializeObject(teamCommand.TargetIDs)}");
@@ -431,7 +431,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, !isInvite, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, !isInvite, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID} IsInvite:{isInvite}");
@@ -505,7 +505,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Leave Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -557,7 +557,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Reject Apply For Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -610,7 +610,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Reject Invite Join Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
@@ -651,7 +651,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Update Team Leader Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");
@@ -710,7 +710,7 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false);
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, true, true, false, false, false, false);
                 if (!verifyTeamCommandResult)
                 {
                     this.logger.LogError($"Update Team Vice Leader Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} ExaminerID:{teamCommand.ExaminerID} TargetID:{teamCommand.TargetID}");

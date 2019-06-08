@@ -44,8 +44,9 @@ namespace GoBike.Team.Service.Managers
         /// <param name="isVerifyTargets">isVerifyTargets</param>
         /// <param name="isVerifyTeamInfo">isVerifyTeamInfo</param>
         /// <param name="isVerifyAnnouncementInfo">isVerifyAnnouncementInfo</param>
+        /// <param name="isVerifyEventInfo">isVerifyEventInfo</param>
         /// <returns>bool</returns>
-        protected bool VerifyTeamCommand(TeamCommandDto teamCommand, bool isVerifyExaminer, bool isVerifyTarget, bool isVerifyTargets, bool isVerifyTeamInfo, bool isVerifyAnnouncementInfo)
+        protected bool VerifyTeamCommand(TeamCommandDto teamCommand, bool isVerifyExaminer, bool isVerifyTarget, bool isVerifyTargets, bool isVerifyTeamInfo, bool isVerifyAnnouncementInfo, bool isVerifyEventInfo)
         {
             if (teamCommand == null)
             {
@@ -92,6 +93,14 @@ namespace GoBike.Team.Service.Managers
             if (isVerifyAnnouncementInfo)
             {
                 if (teamCommand.AnnouncementInfo == null)
+                {
+                    return false;
+                }
+            }
+
+            if (isVerifyEventInfo)
+            {
+                if (teamCommand.EventInfo == null)
                 {
                     return false;
                 }

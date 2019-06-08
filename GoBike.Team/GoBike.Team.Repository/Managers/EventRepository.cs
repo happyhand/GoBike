@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GoBike.Team.Repository.Managers
@@ -67,11 +68,55 @@ namespace GoBike.Team.Repository.Managers
             {
                 FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("EventID", eventID);
                 DeleteResult result = await this.eventDatas.DeleteManyAsync(filter);
-                return result.IsAcknowledged && result.DeletedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Event Data Fail For IsAcknowledged >>> EventID:{eventID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Event Data Fail For DeletedCount >>> EventID:{eventID}");
+                    return false;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Delete Event Data Error >>> EventID:{eventID}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 刪除車隊所有活動資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>bool</returns>
+        public async Task<bool> DeleteEventDataListOfTeam(string teamID)
+        {
+            try
+            {
+                FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("TeamID", teamID);
+                DeleteResult result = await this.eventDatas.DeleteManyAsync(filter);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Event Data List Of Team Fail For IsAcknowledged >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Event Data List Of Team Fail For DeletedCount >>> TeamID:{teamID}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Event Data List Of Team Error >>> TeamID:{teamID}\n{ex}");
                 return false;
             }
         }
@@ -96,20 +141,38 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得活動列表資料
+        /// 取得車隊活動資料列表
         /// </summary>
-        /// <param name="eventIDs">eventIDs</param>
+        /// <param name="teamID">teamID</param>
         /// <returns>EventDatas</returns>
-        public async Task<IEnumerable<EventData>> GetEventDataList(IEnumerable<string> eventIDs)
+        public async Task<IEnumerable<EventData>> GetEventDataListOfTeam(string teamID)
         {
             try
             {
-                FilterDefinition<EventData> filter = Builders<EventData>.Filter.In("EventID", eventIDs);
+                FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("TeamID", teamID);
                 return await this.eventDatas.Find(filter).ToListAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Event Data List Error >>> TeamIDs:{JsonConvert.SerializeObject(eventIDs)}\n{ex}");
+                this.logger.LogError($"Get Event Data List Of Team Error >>> TeamID:{teamID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得會員活動資料列表
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>EventDatas</returns>
+        public async Task<IEnumerable<EventData>> GetEventDataListOfMember(string member)
+        {
+            try
+            {
+                return await this.eventDatas.Find(data => data.JoinMemberList.Contains(member)).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Event Data List Of Member Error >>> Member:{member}\n{ex}");
                 return null;
             }
         }
@@ -125,7 +188,19 @@ namespace GoBike.Team.Repository.Managers
             {
                 FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("_id", eventData.Id);
                 ReplaceOneResult result = await this.eventDatas.ReplaceOneAsync(filter, eventData);
-                return result.IsAcknowledged && result.ModifiedCount > 0;
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Update Event Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(eventData)}");
+                    return false;
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    this.logger.LogError($"Update Event Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(eventData)}");
+                    return false;
+                }
+
+                return true;
             }
             catch (Exception ex)
             {

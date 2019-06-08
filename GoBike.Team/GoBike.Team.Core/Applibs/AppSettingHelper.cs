@@ -64,6 +64,13 @@
             }
         }
 
+        /// <summary>
+        /// 活動預約最大天數
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public int EventMaxDate { get; set; }
+
         #endregion MongoDB 設定資料
     }
 }
