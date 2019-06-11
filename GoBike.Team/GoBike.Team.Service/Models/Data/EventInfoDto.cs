@@ -9,9 +9,14 @@ namespace GoBike.Team.Service.Models.Data
     public class EventInfoDto
     {
         /// <summary>
-        /// Gets or sets EventID
+        /// Gets or sets CreateDate
         /// </summary>
-        public string EventID { get; set; }
+        public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets CreatorID
+        /// </summary>
+        public string CreatorID { get; set; }
 
         /// <summary>
         /// Gets or sets Description
@@ -19,34 +24,19 @@ namespace GoBike.Team.Service.Models.Data
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets CreateDate
-        /// </summary>
-        public DateTime CreateDate { get; set; }
-
-        /// <summary>
         /// Gets or sets EventDate
         /// </summary>
         public DateTime EventDate { get; set; }
 
         /// <summary>
-        /// Gets or sets RoutePoints
+        /// Gets or sets EventID
         /// </summary>
-        public IEnumerable<string> RoutePoints { get; set; }
+        public string EventID { get; set; }
 
         /// <summary>
-        /// Gets or sets Site
+        /// Gets or sets HaveSeenMemberIDs
         /// </summary>
-        public string Site { get; set; }
-
-        /// <summary>
-        /// Gets or sets SaveDeadline
-        /// </summary>
-        public DateTime SaveDeadline { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamID
-        /// </summary>
-        public string TeamID { get; set; }
+        public IEnumerable<string> HaveSeenMemberIDs { get; set; }
 
         /// <summary>
         /// Gets or sets JoinMemberList
@@ -54,8 +44,33 @@ namespace GoBike.Team.Service.Models.Data
         public IEnumerable<string> JoinMemberList { get; set; }
 
         /// <summary>
-        /// Gets or sets MemberID
+        /// Gets or sets RoutePoints
         /// </summary>
-        public string MemberID { get; set; }
+        public IEnumerable<string> RoutePoints { get; set; }
+
+        /// <summary>
+        /// Gets or sets SaveDeadline
+        /// </summary>
+        public DateTime SaveDeadline { get; set; }
+
+        /// <summary>
+        /// Gets or sets Site
+        /// </summary>
+        public string Site { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamID
+        /// </summary>
+        public string TeamID { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamName
+        /// </summary>
+        public string TeamName { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamPhoto
+        /// </summary>
+        public string TeamPhoto { get; set; }
     }
 }

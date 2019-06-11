@@ -200,7 +200,7 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 //// 無須對【已閱公告名單資料】作審查，不應影響原功能
-                bool updateHaveSeenAnnouncementPlayerIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, new List<string>());
+                bool updateHaveSeenAnnouncementMemberIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementMemberIDs(teamData.TeamID, new List<string>());
                 return string.Empty;
             }
             catch (Exception ex)
@@ -238,11 +238,11 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 IEnumerable<AnnouncementData> announcementDatas = await this.announcementRepository.GetAnnouncementDataListOfTeam(teamData.TeamID);
-                bool updateHaveSeenAnnouncementPlayerIDsResult = Utility.UpdateListHandler(teamData.HaveSeenAnnouncementPlayerIDs, teamCommand.TargetID, true);
-                if (updateHaveSeenAnnouncementPlayerIDsResult)
+                bool updateHaveSeenAnnouncementMemberIDsResult = Utility.UpdateListHandler(teamData.HaveSeenAnnouncementMemberIDs, teamCommand.TargetID, true);
+                if (updateHaveSeenAnnouncementMemberIDsResult)
                 {
                     //// 無須對【已閱公告名單資料】作審查，不應影響原功能
-                    bool result = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, teamData.HaveSeenAnnouncementPlayerIDs);
+                    bool result = await this.teamRepository.UpdateHaveSeenAnnouncementMemberIDs(teamData.TeamID, teamData.HaveSeenAnnouncementMemberIDs);
                 }
 
                 return Tuple.Create(this.mapper.Map<IEnumerable<AnnouncementInfoDto>>(announcementDatas), string.Empty);
@@ -297,7 +297,7 @@ namespace GoBike.Team.Service.Managers
                 }
 
                 //// 無須對【已閱公告名單資料】作審查，不應影響原功能
-                bool updateHaveSeenAnnouncementPlayerIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementPlayerIDs(teamData.TeamID, new List<string>());
+                bool updateHaveSeenAnnouncementMemberIDsResult = await this.teamRepository.UpdateHaveSeenAnnouncementMemberIDs(teamData.TeamID, new List<string>());
                 return string.Empty;
             }
             catch (Exception ex)

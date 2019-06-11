@@ -20,6 +20,11 @@ namespace GoBike.Team.API.Controllers.Team
         private readonly IAnnouncementService announcementService;
 
         /// <summary>
+        /// eventService
+        /// </summary>
+        private readonly IEventService eventService;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<DisbandTeamController> logger;
@@ -35,11 +40,13 @@ namespace GoBike.Team.API.Controllers.Team
         /// <param name="logger">logger</param>
         /// <param name="teamService">teamService</param>
         /// <param name="announcementService">announcementService</param>
-        public DisbandTeamController(ILogger<DisbandTeamController> logger, ITeamService teamService, IAnnouncementService announcementService)
+        /// <param name="eventService">eventService</param>
+        public DisbandTeamController(ILogger<DisbandTeamController> logger, ITeamService teamService, IAnnouncementService announcementService, IEventService eventService)
         {
             this.logger = logger;
             this.teamService = teamService;
             this.announcementService = announcementService;
+            this.eventService = eventService;
         }
 
         /// <summary>
@@ -55,10 +62,14 @@ namespace GoBike.Team.API.Controllers.Team
                 string result = await this.announcementService.DeleteAnnouncementListOfTeam(teamCommand);
                 if (string.IsNullOrEmpty(result))
                 {
-                    result = await this.teamService.DisbandTeam(teamCommand);
+                    result = await this.eventService.DeleteEventListOfTeam(teamCommand);
                     if (string.IsNullOrEmpty(result))
                     {
-                        return Ok("解散車隊成功.");
+                        result = await this.teamService.DisbandTeam(teamCommand);
+                        if (string.IsNullOrEmpty(result))
+                        {
+                            return Ok("解散車隊成功.");
+                        }
                     }
                 }
 

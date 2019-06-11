@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GoBike.Team.Core.Applibs;
+using GoBike.Team.Core.Resource;
 using GoBike.Team.Repository.Interface;
 using GoBike.Team.Repository.Models;
 using GoBike.Team.Service.Interface;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GoBike.Team.Service.Managers
@@ -60,7 +62,43 @@ namespace GoBike.Team.Service.Managers
         /// <returns>string</returns>
         public async Task<string> CancelJoinEvent(TeamCommandDto teamCommand)
         {
-            throw new NotImplementedException();
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, true);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Cancel Join Event Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}");
+                    return "取消加入活動失敗.";
+                }
+
+                if (string.IsNullOrEmpty(teamCommand.EventInfo.EventID))
+                {
+                    return "活動編號無效.";
+                }
+
+                EventData eventData = await this.eventRepository.GetEventData(teamCommand.EventInfo.EventID);
+                if (eventData == null)
+                {
+                    return "活動不存在.";
+                }
+
+                bool updateJoinMemberListResult = Utility.UpdateListHandler(eventData.JoinMemberList, teamCommand.TargetID, false);
+                if (updateJoinMemberListResult)
+                {
+                    bool result = await this.eventRepository.UpdateJoinMemberList(eventData.EventID, eventData.JoinMemberList);
+                    if (!result)
+                    {
+                        return "活動參加名單資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Cancel Join Event Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}\n{ex}");
+                return "取消加入活動發生錯誤.";
+            }
         }
 
         /// <summary>
@@ -85,7 +123,12 @@ namespace GoBike.Team.Service.Managers
                     return "車隊不存在.";
                 }
 
-                Tuple<EventData, string> createEventDataResult = this.CreateEventData(teamCommand.TeamID, teamCommand.TargetID, teamCommand.EventInfo);
+                if (!teamData.TeamLeaderID.Equals(teamCommand.TargetID) && !teamData.TeamPlayerIDs.Contains(teamCommand.TargetID))
+                {
+                    return "該會員非車隊隊員.";
+                }
+
+                Tuple<EventData, string> createEventDataResult = await this.CreateEventData(teamData.TeamID, teamData.TeamName, teamCommand.TargetID, teamCommand.EventInfo);
                 if (!string.IsNullOrEmpty(createEventDataResult.Item2))
                 {
                     return createEventDataResult.Item2;
@@ -272,9 +315,46 @@ namespace GoBike.Team.Service.Managers
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(EventInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<EventInfoDto>, string>> GetEventListOfMember(TeamCommandDto teamCommand)
+        public async Task<Tuple<dynamic[], string>> GetEventListOfMember(TeamCommandDto teamCommand)
         {
-            throw new NotImplementedException();
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Get Event List Of Member Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
+                    return Tuple.Create<dynamic[], string>(null, "取得會員活動列表失敗.");
+                }
+
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(teamCommand.TargetID);
+                List<EventInfoDto> joinEventDatas = new List<EventInfoDto>();
+                List<EventInfoDto> notYetJoinEventDatas = new List<EventInfoDto>();
+                foreach (TeamData teamData in teamDatas)
+                {
+                    IEnumerable<EventData> eventDatas = await this.eventRepository.GetEventDataListOfTeam(teamData.TeamID);
+                    IEnumerable<EventInfoDto> eventInfos = this.mapper.Map<IEnumerable<EventInfoDto>>(eventDatas);
+                    foreach (EventInfoDto eventInfo in eventInfos)
+                    {
+                        eventInfo.TeamName = teamData.TeamName;
+                        eventInfo.TeamPhoto = teamData.TeamPhoto;
+                        if (eventInfo.JoinMemberList.Contains(teamCommand.TargetID))
+                        {
+                            joinEventDatas.Add(eventInfo);
+                        }
+                        else
+                        {
+                            notYetJoinEventDatas.Add(eventInfo);
+                        }
+                    }
+                }
+
+                return Tuple.Create(new dynamic[] { joinEventDatas, notYetJoinEventDatas }, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Event List Of Member Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return Tuple.Create<dynamic[], string>(null, "取得會員活動列表發生錯誤.");
+            }
         }
 
         /// <summary>
@@ -284,7 +364,41 @@ namespace GoBike.Team.Service.Managers
         /// <returns>Tuple(EventInfoDtos, string)</returns>
         public async Task<Tuple<IEnumerable<EventInfoDto>, string>> GetEventListOfTeam(TeamCommandDto teamCommand)
         {
-            throw new NotImplementedException();
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Get Event List Of Team Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
+                    return Tuple.Create<IEnumerable<EventInfoDto>, string>(null, "取得車隊活動列表失敗.");
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                if (teamData == null)
+                {
+                    return Tuple.Create<IEnumerable<EventInfoDto>, string>(null, "車隊不存在.");
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamCommand.TargetID) && !teamData.TeamPlayerIDs.Contains(teamCommand.TargetID))
+                {
+                    return Tuple.Create<IEnumerable<EventInfoDto>, string>(null, "該會員非車隊隊員.");
+                }
+
+                IEnumerable<EventData> eventDatas = await this.eventRepository.GetEventDataListOfTeam(teamCommand.TeamID);
+                IEnumerable<EventInfoDto> eventInfos = this.mapper.Map<IEnumerable<EventInfoDto>>(eventDatas);
+                foreach (EventInfoDto eventInfo in eventInfos)
+                {
+                    eventInfo.TeamName = teamData.TeamName;
+                    eventInfo.TeamPhoto = teamData.TeamPhoto;
+                }
+
+                return Tuple.Create(eventInfos, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Event List Of Team Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
+                return Tuple.Create<IEnumerable<EventInfoDto>, string>(null, "取得車隊活動列表發生錯誤.");
+            }
         }
 
         /// <summary>
@@ -294,17 +408,111 @@ namespace GoBike.Team.Service.Managers
         /// <returns>string</returns>
         public async Task<string> JoinEvent(TeamCommandDto teamCommand)
         {
-            throw new NotImplementedException();
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, true);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"Join Event Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}");
+                    return "加入活動失敗.";
+                }
+
+                if (string.IsNullOrEmpty(teamCommand.EventInfo.EventID))
+                {
+                    return "活動編號無效.";
+                }
+
+                EventData eventData = await this.eventRepository.GetEventData(teamCommand.EventInfo.EventID);
+                if (eventData == null)
+                {
+                    return "活動不存在.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamCommand.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamCommand.TargetID) && !teamData.TeamPlayerIDs.Contains(teamCommand.TargetID))
+                {
+                    return "該會員非車隊隊員.";
+                }
+
+                bool updateJoinMemberListResult = Utility.UpdateListHandler(eventData.JoinMemberList, teamCommand.TargetID, true);
+                if (updateJoinMemberListResult)
+                {
+                    bool result = await this.eventRepository.UpdateJoinMemberList(eventData.EventID, eventData.JoinMemberList);
+                    if (!result)
+                    {
+                        return "活動參加名單資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Event Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}\n{ex}");
+                return "加入活動發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 審閱活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        public async Task<string> ViewEvent(TeamCommandDto teamCommand)
+        {
+            try
+            {
+                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, true);
+                if (!verifyTeamCommandResult)
+                {
+                    this.logger.LogError($"View Event Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}");
+                    return "審閱活動失敗.";
+                }
+
+                if (string.IsNullOrEmpty(teamCommand.EventInfo.EventID))
+                {
+                    return "活動編號無效.";
+                }
+
+                EventData eventData = await this.eventRepository.GetEventData(teamCommand.EventInfo.EventID);
+                if (eventData == null)
+                {
+                    return "活動不存在.";
+                }
+
+                bool updateHaveSeenMemberIDsResult = Utility.UpdateListHandler(eventData.HaveSeenMemberIDs, teamCommand.TargetID, true);
+                if (updateHaveSeenMemberIDsResult)
+                {
+                    bool result = await this.eventRepository.UpdateHaveSeenMemberIDs(eventData.EventID, eventData.JoinMemberList);
+                    if (!result)
+                    {
+                        return "已閱活動名單資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"View Event Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID} EventID:{(teamCommand.EventInfo != null ? teamCommand.EventInfo.EventID : "Null")}\n{ex}");
+                return "審閱活動發生錯誤.";
+            }
         }
 
         /// <summary>
         /// 創建新活動資料
         /// </summary>
         /// <param name="teamID">teamID</param>
+        /// <param name="teamName">teamName</param>
         /// <param name="creatorID">publisherID</param>
         /// <param name="eventInfo">eventInfo</param>
         /// <returns>Tuple(EventData, string)</returns>
-        private Tuple<EventData, string> CreateEventData(string teamID, string creatorID, EventInfoDto eventInfo)
+        private async Task<Tuple<EventData, string>> CreateEventData(string teamID, string teamName, string creatorID, EventInfoDto eventInfo)
         {
             if (eventInfo.EventDate == null)
             {
@@ -319,6 +527,12 @@ namespace GoBike.Team.Service.Managers
             if (string.IsNullOrEmpty(eventInfo.Description))
             {
                 return Tuple.Create<EventData, string>(null, "無路線描述.");
+            }
+
+            bool verifyEventDataByCreatorIDResult = await this.eventRepository.VerifyEventDataByCreatorID(creatorID);
+            if (verifyEventDataByCreatorIDResult)
+            {
+                return Tuple.Create<EventData, string>(null, "無法建立兩個以上的活動.");
             }
 
             DateTime createDate = DateTime.Now;
@@ -336,10 +550,12 @@ namespace GoBike.Team.Service.Managers
             EventData eventData = this.mapper.Map<EventData>(eventInfo);
             eventData.EventID = this.GetSerialID(createDate);
             eventData.TeamID = teamID;
-            eventData.MemberID = creatorID;
+            eventData.CreatorID = creatorID;
             eventData.CreateDate = createDate;
             eventData.RoutePoints = new List<string>();
-            eventData.JoinMemberList = new List<string>();
+            eventData.JoinMemberList = new List<string>() { creatorID };
+            eventData.HaveSeenMemberIDs = new List<string>();
+            eventData.SaveDeadline = new DateTime(eventInfo.EventDate.Year, eventInfo.EventDate.Month, eventInfo.EventDate.Day, 23, 59, 59);
             return Tuple.Create(eventData, string.Empty);
         }
 
@@ -382,6 +598,8 @@ namespace GoBike.Team.Service.Managers
             eventData.EventDate = eventInfo.EventDate;
             eventData.Site = eventInfo.Site;
             eventData.Description = eventInfo.Description;
+            eventData.HaveSeenMemberIDs = new List<string>();
+            eventData.SaveDeadline = new DateTime(eventInfo.EventDate.Year, eventInfo.EventDate.Month, eventInfo.EventDate.Day, 23, 59, 59);
             return string.Empty;
         }
 
@@ -403,7 +621,7 @@ namespace GoBike.Team.Service.Managers
             {
                 if (!teamData.TeamViceLeaderIDs.Equals(examinerID))
                 {
-                    if (!eventData.MemberID.Equals(examinerID))
+                    if (!eventData.CreatorID.Equals(examinerID))
                     {
                         return false;
                     }

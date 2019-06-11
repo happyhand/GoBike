@@ -6,7 +6,6 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GoBike.Team.Repository.Managers
@@ -160,24 +159,6 @@ namespace GoBike.Team.Repository.Managers
         }
 
         /// <summary>
-        /// 取得會員活動資料列表
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <returns>EventDatas</returns>
-        public async Task<IEnumerable<EventData>> GetEventDataListOfMember(string member)
-        {
-            try
-            {
-                return await this.eventDatas.Find(data => data.JoinMemberList.Contains(member)).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Event Data List Of Member Error >>> Member:{member}\n{ex}");
-                return null;
-            }
-        }
-
-        /// <summary>
         /// 更新活動資料
         /// </summary>
         /// <param name="eventData">eventData</param>
@@ -205,6 +186,93 @@ namespace GoBike.Team.Repository.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Update Event Data Error >>> Data:{JsonConvert.SerializeObject(eventData)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新已閱活動名單資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateHaveSeenMemberIDs(string eventID, IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("EventID", eventID);
+                UpdateDefinition<EventData> update = Builders<EventData>.Update.Set(data => data.HaveSeenMemberIDs, memberIDs);
+                UpdateResult result = await this.eventDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Update Have Seen Member IDs Fail For IsAcknowledged >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    this.logger.LogError($"Update Have Seen Member IDs Fail For ModifiedCount >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Have Seen Member IDs Error >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新活動參加名單資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateJoinMemberList(string eventID, IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("EventID", eventID);
+                UpdateDefinition<EventData> update = Builders<EventData>.Update.Set(data => data.JoinMemberList, memberIDs);
+                UpdateResult result = await this.eventDatas.UpdateOneAsync(filter, update);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Update Join Member List Fail For IsAcknowledged >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    this.logger.LogError($"Update Join Member List Fail For ModifiedCount >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Join Member List Error >>> EventID:{eventID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 驗證活動資料 (By CreatorID)
+        /// </summary>
+        /// <param name="creatorID">creatorID</param>
+        /// <returns>bool</returns>
+        public async Task<bool> VerifyEventDataByCreatorID(string creatorID)
+        {
+            try
+            {
+                FilterDefinition<EventData> filter = Builders<EventData>.Filter.Eq("CreatorID", creatorID);
+                return await this.eventDatas.CountDocumentsAsync(filter) > 0;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Verify Event Data By Creator ID Error >>> CreatorID:{creatorID}\n{ex}");
                 return false;
             }
         }

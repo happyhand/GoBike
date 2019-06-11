@@ -60,7 +60,7 @@ namespace GoBike.Team.Repository.Interface
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>bool</returns>
-        Task<bool> UpdateHaveSeenAnnouncementPlayerIDs(string teamID, IEnumerable<string> memberIDs);
+        Task<bool> UpdateHaveSeenAnnouncementMemberIDs(string teamID, IEnumerable<string> memberIDs);
 
         /// <summary>
         /// 更新車隊資料

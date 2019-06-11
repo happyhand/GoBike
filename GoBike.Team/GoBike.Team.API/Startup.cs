@@ -61,7 +61,9 @@ namespace GoBike.Team
             services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<IInteractiveService, InteractiveService>();
             services.AddSingleton<IAnnouncementService, AnnouncementService>();
+            services.AddSingleton<IEventService, EventService>();
             services.AddSingleton<ITeamRepository, TeamRepository>();
+            services.AddSingleton<IAnnouncementRepository, AnnouncementRepository>();
             services.AddSingleton<IEventRepository, EventRepository>();
         }
 

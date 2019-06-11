@@ -234,7 +234,7 @@ namespace GoBike.API.Service.Managers.Team
                     }
 
                     //// 取得【已閱最新公告】更新狀態
-                    teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
+                    teamDetailInfoView.AnnouncementUpdateType = teamInfo.HaveSeenAnnouncementMemberIDs.Contains(teamCommand.TargetID) ? (int)TeamAnnouncementUpdateType.Read : (int)TeamAnnouncementUpdateType.None;
                     //// TODO 取得【已閱最新活動】更新狀態
                     teamDetailInfoView.EventUpdateType = (int)TeamAnnouncementUpdateType.None;
                     //// TODO 取得活動列表
@@ -479,7 +479,7 @@ namespace GoBike.API.Service.Managers.Team
         private TeamSimpleInfoViewDto TransformTeamSimpleInfo(TeamInfoDto teamInfo, string memberID)
         {
             TeamSimpleInfoViewDto teamSimpleInfoView = this.mapper.Map<TeamSimpleInfoViewDto>(teamInfo);
-            bool hasNews = teamInfo.HaveSeenAnnouncementPlayerIDs.Contains(memberID);
+            bool hasNews = teamInfo.HaveSeenAnnouncementMemberIDs.Contains(memberID);
             if (!hasNews)
             {
                 int teamIdentity = this.GetTeamIdentity(teamInfo, memberID);

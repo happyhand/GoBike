@@ -52,10 +52,26 @@ namespace GoBike.Team.Repository.Interface
         Task<bool> UpdateEventData(EventData eventData);
 
         /// <summary>
-        /// 取得會員活動資料列表
+        /// 更新已閱活動名單資料
         /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <returns>EventDatas</returns>
-        Task<IEnumerable<EventData>> GetEventDataListOfMember(string member);
+        /// <param name="eventID">eventID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateHaveSeenMemberIDs(string eventID, IEnumerable<string> memberIDs);
+
+        /// <summary>
+        /// 更新活動參加會員
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateJoinMemberList(string eventID, IEnumerable<string> memberIDs);
+
+        /// <summary>
+        /// 驗證活動資料 (By CreatorID)
+        /// </summary>
+        /// <param name="creatorID">creatorID</param>
+        /// <returns>bool</returns>
+        Task<bool> VerifyEventDataByCreatorID(string creatorID);
     }
 }

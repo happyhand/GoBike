@@ -177,22 +177,22 @@ namespace GoBike.Team.Repository.Managers
         /// <param name="teamID">teamID</param>
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>bool</returns>
-        public async Task<bool> UpdateHaveSeenAnnouncementPlayerIDs(string teamID, IEnumerable<string> memberIDs)
+        public async Task<bool> UpdateHaveSeenAnnouncementMemberIDs(string teamID, IEnumerable<string> memberIDs)
         {
             try
             {
                 FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.HaveSeenAnnouncementPlayerIDs, memberIDs);
+                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.HaveSeenAnnouncementMemberIDs, memberIDs);
                 UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
                 if (!result.IsAcknowledged)
                 {
-                    this.logger.LogError($"Update Have Seen Announcement Player IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    this.logger.LogError($"Update Have Seen Announcement Member IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
                     return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    this.logger.LogError($"Update Have Seen Announcement Player IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
+                    this.logger.LogError($"Update Have Seen Announcement Member IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
                     return false;
                 }
 
@@ -200,7 +200,7 @@ namespace GoBike.Team.Repository.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Have Seen Announcement Player IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                this.logger.LogError($"Update Have Seen Announcement Member IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return false;
             }
         }

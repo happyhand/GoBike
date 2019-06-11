@@ -347,7 +347,7 @@ namespace GoBike.Team.Service.Managers
             teamData.TeamBlacklistIDs = new List<string>();
             teamData.TeamBlacklistedIDs = new List<string>();
             teamData.TeamEventIDs = new List<string>();
-            teamData.HaveSeenAnnouncementPlayerIDs = new List<string>();
+            teamData.HaveSeenAnnouncementMemberIDs = new List<string>();
             return Tuple.Create(teamData, string.Empty);
         }
 

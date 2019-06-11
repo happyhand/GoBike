@@ -51,7 +51,7 @@ namespace GoBike.Team.Service.Interface
         /// </summary>
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>Tuple(EventInfoDtos, string)</returns>
-        Task<Tuple<IEnumerable<EventInfoDto>, string>> GetEventListOfMember(TeamCommandDto teamCommand);
+        Task<Tuple<dynamic[], string>> GetEventListOfMember(TeamCommandDto teamCommand);
 
         /// <summary>
         /// 取得車隊活動列表
@@ -66,5 +66,12 @@ namespace GoBike.Team.Service.Interface
         /// <param name="teamCommand">teamCommand</param>
         /// <returns>string</returns>
         Task<string> JoinEvent(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 審閱活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>string</returns>
+        Task<string> ViewEvent(TeamCommandDto teamCommand);
     }
 }
