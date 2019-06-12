@@ -4,15 +4,10 @@ using System.Collections.Generic;
 namespace GoBike.Team.Service.Models.Data
 {
     /// <summary>
-    /// 活動資料
+    /// 活動簡易資料
     /// </summary>
-    public class EventInfoDto
+    public class EventSimpleInfoDto
     {
-        /// <summary>
-        /// Gets or sets CreateDate
-        /// </summary>
-        public DateTime CreateDate { get; set; }
-
         /// <summary>
         /// Gets or sets CreatorID
         /// </summary>
@@ -34,6 +29,11 @@ namespace GoBike.Team.Service.Models.Data
         public string EventID { get; set; }
 
         /// <summary>
+        /// Gets or sets EventTitle
+        /// </summary>
+        public string EventTitle { get; set; }
+
+        /// <summary>
         /// Gets or sets HaveSeenMemberIDs
         /// </summary>
         public IEnumerable<string> HaveSeenMemberIDs { get; set; }
@@ -42,21 +42,6 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets JoinMemberList
         /// </summary>
         public IEnumerable<string> JoinMemberList { get; set; }
-
-        /// <summary>
-        /// Gets or sets RoutePoints
-        /// </summary>
-        public IEnumerable<string> RoutePoints { get; set; }
-
-        /// <summary>
-        /// Gets or sets SaveDeadline
-        /// </summary>
-        public DateTime SaveDeadline { get; set; }
-
-        /// <summary>
-        /// Gets or sets Site
-        /// </summary>
-        public string Site { get; set; }
 
         /// <summary>
         /// Gets or sets TeamID

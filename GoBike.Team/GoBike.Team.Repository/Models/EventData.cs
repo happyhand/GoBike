@@ -41,6 +41,12 @@ namespace GoBike.Team.Repository.Models
         public string EventID { get; set; }
 
         /// <summary>
+        /// Gets or sets EventTitle
+        /// </summary>
+        [BsonElement("EventTitle")]
+        public string EventTitle { get; set; }
+
+        /// <summary>
         /// Gets or sets HaveSeenMemberIDs
         /// </summary>
         [BsonElement("HaveSeenMemberIDs")]
