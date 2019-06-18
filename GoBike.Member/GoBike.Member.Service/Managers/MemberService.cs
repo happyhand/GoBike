@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GoBike.Member.Service.Managers
@@ -201,10 +200,11 @@ namespace GoBike.Member.Service.Managers
                     return "信箱或密碼無效.";
                 }
 
-                if (string.IsNullOrEmpty(memberInfo.Mobile))
-                {
-                    return "行動電話號碼無效.";
-                }
+                //// 待確認是否驗證
+                //if (string.IsNullOrEmpty(memberInfo.Mobile))
+                //{
+                //    return "行動電話號碼無效.";
+                //}
 
                 if (!Utility.IsValidEmail(memberInfo.Email))
                 {
@@ -216,10 +216,11 @@ namespace GoBike.Member.Service.Managers
                     return "密碼格式錯誤.";
                 }
 
-                if (!Utility.IsValidMobile(memberInfo.Mobile))
-                {
-                    return "行動電話號碼格式錯誤.";
-                }
+                //// 待確認是否驗證
+                //if (!Utility.IsValidMobile(memberInfo.Mobile))
+                //{
+                //    return "行動電話號碼格式錯誤.";
+                //}
 
                 bool emailHasRegister = await this.memberRepository.GetMemebrDataByEmail(memberInfo.Email) != null;
                 if (emailHasRegister)
@@ -227,14 +228,15 @@ namespace GoBike.Member.Service.Managers
                     return "此信箱已經被註冊.";
                 }
 
-                bool mobileHasRegister = await this.memberRepository.GetMemebrDataByMobile(memberInfo.Mobile) != null;
-                if (mobileHasRegister)
-                {
-                    return "此行動電話號碼已經被註冊.";
-                }
+                //// 待確認是否驗證
+                //bool mobileHasRegister = await this.memberRepository.GetMemebrDataByMobile(memberInfo.Mobile) != null;
+                //if (mobileHasRegister)
+                //{
+                //    return "此行動電話號碼已經被註冊.";
+                //}
 
                 string memberSerialNumber = await this.memberRepository.GetMemberSerialNumber();
-                if (!string.IsNullOrEmpty(memberSerialNumber))
+                if (string.IsNullOrEmpty(memberSerialNumber))
                 {
                     return "取得會員序號失敗.";
                 }
@@ -350,29 +352,30 @@ namespace GoBike.Member.Service.Managers
         /// <returns>bool</returns>
         private bool IsValidPassword(string password)
         {
-            int passwordCount = password.Length;
-            if (passwordCount < 8 || passwordCount > 14)
-            {
-                return false;
-            }
+            //// 待確認驗證方式
+            //int passwordCount = password.Length;
+            //if (passwordCount < 8 || passwordCount > 14)
+            //{
+            //    return false;
+            //}
 
-            int preCharCode = -1;
-            for (int i = 0; i < passwordCount; i++)
-            {
-                string word = password[i].ToString();
-                int charCode = (int)password[i];
-                if (!Regex.IsMatch(word, @"[0-9a-zＡ-Ｚ０-９]"))
-                {
-                    return false;
-                }
+            //int preCharCode = -1;
+            //for (int i = 0; i < passwordCount; i++)
+            //{
+            //    string word = password[i].ToString();
+            //    int charCode = (int)password[i];
+            //    if (!Regex.IsMatch(word, @"[0-9a-zＡ-Ｚ０-９]"))
+            //    {
+            //        return false;
+            //    }
 
-                if (Math.Abs(charCode - preCharCode) == 1)
-                {
-                    return false;
-                }
+            //    if (Math.Abs(charCode - preCharCode) == 1)
+            //    {
+            //        return false;
+            //    }
 
-                preCharCode = charCode;
-            }
+            //    preCharCode = charCode;
+            //}
 
             return true;
         }

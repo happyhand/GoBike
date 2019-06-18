@@ -57,7 +57,7 @@ namespace GoBike.Team.API.Controllers.Event
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Event List Of Member Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
+                this.logger.LogError($"Get Event List Of Member Error >>> TargetID:{(teamCommand != null ? teamCommand.TargetID : "Null")}\n{ex}");
                 return BadRequest("取得會員活動列表發生錯誤.");
             }
         }

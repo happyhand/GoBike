@@ -53,6 +53,12 @@ namespace GoBike.Team.Repository.Models
         public IEnumerable<string> HaveSeenMemberIDs { get; set; }
 
         /// <summary>
+        /// Gets or sets Highest
+        /// </summary>
+        [BsonElement("Highest")]
+        public string Highest { get; set; }
+
+        /// <summary>
         /// Gets or sets Id
         /// </summary>
         public ObjectId Id { get; set; }

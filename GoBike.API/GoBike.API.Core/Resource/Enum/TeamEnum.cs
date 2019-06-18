@@ -21,7 +21,6 @@
     /// 隊長         :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、審核加入、編輯資料、移交隊長、解散車隊
     /// 副隊長       :歷史公告、發起公告、編輯公告、刪除公告、發起活動、邀請好友、審核加入、編輯資料、離開車隊
     /// 隊員         :歷史公告、發起活動、離開車隊
-    /// 活動發起人    :編輯活動、刪除活動
     /// 非隊員       :申請加入
     /// </summary>
     public enum TeamActionSettingType
@@ -77,29 +76,19 @@
         HoldEvent = 256,
 
         /// <summary>
-        /// 編輯活動
-        /// </summary>
-        EditEvent = 512,
-
-        /// <summary>
-        /// 移除活動
-        /// </summary>
-        RemoveEvent = 1024,
-
-        /// <summary>
         /// 移交隊長
         /// </summary>
-        Transfer = 2048,
+        Transfer = 512,
 
         /// <summary>
         /// 解散車隊
         /// </summary>
-        Disband = 4096,
+        Disband = 1024,
 
         /// <summary>
         /// 離開車隊
         /// </summary>
-        Leave = 8192
+        Leave = 2048
     }
 
     /// <summary>
@@ -148,22 +137,6 @@
         /// 待處理
         /// </summary>
         WaitHandler = 1
-    }
-
-    /// <summary>
-    /// 車隊活動設定資料
-    /// </summary>
-    public enum TeamEventSettingType
-    {
-        /// <summary>
-        /// 無設定
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// 編輯資料
-        /// </summary>
-        Edit = 1
     }
 
     /// <summary>
@@ -251,29 +224,24 @@
     public enum TeamJoinSettingType
     {
         /// <summary>
-        /// 取消邀請加入車隊
-        /// </summary>
-        CancelInviteJoin = -2,
-
-        /// <summary>
-        /// 拒絕加入車隊
-        /// </summary>
-        RejectJoin = -1,
-
-        /// <summary>
         /// 無設定
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// 允許加入車隊
+        /// 處理申請加入
         /// </summary>
-        AllowJoin = 1,
+        HandleApplyFor = 1,
 
         /// <summary>
         /// 邀請加入車隊
         /// </summary>
-        InviteJoin = 2
+        InviteJoin = 2,
+
+        /// <summary>
+        /// 取消邀請加入車隊
+        /// </summary>
+        CancelInviteJoin = 3,
     }
 
     /// <summary>

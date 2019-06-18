@@ -201,5 +201,51 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> PublishAnnouncement(TeamCommandDto teamCommand);
 
         #endregion 車隊公告資料
+
+        #region 車隊活動資料
+
+        /// <summary>
+        /// 取消加入活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> CancelJoinEvent(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 建立活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> CreateEvent(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 刪除活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DeleteEvent(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 編輯活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditEvent(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 取得活動詳細資訊
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetEventDetailInfo(TeamCommandDto teamCommand);
+
+        /// <summary>
+        /// 加入活動
+        /// </summary>
+        /// <param name="teamCommand">teamCommand</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> JoinEvent(TeamCommandDto teamCommand);
+
+        #endregion 車隊活動資料
     }
 }

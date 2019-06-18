@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static GoBike.Team.Service.Models.Data.EventSimpleInfoDto;
 
 namespace GoBike.Team.Service.Managers
 {
@@ -352,7 +353,7 @@ namespace GoBike.Team.Service.Managers
                 if (updateHaveSeenMemberIDsResult)
                 {
                     //// 無須對【已閱活動名單資料】作審查，不應影響原功能
-                    bool result = await this.eventRepository.UpdateHaveSeenMemberIDs(teamData.TeamID, teamData.HaveSeenAnnouncementMemberIDs);
+                    bool result = await this.eventRepository.UpdateHaveSeenMemberIDs(teamData.TeamID, eventData.HaveSeenMemberIDs);
                 }
 
                 EventDetailInfoDto eventDetailInfo = this.mapper.Map<EventDetailInfoDto>(eventData);
@@ -376,25 +377,33 @@ namespace GoBike.Team.Service.Managers
         {
             try
             {
-                bool verifyTeamCommandResult = this.VerifyTeamCommand(teamCommand, false, true, false, false, false, false);
-                if (!verifyTeamCommandResult)
+                if (teamCommand == null)
                 {
-                    this.logger.LogError($"Get Event List Of Member Fail For Verify TeamCommand >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}");
+                    this.logger.LogError($"Get Event List Of Member Fail For TeamCommand Null");
                     return Tuple.Create<List<EventSimpleInfoDto>[], string>(null, "取得會員活動列表失敗.");
                 }
 
-                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(teamCommand.TargetID);
+                if (string.IsNullOrEmpty(teamCommand.TargetID))
+                {
+                    this.logger.LogError($"Get Event List Of Member Fail For TargetID Null");
+                    return Tuple.Create<List<EventSimpleInfoDto>[], string>(null, "取得會員活動列表失敗.");
+                }
+
+                string memberID = teamCommand.TargetID;
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(memberID);
                 List<EventSimpleInfoDto> joinEventDatas = new List<EventSimpleInfoDto>();
                 List<EventSimpleInfoDto> notYetJoinEventDatas = new List<EventSimpleInfoDto>();
                 foreach (TeamData teamData in teamDatas)
                 {
+                    bool isExaminer = teamData.TeamLeaderID.Equals(memberID) || teamData.TeamViceLeaderIDs.Contains(memberID);
                     IEnumerable<EventData> eventDatas = await this.eventRepository.GetEventDataListOfTeam(teamData.TeamID);
                     IEnumerable<EventSimpleInfoDto> eventInfos = this.mapper.Map<IEnumerable<EventSimpleInfoDto>>(eventDatas);
                     foreach (EventSimpleInfoDto eventInfo in eventInfos)
                     {
                         eventInfo.TeamName = teamData.TeamName;
                         eventInfo.TeamPhoto = teamData.TeamPhoto;
-                        if (eventInfo.JoinMemberList.Contains(teamCommand.TargetID))
+                        eventInfo.EventSettingType = (isExaminer || eventInfo.CreatorID.Equals(memberID)) ? (int)TeamEventSettingType.Edit : (int)TeamEventSettingType.None;
+                        if (eventInfo.JoinMemberList.Contains(memberID))
                         {
                             joinEventDatas.Add(eventInfo);
                         }
@@ -409,7 +418,7 @@ namespace GoBike.Team.Service.Managers
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Event List Of Member Error >>> TeamID:{teamCommand.TeamID} TargetID:{teamCommand.TargetID}\n{ex}");
+                this.logger.LogError($"Get Event List Of Member Error >>> TargetID:{(teamCommand != null ? teamCommand.TargetID : "Null")}\n{ex}");
                 return Tuple.Create<List<EventSimpleInfoDto>[], string>(null, "取得會員活動列表發生錯誤.");
             }
         }
@@ -441,12 +450,15 @@ namespace GoBike.Team.Service.Managers
                     return Tuple.Create<IEnumerable<EventSimpleInfoDto>, string>(null, "該會員非車隊隊員.");
                 }
 
+                string memberID = teamCommand.TargetID;
                 IEnumerable<EventData> eventDatas = await this.eventRepository.GetEventDataListOfTeam(teamCommand.TeamID);
                 IEnumerable<EventSimpleInfoDto> eventInfos = this.mapper.Map<IEnumerable<EventSimpleInfoDto>>(eventDatas);
+                bool isExaminer = teamData.TeamLeaderID.Equals(memberID) || teamData.TeamViceLeaderIDs.Contains(memberID);
                 foreach (EventSimpleInfoDto eventInfo in eventInfos)
                 {
                     eventInfo.TeamName = teamData.TeamName;
                     eventInfo.TeamPhoto = teamData.TeamPhoto;
+                    eventInfo.EventSettingType = (isExaminer || eventInfo.CreatorID.Equals(memberID)) ? (int)TeamEventSettingType.Edit : (int)TeamEventSettingType.None;
                 }
 
                 return Tuple.Create(eventInfos, string.Empty);

@@ -174,7 +174,8 @@ namespace GoBike.Team.Service.Managers
                     return Tuple.Create<TeamInfoDto, string>(null, "會員已被車隊設為黑名單.");
                 }
 
-                return Tuple.Create(this.mapper.Map<TeamInfoDto>(teamData), string.Empty);
+                TeamInfoDto teamInfo = await this.OnTransformTeamDataNews(teamData, teamCommand.TargetID);
+                return Tuple.Create(teamInfo, string.Empty);
             }
             catch (Exception ex)
             {
@@ -200,10 +201,21 @@ namespace GoBike.Team.Service.Managers
 
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(memberID);
                 TeamData leaderTeamData = teamDatas.Where(data => data.TeamLeaderID.Equals(memberID)).FirstOrDefault();
+                TeamInfoDto leaderTeamInfo = null;
                 if (leaderTeamData != null)
+                {
                     (teamDatas as List<TeamData>).Remove(leaderTeamData);
+                    leaderTeamInfo = await this.OnTransformTeamDataNews(leaderTeamData, memberID);
+                }
 
-                dynamic[] myTeamInfo = new dynamic[] { this.mapper.Map<TeamInfoDto>(leaderTeamData), this.mapper.Map<IEnumerable<TeamInfoDto>>(teamDatas) };
+                IEnumerable<TeamInfoDto> teamInfos = new List<TeamInfoDto>();
+                foreach (TeamData teamData in teamDatas)
+                {
+                    TeamInfoDto teamInfo = await this.OnTransformTeamDataNews(teamData, memberID);
+                    (teamInfos as List<TeamInfoDto>).Add(teamInfo);
+                }
+
+                dynamic[] myTeamInfo = new dynamic[] { leaderTeamInfo, teamInfos };
                 return Tuple.Create(myTeamInfo, string.Empty);
             }
             catch (Exception ex)
@@ -346,9 +358,31 @@ namespace GoBike.Team.Service.Managers
             teamData.TeamInviteJoinIDs = new List<string>();
             teamData.TeamBlacklistIDs = new List<string>();
             teamData.TeamBlacklistedIDs = new List<string>();
-            teamData.TeamEventIDs = new List<string>();
             teamData.HaveSeenAnnouncementMemberIDs = new List<string>();
             return Tuple.Create(teamData, string.Empty);
+        }
+
+        /// <summary>
+        /// 轉換車隊最新消息資料
+        /// </summary>
+        /// <param name="teamData">teamData</param>
+        /// <param name="targetID">targetID</param>
+        /// <returns>TeamInfoDto</returns>
+        private async Task<TeamInfoDto> OnTransformTeamDataNews(TeamData teamData, string targetID)
+        {
+            TeamInfoDto teamInfo = this.mapper.Map<TeamInfoDto>(teamData);
+            teamInfo.HasNewAnnouncement = !teamData.HaveSeenAnnouncementMemberIDs.Contains(targetID);
+            IEnumerable<EventData> eventDatas = await eventRepository.GetEventDataListOfTeam(teamData.TeamID);
+            foreach (EventData eventData in eventDatas)
+            {
+                if (!eventData.HaveSeenMemberIDs.Contains(targetID))
+                {
+                    teamInfo.HasNewEvent = true;
+                    break;
+                }
+            }
+
+            return teamInfo;
         }
 
         /// <summary>

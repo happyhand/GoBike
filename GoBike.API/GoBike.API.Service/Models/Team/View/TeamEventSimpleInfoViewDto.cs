@@ -1,38 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace GoBike.Team.Service.Models.Data
+namespace GoBike.API.Service.Models.Team.View
 {
     /// <summary>
-    /// 活動簡易資料
+    /// 車隊活動簡易資訊可視資料
     /// </summary>
-    public class EventSimpleInfoDto
+    public class TeamEventSimpleInfoViewDto
     {
-        /// <summary>
-        /// 車隊活動設定資料
-        /// </summary>
-        public enum TeamEventSettingType
-        {
-            /// <summary>
-            /// 無設定
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// 編輯資料
-            /// </summary>
-            Edit = 1
-        }
-
         /// <summary>
         /// Gets or sets CreatorID
         /// </summary>
         public string CreatorID { get; set; }
 
         /// <summary>
-        /// Gets or sets Description
+        /// Gets or sets CreatorName
         /// </summary>
-        public string Description { get; set; }
+        public string CreatorName { get; set; }
 
         /// <summary>
         /// Gets or sets EventDate
@@ -45,7 +28,7 @@ namespace GoBike.Team.Service.Models.Data
         public string EventID { get; set; }
 
         /// <summary>
-        /// Gets or sets EventSettingType
+        /// Gets or sets CanEdit
         /// </summary>
         public int EventSettingType { get; set; }
 
@@ -53,16 +36,6 @@ namespace GoBike.Team.Service.Models.Data
         /// Gets or sets EventTitle
         /// </summary>
         public string EventTitle { get; set; }
-
-        /// <summary>
-        /// Gets or sets HaveSeenMemberIDs
-        /// </summary>
-        public IEnumerable<string> HaveSeenMemberIDs { get; set; }
-
-        /// <summary>
-        /// Gets or sets JoinMemberList
-        /// </summary>
-        public IEnumerable<string> JoinMemberList { get; set; }
 
         /// <summary>
         /// Gets or sets TeamID

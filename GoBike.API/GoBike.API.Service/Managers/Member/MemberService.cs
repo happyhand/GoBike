@@ -9,6 +9,8 @@ using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Member.Command.Data;
 using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
+using GoBike.API.Service.Models.Team.Command;
+using GoBike.API.Service.Models.Team.Command.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
@@ -319,7 +321,7 @@ namespace GoBike.API.Service.Managers.Member
                         memberCardInfoView.InteractiveStatus = await httpResponseMessage.Content.ReadAsAsync<int>();
                         //// TODO 會員騎乘資料
                         memberCardInfoView.RideDataList = new List<MemberRideRecordDto>();
-                        //// TODO 車隊設定資料
+                        //// 車隊設定資料
                         if (string.IsNullOrEmpty(memberSearchCommand.TeamID))
                         {
                             memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.None;
@@ -330,6 +332,38 @@ namespace GoBike.API.Service.Managers.Member
                                 Ok = true,
                                 Data = memberCardInfoView
                             };
+                        }
+
+                        postData = JsonConvert.SerializeObject(new TeamCommandDto() { TeamID = memberSearchCommand.TeamID, TargetID = memberID });
+                        httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/GetTeamInfo", postData);
+                        TeamInfoDto teamInfo = await httpResponseMessage.Content.ReadAsAsync<TeamInfoDto>();
+                        int memberIdentity = this.GetTeamIdentity(teamInfo, memberID);
+                        int targetIdentity = this.GetTeamIdentity(teamInfo, memberCardInfoView.MemberID);
+                        if (targetIdentity == (int)TeamIdentityType.None)
+                        {
+                            if (memberIdentity == (int)TeamIdentityType.Leader || memberIdentity == (int)TeamIdentityType.ViceLeader)
+                            {
+                                if (teamInfo.TeamInviteJoinIDs.Contains(memberCardInfoView.MemberID))
+                                {
+                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.CancelInviteJoin;
+                                }
+                                else if (teamInfo.TeamApplyForJoinIDs.Contains(memberCardInfoView.MemberID))
+                                {
+                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.HandleApplyFor;
+                                }
+                                else
+                                {
+                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.InviteJoin;
+                                }
+                            }
+                            memberCardInfoView.TeamKickOutSetting = (int)TeamKickOutSettingType.None;
+                            memberCardInfoView.TeamViceLeaderSetting = (int)TeamViceLeaderSettingType.None;
+                        }
+                        else
+                        {
+                            memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.None;
+                            memberCardInfoView.TeamKickOutSetting = this.GetTeamKickOutSetFlag(memberIdentity, targetIdentity);
+                            memberCardInfoView.TeamViceLeaderSetting = this.GetTeamViceLeaderSetFlag(memberIdentity, targetIdentity);
                         }
 
                         return new ResponseResultDto()
@@ -423,5 +457,81 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         #endregion TODO
+
+        /// <summary>
+        /// 取得車隊身分
+        /// </summary>
+        /// <param name="teamInfo">teamInfo</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>int</returns>
+        private int GetTeamIdentity(TeamInfoDto teamInfo, string memberID)
+        {
+            if (teamInfo.TeamLeaderID.Equals(memberID))
+            {
+                return (int)TeamIdentityType.Leader;
+            }
+            else if (teamInfo.TeamViceLeaderIDs.Contains(memberID))
+            {
+                return (int)TeamIdentityType.ViceLeader;
+            }
+            else if (teamInfo.TeamPlayerIDs.Contains(memberID))
+            {
+                return (int)TeamIdentityType.Normal;
+            }
+
+            return (int)TeamIdentityType.None;
+        }
+
+        /// <summary>
+        /// 取得車隊踢除設定
+        /// </summary>
+        /// <param name="examinerIdentity">examinerIdentity</param>
+        /// <param name="targetIdentity">targetIdentity</param>
+        /// <returns>int</returns>
+        private int GetTeamKickOutSetFlag(int examinerIdentity, int targetIdentity)
+        {
+            switch (examinerIdentity)
+            {
+                case (int)TeamIdentityType.Leader:
+                case (int)TeamIdentityType.ViceLeader:
+                    switch (targetIdentity)
+                    {
+                        case (int)TeamIdentityType.Leader:
+                            return (int)TeamKickOutSettingType.None;
+
+                        default:
+                            return (int)TeamKickOutSettingType.KickOut;
+                    }
+                default:
+                    return (int)TeamKickOutSettingType.None;
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊副隊長委任設定
+        /// </summary>
+        /// <param name="examinerIdentity">examinerIdentity</param>
+        /// <param name="targetIdentity">targetIdentity</param>
+        /// <returns>int</returns>
+        private int GetTeamViceLeaderSetFlag(int examinerIdentity, int targetIdentity)
+        {
+            switch (examinerIdentity)
+            {
+                case (int)TeamIdentityType.Leader:
+                    switch (targetIdentity)
+                    {
+                        case (int)TeamIdentityType.Leader:
+                            return (int)TeamViceLeaderSettingType.None;
+
+                        case (int)TeamIdentityType.ViceLeader:
+                            return (int)TeamViceLeaderSettingType.Cancel;
+
+                        default:
+                            return (int)TeamViceLeaderSettingType.Appoint;
+                    }
+                default:
+                    return (int)TeamViceLeaderSettingType.None;
+            }
+        }
     }
 }

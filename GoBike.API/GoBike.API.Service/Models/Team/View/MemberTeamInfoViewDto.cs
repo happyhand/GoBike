@@ -13,27 +13,23 @@ namespace GoBike.API.Service.Models.Team.View
         public int InviteJoinUpdateType { get; set; }
 
         /// <summary>
+        /// Gets or sets JoinedEventList
+        /// </summary>
+        public IEnumerable<TeamEventSimpleInfoViewDto> JoinedEventList { get; set; }
+
+        /// <summary>
         /// Gets or sets LeaderTeam
         /// </summary>
         public TeamSimpleInfoViewDto LeaderTeam { get; set; }
 
         /// <summary>
+        /// Gets or sets NotYetJoinEventList
+        /// </summary>
+        public IEnumerable<TeamEventSimpleInfoViewDto> NotYetJoinEventList { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamID
         /// </summary>
         public IEnumerable<TeamSimpleInfoViewDto> TeamList { get; set; }
-
-        #region TODO
-
-        /// <summary>
-        /// Gets or sets JoinedEventList
-        /// </summary>
-        public IEnumerable<dynamic> JoinedEventList { get; set; }
-
-        /// <summary>
-        /// Gets or sets notYetJoinEventList
-        /// </summary>
-        public IEnumerable<dynamic> notYetJoinEventList { get; set; }
-
-        #endregion TODO
     }
 }

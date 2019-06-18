@@ -94,12 +94,6 @@ namespace GoBike.Team.Repository.Models
         public DateTime TeamCreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets TeamEventIDs
-        /// </summary>
-        [BsonElement("TeamEventIDs")]
-        public IEnumerable<string> TeamEventIDs { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamExamineStatus (0:close, 1:open)
         /// </summary>
         [BsonElement("TeamExamineStatus")]

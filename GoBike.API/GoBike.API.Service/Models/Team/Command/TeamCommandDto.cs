@@ -14,6 +14,11 @@ namespace GoBike.API.Service.Models.Team.Command
         public AnnouncementInfoDto AnnouncementInfo { get; set; }
 
         /// <summary>
+        /// Gets or sets EventInfo
+        /// </summary>
+        public EventDetailInfoDto EventInfo { get; set; }
+
+        /// <summary>
         /// Gets or sets ExaminerID
         /// </summary>
         public string ExaminerID { get; set; }

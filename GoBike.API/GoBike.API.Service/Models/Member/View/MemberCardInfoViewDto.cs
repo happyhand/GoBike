@@ -29,7 +29,7 @@ namespace GoBike.API.Service.Models.Member.View
         #region 車隊設定資料
 
         /// <summary>
-        /// Gets or sets TeamJoinSetting (-2:取消邀請加入車隊，-1:拒絕加入車隊，0:無設定，1:允許加入車隊，2:邀請加入車隊)
+        /// Gets or sets TeamJoinSetting (0:無設定，1:處理申請加入，2:邀請加入車隊，3:取消邀請加入車隊)
         /// </summary>
         public int TeamJoinSetting { get; set; }
 

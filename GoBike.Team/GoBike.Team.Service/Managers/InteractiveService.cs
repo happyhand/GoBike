@@ -328,7 +328,7 @@ namespace GoBike.Team.Service.Managers
                     return "車隊不存在.";
                 }
 
-                if (!teamData.TeamApplyForJoinIDs.Contains(teamCommand.TargetID))
+                if (teamData.TeamApplyForJoinIDs.Contains(teamCommand.TargetID))
                 {
                     return "該會員已提出申請加入請求.";
                 }
