@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.Service.API", "GoBike.Service.API\GoBike.Service.API.csproj", "{9FA19CA3-3685-49F9-A04F-35ED48E2DCB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.Service.Core", "GoBike.Service.Core\GoBike.Service.Core.csproj", "{0AC5958E-40FB-4473-ADF2-A98341D1B202}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.Service.Repository", "GoBike.Service.Repository\GoBike.Service.Repository.csproj", "{DBC4160B-8191-4D91-8C42-28B0C60E3E28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.Service.Service", "GoBike.Service.Service\GoBike.Service.Service.csproj", "{694B03C3-2419-4DB3-822E-2DE40D6E3B3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FA19CA3-3685-49F9-A04F-35ED48E2DCB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FA19CA3-3685-49F9-A04F-35ED48E2DCB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FA19CA3-3685-49F9-A04F-35ED48E2DCB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FA19CA3-3685-49F9-A04F-35ED48E2DCB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AC5958E-40FB-4473-ADF2-A98341D1B202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AC5958E-40FB-4473-ADF2-A98341D1B202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AC5958E-40FB-4473-ADF2-A98341D1B202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AC5958E-40FB-4473-ADF2-A98341D1B202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBC4160B-8191-4D91-8C42-28B0C60E3E28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC4160B-8191-4D91-8C42-28B0C60E3E28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBC4160B-8191-4D91-8C42-28B0C60E3E28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBC4160B-8191-4D91-8C42-28B0C60E3E28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{694B03C3-2419-4DB3-822E-2DE40D6E3B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{694B03C3-2419-4DB3-822E-2DE40D6E3B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{694B03C3-2419-4DB3-822E-2DE40D6E3B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{694B03C3-2419-4DB3-822E-2DE40D6E3B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5085F4D-49BA-4104-BAF2-8F3ABB86F024}
+	EndGlobalSection
+EndGlobal

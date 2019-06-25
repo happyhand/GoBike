@@ -64,3 +64,12 @@
 /GoBike.Team/GoBike.Team.Service/bin
 /GoBike.Team/.vs
 /serverCommand.gobike.com
+/GoBike.Service/.vs
+/GoBike.Service/GoBike.Service.API/obj
+/GoBike.Service/GoBike.Service.API/bin
+/GoBike.Service/GoBike.Service.Core/obj
+/GoBike.Service/GoBike.Service.Core/bin
+/GoBike.Service/GoBike.Service.Repository/obj
+/GoBike.Service/GoBike.Service.Repository/bin
+/GoBike.Service/GoBike.Service.Service/obj
+/GoBike.Service/GoBike.Service.Service/bin
