@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Models\Member\View\MemberSettingInfoViewDto.cs~RF38f567d8.TMP" />
+    <None Remove="Modelsbackup\Member\View\MemberSettingInfoViewDto.cs~RF38f567d8.TMP" />
   </ItemGroup>
 
   <ItemGroup>

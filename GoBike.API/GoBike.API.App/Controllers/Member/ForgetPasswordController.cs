@@ -1,12 +1,9 @@
 ﻿using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Email;
-using GoBike.API.Service.Models.Member.Command;
 using GoBike.API.Service.Models.Response;
-using GoBike.API.Service.Models.Verifier.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -49,18 +46,24 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// 忘記密碼 - 請求產生驗證碼
         /// </summary>
-        /// <param name="verifierCommand">verifierCommand</param>
+        /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/Member/[controller]")]
-        public async Task<IActionResult> GetVerifierCode(VerifierCommandDto verifierCommand)
+        public async Task<IActionResult> GetVerifierCode(GetVerifierCodePostData postData)
         {
             try
             {
-                verifierCommand.Type = "Password";
-                verifierCommand.VerifierCode = await this.verifierService.GetVerifierCode(verifierCommand);
-                EmailContext emailContext = EmailContext.GetVerifierCodetEmailContext(verifierCommand.Email, verifierCommand.VerifierCode);
-                ResponseResultDto responseResult = await this.verifierService.SendVerifierCode(verifierCommand, emailContext);
+                string type = "password";
+                string verifierCode = await this.verifierService.GetVerifierCode(type, postData.Email);
+                if (string.IsNullOrEmpty(verifierCode))
+                {
+                    this.logger.LogError($"Get Verifier Code Fail For Get Verifier Code >>> Email:{postData.Email}");
+                    return BadRequest("取得查詢密碼驗證碼失敗.");
+                }
+
+                EmailContext emailContext = EmailContext.GetVerifierCodetEmailContext(postData.Email, verifierCode);
+                ResponseResultDto responseResult = await this.verifierService.SendVerifierCode(type, postData.Email, verifierCode, emailContext);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);
@@ -70,31 +73,31 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Verifier Code Error >>> Data:{JsonConvert.SerializeObject(verifierCommand)}\n{ex}");
-                return BadRequest("取得查詢密碼驗證碼發生錯誤.");
+                this.logger.LogError($"Get Verifier Code Error >>> Email:{postData.Email}\n{ex}");
+                return BadRequest("請求產生驗證碼發生錯誤.");
             }
         }
 
         /// <summary>
         /// 忘記密碼 - 驗證驗證碼並重設密碼
         /// </summary>
-        /// <param name="verifierCommand">verifierCommand</param>
+        /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/Member/[controller]/VerifierCode")]
-        public async Task<IActionResult> ResetPassword(VerifierCommandDto verifierCommand)
+        public async Task<IActionResult> ResetPassword(VerifierPostData postData)
         {
             try
             {
-                verifierCommand.Type = "Password";
-                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(verifierCommand);
+                string type = "password";
+                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(type, postData.Email, postData.VerifierCode);
                 if (!isValidVerifierCode)
                 {
                     return BadRequest("驗證碼驗證失敗.");
                 }
                 else
                 {
-                    ResponseResultDto responseResult = await this.memberService.ResetPassword(new MemberBaseCommandDto() { Email = verifierCommand.Email });
+                    ResponseResultDto responseResult = await this.memberService.ResetPassword(postData.Email);
                     if (responseResult.Ok)
                     {
                         return Ok(responseResult.Data);
@@ -105,9 +108,36 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Email:{verifierCommand.Email} VerifierCode:{verifierCommand.VerifierCode}\n{ex}");
-                return BadRequest("重設密碼發生錯誤.");
+                this.logger.LogError($"Reset Password Error >>> Email:{postData.Email} VerifierCode:{postData.VerifierCode}\n{ex}");
+                return BadRequest("會員重設密碼發生錯誤.");
             }
+        }
+
+        /// <summary>
+        /// 請求產生驗證碼 Post 資料
+        /// </summary>
+        public class GetVerifierCodePostData
+        {
+            /// <summary>
+            /// Gets or sets MemberID
+            /// </summary>
+            public string Email { get; set; }
+        }
+
+        /// <summary>
+        /// 請求產生驗證碼 Post 資料
+        /// </summary>
+        public class VerifierPostData
+        {
+            /// <summary>
+            /// Gets or sets MemberID
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Gets or sets VerifierCode
+            /// </summary>
+            public string VerifierCode { get; set; }
         }
     }
 }

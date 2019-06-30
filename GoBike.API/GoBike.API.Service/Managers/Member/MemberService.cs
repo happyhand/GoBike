@@ -1,23 +1,13 @@
 ﻿using AutoMapper;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
-using GoBike.API.Core.Resource.Enum;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Email;
-using GoBike.API.Service.Models.Interactive.Command;
-using GoBike.API.Service.Models.Member.Command;
-using GoBike.API.Service.Models.Member.Command.Data;
-using GoBike.API.Service.Models.Member.View;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
-using GoBike.API.Service.Models.Team.Command;
-using GoBike.API.Service.Models.Team.Command.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -52,32 +42,23 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="memberDto">memberDto</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> EditData(MemberInfoDto memberInfo)
+        public async Task<ResponseResultDto> EditData(MemberDto memberDto)
         {
             try
             {
-                string postData = JsonConvert.SerializeObject(memberInfo);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/EditData", postData);
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    return new ResponseResultDto()
-                    {
-                        Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberSettingInfoViewDto>()
-                    };
-                }
-
+                string postData = JsonConvert.SerializeObject(memberDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/EditData", postData);
                 return new ResponseResultDto()
                 {
-                    Ok = false,
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
                 };
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberDto)}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -87,22 +68,24 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
-        /// 取得會員資訊
+        /// 會員登入
         /// </summary>
-        /// <param name="memberBaseCommand">memberBaseCommand</param>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> GetMemberInfo(MemberBaseCommandDto memberBaseCommand)
+        public async Task<ResponseResultDto> Login(string email, string password)
         {
             try
             {
-                string postData = JsonConvert.SerializeObject(memberBaseCommand);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
+                string postData = JsonConvert.SerializeObject(new MemberDto() { Email = email, Password = password });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Login", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
+                    string memberID = await httpResponseMessage.Content.ReadAsAsync<string>();
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberSettingInfoViewDto>()
+                        Data = new string[] { memberID, this.CreateLoginToken(email, password, string.Empty, string.Empty) }
                     };
                 }
 
@@ -110,47 +93,6 @@ namespace GoBike.API.Service.Managers.Member
                 {
                     Ok = false,
                     Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                };
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Member Info Error >>> MemberID:{memberBaseCommand.MemberID}\n{ex}");
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "取得會員資訊發生錯誤."
-                };
-            }
-        }
-
-        /// <summary>
-        /// 會員登入 (normal)
-        /// </summary>
-        /// <param name="httpContext">httpContext</param>
-        /// <param name="email">email</param>
-        /// <param name="password">password</param>
-        /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Login(HttpContext httpContext, string email, string password)
-        {
-            try
-            {
-                string postData = JsonConvert.SerializeObject(new MemberBaseCommandDto() { Email = email, Password = password });
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Login", postData);
-                string result = await httpResponseMessage.Content.ReadAsAsync<string>();
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    httpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, result);
-                    return new ResponseResultDto()
-                    {
-                        Ok = true,
-                        Data = $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}"
-                    };
-                }
-
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = result
                 };
             }
             catch (Exception ex)
@@ -167,25 +109,114 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員登入 (token)
         /// </summary>
-        /// <param name="httpContext">httpContext</param>
         /// <param name="token">token</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Login(HttpContext httpContext, string token)
+        public async Task<ResponseResultDto> Login(string token)
         {
             try
             {
                 string[] dataArr = token.Split(CommonFlagHelper.CommonFlag.SeparateFlag);
-                string email = Utility.DecryptAES(dataArr[0]);
-                string password = Utility.DecryptAES(dataArr[1]);
-                return await this.Login(httpContext, email, password);
+                string data1 = Utility.DecryptAES(dataArr[0]);
+                string data2 = Utility.DecryptAES(dataArr[1]);
+                if (data1.Equals(CommonFlagHelper.CommonFlag.PlatformFlag.FB))
+                {
+                    string fbToken = Utility.DecryptAES(dataArr[2]);
+                    return await this.LoginFB(data2, fbToken);
+                }
+
+                if (data1.Equals(CommonFlagHelper.CommonFlag.PlatformFlag.Google))
+                {
+                    string googleToken = Utility.DecryptAES(dataArr[2]);
+                    return await this.LoginGoogle(data2, googleToken);
+                }
+
+                return await this.Login(data1, data2);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Token Login Error >>> Token:{token}\n{ex}");
+                this.logger.LogError($"Login Auto Token Error >>> Token:{token}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "自動登入驗證碼發生錯誤，無法編譯."
+                    Data = "會員登入發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 會員登入 (FB)
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="token">token</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> LoginFB(string email, string token)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { Email = email, FBToken = token });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Login/FB", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string memberID = await httpResponseMessage.Content.ReadAsAsync<string>();
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = new string[] { memberID, this.CreateLoginToken(email, string.Empty, token, string.Empty) }
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Login FB Error >>> FBToken:{token}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員登入發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 會員登入 (Google)
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="token">token</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> LoginGoogle(string email, string token)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { Email = email, GoogleToken = token });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Login/Google", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string memberID = await httpResponseMessage.Content.ReadAsAsync<string>();
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = new string[] { memberID, this.CreateLoginToken(email, string.Empty, string.Empty, token) }
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Login Google Error >>> GoogleToken:{token}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員登入發生錯誤."
                 };
             }
         }
@@ -193,14 +224,15 @@ namespace GoBike.API.Service.Managers.Member
         /// <summary>
         /// 會員註冊
         /// </summary>
-        /// <param name="memberBaseCommand">memberBaseCommand</param>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> Register(MemberBaseCommandDto memberBaseCommand)
+        public async Task<ResponseResultDto> Register(string email, string password)
         {
             try
             {
-                string postData = JsonConvert.SerializeObject(memberBaseCommand);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/Register", postData);
+                string postData = JsonConvert.SerializeObject(new MemberDto() { Email = email, Password = password });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Register", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -209,7 +241,7 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Register Error >>> Email:{memberBaseCommand.Email} Password:{memberBaseCommand.Password}\n{ex}");
+                this.logger.LogError($"Register Error >>> Email:{email} Password:{password}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
@@ -219,20 +251,20 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
-        /// 重設密碼
+        /// 會員重設密碼
         /// </summary>
-        /// <param name="memberBaseCommand">memberBaseCommand</param>
+        /// <param name="email">email</param>
         /// <returns>HttpResponseMessage</returns>
-        public async Task<ResponseResultDto> ResetPassword(MemberBaseCommandDto memberBaseCommand)
+        public async Task<ResponseResultDto> ResetPassword(string email)
         {
             try
             {
-                memberBaseCommand.Password = Guid.NewGuid().ToString().Substring(0, 8);
-                string postData = JsonConvert.SerializeObject(memberBaseCommand);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/ResetPassword", postData);
+                string postData = JsonConvert.SerializeObject(new MemberDto() { Email = email });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/ResetPassword", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(memberBaseCommand.Email, memberBaseCommand.Password);
+                    string password = await httpResponseMessage.Content.ReadAsAsync<string>();
+                    EmailContext emailContext = EmailContext.GetResetPasswordEmailContext(email, password);
                     postData = JsonConvert.SerializeObject(emailContext);
                     httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.SmtpService, "api/SendEmail", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
@@ -253,285 +285,41 @@ namespace GoBike.API.Service.Managers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Reset Password Error >>> Email:{memberBaseCommand.Email}\n{ex}");
+                this.logger.LogError($"Reset Password Error >>> Email:{email}\n{ex}");
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "重設密碼發生錯誤."
-                };
-            }
-        }
-
-        #region TODO
-
-        /// <summary>
-        /// 查詢會員資訊
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="memberSearchCommand">memberSearchCommand</param>
-        /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> InquireMemberInfo(string memberID, MemberSearchCommandDto memberSearchCommand)
-        {
-            try
-            {
-                //// 判斷 Search Key
-                MemberBaseCommandDto memberBaseCommand = new MemberBaseCommandDto() { MemberID = memberID };
-                string searchKey = memberSearchCommand.SearchKey;
-                if (searchKey.Contains("@"))
-                {
-                    memberBaseCommand.Email = searchKey;
-                }
-                else if (searchKey.Length == 6) //// 目前只能先寫死，待思考有沒有其他更好的方式
-                {
-                    memberBaseCommand.MemberID = searchKey;
-                }
-                else if (searchKey.Length == 10) //// 目前只能先寫死，待思考有沒有其他更好的方式
-                {
-                    memberBaseCommand.Mobile = searchKey;
-                }
-                else
-                {
-                    return new ResponseResultDto()
-                    {
-                        Ok = false,
-                        Data = "無效的查詢參數."
-                    };
-                }
-
-                //// 取得會員資料
-                string postData = JsonConvert.SerializeObject(memberBaseCommand);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.MemberService, "api/GetMemberInfo", postData);
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    MemberCardInfoViewDto memberCardInfoView = await httpResponseMessage.Content.ReadAsAsync<MemberCardInfoViewDto>();
-                    if (memberID.Equals(memberCardInfoView.MemberID))
-                    {
-                        return new ResponseResultDto()
-                        {
-                            Ok = false,
-                            Data = "無法查詢會員本身資料."
-                        };
-                    }
-
-                    //// 取得互動資料
-                    postData = JsonConvert.SerializeObject(new MemberInteractiveCommandDto() { InitiatorID = memberID, ReceiverID = memberCardInfoView.MemberID });
-                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.InteractiveService, "api/GetMemberInteractiveStatus", postData);
-                    if (httpResponseMessage.IsSuccessStatusCode)
-                    {
-                        memberCardInfoView.InteractiveStatus = await httpResponseMessage.Content.ReadAsAsync<int>();
-                        //// TODO 會員騎乘資料
-                        memberCardInfoView.RideDataList = new List<MemberRideRecordDto>();
-                        //// 車隊設定資料
-                        if (string.IsNullOrEmpty(memberSearchCommand.TeamID))
-                        {
-                            memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.None;
-                            memberCardInfoView.TeamKickOutSetting = (int)TeamKickOutSettingType.None;
-                            memberCardInfoView.TeamViceLeaderSetting = (int)TeamViceLeaderSettingType.None;
-                            return new ResponseResultDto()
-                            {
-                                Ok = true,
-                                Data = memberCardInfoView
-                            };
-                        }
-
-                        postData = JsonConvert.SerializeObject(new TeamCommandDto() { TeamID = memberSearchCommand.TeamID, TargetID = memberID });
-                        httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.TeamService, "api/Team/GetTeamInfo", postData);
-                        TeamInfoDto teamInfo = await httpResponseMessage.Content.ReadAsAsync<TeamInfoDto>();
-                        int memberIdentity = this.GetTeamIdentity(teamInfo, memberID);
-                        int targetIdentity = this.GetTeamIdentity(teamInfo, memberCardInfoView.MemberID);
-                        if (targetIdentity == (int)TeamIdentityType.None)
-                        {
-                            if (memberIdentity == (int)TeamIdentityType.Leader || memberIdentity == (int)TeamIdentityType.ViceLeader)
-                            {
-                                if (teamInfo.TeamInviteJoinIDs.Contains(memberCardInfoView.MemberID))
-                                {
-                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.CancelInviteJoin;
-                                }
-                                else if (teamInfo.TeamApplyForJoinIDs.Contains(memberCardInfoView.MemberID))
-                                {
-                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.HandleApplyFor;
-                                }
-                                else
-                                {
-                                    memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.InviteJoin;
-                                }
-                            }
-                            memberCardInfoView.TeamKickOutSetting = (int)TeamKickOutSettingType.None;
-                            memberCardInfoView.TeamViceLeaderSetting = (int)TeamViceLeaderSettingType.None;
-                        }
-                        else
-                        {
-                            memberCardInfoView.TeamJoinSetting = (int)TeamJoinSettingType.None;
-                            memberCardInfoView.TeamKickOutSetting = this.GetTeamKickOutSetFlag(memberIdentity, targetIdentity);
-                            memberCardInfoView.TeamViceLeaderSetting = this.GetTeamViceLeaderSetFlag(memberIdentity, targetIdentity);
-                        }
-
-                        return new ResponseResultDto()
-                        {
-                            Ok = true,
-                            Data = memberCardInfoView
-                        };
-                    }
-                    else
-                    {
-                        return new ResponseResultDto()
-                        {
-                            Ok = false,
-                            Data = "無會員資料."
-                        };
-                    }
-                }
-
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                };
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Inquire Member Info Error >>> MemberID:{memberID} SearchKey:{memberSearchCommand.SearchKey} TeamID:{memberSearchCommand.TeamID}\n{ex}");
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "查詢會員資訊發生錯誤."
+                    Data = "會員重設密碼發生錯誤."
                 };
             }
         }
 
         /// <summary>
-        /// 上傳頭像
+        /// 建立登入 Token
         /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="file">file</param>
-        /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> UploadPhoto(string memberID, IFormFile file)
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <param name="fbToken">fbToken</param>
+        /// <param name="googleToken">googleToken</param>
+        /// <returns>string</returns>
+        private string CreateLoginToken(string email, string password, string fbToken, string googleToken)
         {
-            if (string.IsNullOrEmpty(memberID))
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "會員編號無效."
-                };
+                return $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}";
             }
 
-            if (file == null)
+            if (!string.IsNullOrEmpty(fbToken))
             {
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "無檔案上傳."
-                };
+                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.FB)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(fbToken)}";
             }
 
-            //// TODO 檔案大小判斷
-            //this.logger.LogInformation($"UploadPhoto >>> {file.Length}");
-            try
+            if (!string.IsNullOrEmpty(googleToken))
             {
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.UploadFilesService, "api/UploadFiles/Images", new FormFileCollection() { file });
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    string photoUrl = (await httpResponseMessage.Content.ReadAsAsync<IEnumerable<string>>()).FirstOrDefault();
-
-                    ResponseResultDto responseResult = await this.EditData(new MemberInfoDto() { MemberID = memberID, Photo = photoUrl });
-                    responseResult.Data = responseResult.Ok ? photoUrl : responseResult.Data;
-                    return responseResult;
-                }
-
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                };
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Upload Photo Error >>> MemberID:{memberID} File:{file}\n{ex}");
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "上傳頭像發生錯誤."
-                };
-            }
-        }
-
-        #endregion TODO
-
-        /// <summary>
-        /// 取得車隊身分
-        /// </summary>
-        /// <param name="teamInfo">teamInfo</param>
-        /// <param name="memberID">memberID</param>
-        /// <returns>int</returns>
-        private int GetTeamIdentity(TeamInfoDto teamInfo, string memberID)
-        {
-            if (teamInfo.TeamLeaderID.Equals(memberID))
-            {
-                return (int)TeamIdentityType.Leader;
-            }
-            else if (teamInfo.TeamViceLeaderIDs.Contains(memberID))
-            {
-                return (int)TeamIdentityType.ViceLeader;
-            }
-            else if (teamInfo.TeamPlayerIDs.Contains(memberID))
-            {
-                return (int)TeamIdentityType.Normal;
+                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.Google)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(googleToken)}";
             }
 
-            return (int)TeamIdentityType.None;
-        }
-
-        /// <summary>
-        /// 取得車隊踢除設定
-        /// </summary>
-        /// <param name="examinerIdentity">examinerIdentity</param>
-        /// <param name="targetIdentity">targetIdentity</param>
-        /// <returns>int</returns>
-        private int GetTeamKickOutSetFlag(int examinerIdentity, int targetIdentity)
-        {
-            switch (examinerIdentity)
-            {
-                case (int)TeamIdentityType.Leader:
-                case (int)TeamIdentityType.ViceLeader:
-                    switch (targetIdentity)
-                    {
-                        case (int)TeamIdentityType.Leader:
-                            return (int)TeamKickOutSettingType.None;
-
-                        default:
-                            return (int)TeamKickOutSettingType.KickOut;
-                    }
-                default:
-                    return (int)TeamKickOutSettingType.None;
-            }
-        }
-
-        /// <summary>
-        /// 取得車隊副隊長委任設定
-        /// </summary>
-        /// <param name="examinerIdentity">examinerIdentity</param>
-        /// <param name="targetIdentity">targetIdentity</param>
-        /// <returns>int</returns>
-        private int GetTeamViceLeaderSetFlag(int examinerIdentity, int targetIdentity)
-        {
-            switch (examinerIdentity)
-            {
-                case (int)TeamIdentityType.Leader:
-                    switch (targetIdentity)
-                    {
-                        case (int)TeamIdentityType.Leader:
-                            return (int)TeamViceLeaderSettingType.None;
-
-                        case (int)TeamIdentityType.ViceLeader:
-                            return (int)TeamViceLeaderSettingType.Cancel;
-
-                        default:
-                            return (int)TeamViceLeaderSettingType.Appoint;
-                    }
-                default:
-                    return (int)TeamViceLeaderSettingType.None;
-            }
+            return string.Empty;
         }
     }
 }

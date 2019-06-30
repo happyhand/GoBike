@@ -2,7 +2,7 @@
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Member.Command.Data;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -43,17 +43,18 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// 會員編輯
         /// </summary>
-        /// <param name="memberInfo">memberInfo</param>
+        /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(MemberInfoDto memberInfo)
+        public async Task<IActionResult> Post(EditDataPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            memberInfo.MemberID = memberID;
+            MemberDto memberDto = new MemberDto() { Password = postData.Password };
+            memberDto.MemberID = memberID;
             try
             {
-                ResponseResultDto responseResult = await this.memberService.EditData(memberInfo);
+                ResponseResultDto responseResult = await this.memberService.EditData(memberDto);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);
@@ -63,9 +64,20 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberInfo)}\n{ex}");
+                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberDto)}\n{ex}");
                 return BadRequest("會員編輯發生錯誤.");
             }
+        }
+
+        /// <summary>
+        /// Post 資料
+        /// </summary>
+        public class EditDataPostData
+        {
+            /// <summary>
+            /// Gets or sets Password
+            /// </summary>
+            public string Password { get; set; }
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Models.Member.Command;
+﻿using GoBike.API.Core.Applibs;
+using GoBike.API.Core.Resource;
+using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -36,55 +37,165 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// 會員登入 - 一般登入
+        /// 會員登入 - 自動登入
         /// </summary>
-        /// <param name="memberBaseCommand">memberBaseCommand</param>
+        /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/Member/[controller]")]
-        public async Task<IActionResult> NormalLogin(MemberBaseCommandDto memberBaseCommand)
+        [Route("api/Member/[controller]/[action]")]
+        public async Task<IActionResult> AutoToken(AutoTokenLoginPostData postData)
         {
             try
             {
-                ResponseResultDto responseResult = await this.memberService.Login(this.HttpContext, memberBaseCommand.Email, memberBaseCommand.Password);
-                if (responseResult.Ok)
-                {
-                    return Ok(responseResult.Data);
-                }
-
-                return BadRequest(responseResult.Data);
+                ResponseResultDto responseResult = await this.memberService.Login(postData.Token);
+                return this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Normal Login Error >>> Email:{memberBaseCommand.Email} Password:{memberBaseCommand.Password}\n{ex}");
+                this.logger.LogError($"Login Auto Token Error >>> Token:{postData.Token}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
         }
 
         /// <summary>
-        /// 會員登入 - Token 登入
+        /// 會員登入 - FB 登入
         /// </summary>
-        /// <param name="memberBaseCommand">memberBaseCommand</param>
+        /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        [Route("api/Member/[controller]/Token")]
-        public async Task<IActionResult> TokenLogin(MemberBaseCommandDto memberBaseCommand)
+        [Route("api/Member/[controller]/[action]")]
+        public async Task<IActionResult> FB(FBLoginPostData postData)
         {
             try
             {
-                ResponseResultDto responseResult = await this.memberService.Login(this.HttpContext, memberBaseCommand.Token);
-                if (responseResult.Ok)
-                {
-                    return Ok(responseResult.Data);
-                }
-
-                return BadRequest(responseResult.Data);
+                ResponseResultDto responseResult = await this.memberService.LoginFB(postData.Email, postData.Token);
+                return this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Token Login Error >>> Token:{memberBaseCommand.Token}\n{ex}");
+                this.logger.LogError($"Login FB Error >>> FBToken:{postData.Token}\n{ex}");
                 return BadRequest("會員登入發生錯誤.");
             }
+        }
+
+        /// <summary>
+        /// 會員登入 - Google 登入
+        /// </summary>
+        /// <param name="postData">postData</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [Route("api/Member/[controller]/[action]")]
+        public async Task<IActionResult> Google(FBLoginPostData postData)
+        {
+            try
+            {
+                ResponseResultDto responseResult = await this.memberService.LoginGoogle(postData.Email, postData.Token);
+                return this.HandleLoginResult(responseResult);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Login Google Error >>> GoogleToken:{postData.Token}\n{ex}");
+                return BadRequest("會員登入發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 會員登入 - 一般登入
+        /// </summary>
+        /// <param name="postData">postData</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [Route("api/Member/[controller]")]
+        public async Task<IActionResult> Normal(NormalLoginPostData postData)
+        {
+            try
+            {
+                ResponseResultDto responseResult = await this.memberService.Login(postData.Email, postData.Password);
+                return this.HandleLoginResult(responseResult);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Normal Login Error >>> Email:{postData.Email} Password:{postData.Password}\n{ex}");
+                return BadRequest("會員登入發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 處理登入結果
+        /// </summary>
+        /// <param name="responseResult">responseResult</param>
+        /// <returns>IActionResult</returns>
+        private IActionResult HandleLoginResult(ResponseResultDto responseResult)
+        {
+            if (responseResult.Ok)
+            {
+                string[] dataArr = responseResult.Data;
+                string memberID = dataArr[0];
+                string token = dataArr[1];
+                this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberID);
+                return Ok(token);
+            }
+
+            return BadRequest(responseResult.Data);
+        }
+
+        /// <summary>
+        /// 自動登入 Post 資料
+        /// </summary>
+        public class AutoTokenLoginPostData
+        {
+            /// <summary>
+            /// Gets or sets Token
+            /// </summary>
+            public string Token { get; set; }
+        }
+
+        /// <summary>
+        /// FB 登入 Post 資料
+        /// </summary>
+        public class FBLoginPostData
+        {
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Gets or sets Token
+            /// </summary>
+            public string Token { get; set; }
+        }
+
+        /// <summary>
+        /// Google 登入 Post 資料
+        /// </summary>
+        public class GoogleLoginPostData
+        {
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Gets or sets Token
+            /// </summary>
+            public string Token { get; set; }
+        }
+
+        /// <summary>
+        /// 一般登入 Post 資料
+        /// </summary>
+        public class NormalLoginPostData
+        {
+            /// <summary>
+            /// Gets or sets Email
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Gets or sets Password
+            /// </summary>
+            public string Password { get; set; }
         }
     }
 }

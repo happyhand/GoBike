@@ -14,15 +14,5 @@
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Nickname
-        /// </summary>
-        public string Nickname { get; set; }
-
-        /// <summary>
-        /// Gets or sets Photo
-        /// </summary>
-        public string Photo { get; set; }
     }
 }

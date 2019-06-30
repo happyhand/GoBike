@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GoBike.API.Repository.Managers
@@ -42,7 +43,7 @@ namespace GoBike.API.Repository.Managers
 
             ConnectionMultiplexer connectionMultiplexer = lazyConnection.Value;
             this.database = connectionMultiplexer.GetDatabase(1);
-            this.redisServer = connectionMultiplexer.GetServer(AppSettingHelper.Appsetting.RedisConnection);
+            this.redisServer = connectionMultiplexer.GetServer(connectionMultiplexer.GetEndPoints().First());
         }
 
         /// <summary>
