@@ -36,6 +36,11 @@ namespace GoBike.Service.Repository.Models.Member
         public ObjectId Id { get; set; }
 
         /// <summary>
+        /// Gets or sets LatestRideDistance
+        /// </summary>
+        public string LatestRideDistance { get; set; }
+
+        /// <summary>
         /// Gets or sets LoginDate
         /// </summary>
         public DateTime LoginDate { get; set; }
@@ -49,6 +54,11 @@ namespace GoBike.Service.Repository.Models.Member
         /// Gets or sets Password
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets TotalRideDistance
+        /// </summary>
+        public string TotalRideDistance { get; set; }
 
         #endregion Login Data
     }

@@ -59,7 +59,15 @@ namespace GoBike.API.Service.Interface.Member
         /// 會員重設密碼
         /// </summary>
         /// <param name="email">email</param>
-        /// <returns>HttpResponseMessage</returns>
+        /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> ResetPassword(string email);
+
+        /// <summary>
+        /// 搜尋會員
+        /// </summary>
+        /// <param name="searchKey">searchKey</param>
+        /// <param name="searcher">searcher</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> SearchMember(string searchKey, string searcher);
     }
 }

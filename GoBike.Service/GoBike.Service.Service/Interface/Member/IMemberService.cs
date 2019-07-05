@@ -1,5 +1,6 @@
 ﻿using GoBike.Service.Repository.Models.Member;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GoBike.Service.Service.Interface.Member
@@ -48,5 +49,19 @@ namespace GoBike.Service.Service.Interface.Member
         /// <param name="memberDto">memberDto</param>
         /// <returns>Tuple(string, string)</returns>
         Task<Tuple<string, string>> ResetPassword(MemberDto memberDto);
+
+        /// <summary>
+        /// 搜尋會員
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>Tuple(MemberDto, string)</returns>
+        Task<Tuple<MemberDto, string>> SearchMember(MemberDto memberDto);
+
+        /// <summary>
+        /// 搜尋會員列表
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        Task<Tuple<IEnumerable<MemberDto>, string>> SearchMemberList(IEnumerable<string> memberIDs);
     }
 }

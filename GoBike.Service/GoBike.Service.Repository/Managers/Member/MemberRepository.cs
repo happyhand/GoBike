@@ -1,4 +1,5 @@
-﻿using GoBike.Service.Core.Applibs;
+﻿using Firebase.Database;
+using GoBike.Service.Core.Applibs;
 using GoBike.Service.Repository.Interface.Member;
 using GoBike.Service.Repository.Models;
 using GoBike.Service.Repository.Models.Member;
@@ -33,6 +34,12 @@ namespace GoBike.Service.Repository.Managers.Member
         /// </summary>
         private readonly IMongoCollection<SerialNumberData> serialNumberDatas;
 
+        #region firebase
+
+        private FirebaseClient Firebase { get; }
+
+        #endregion firebase
+
         /// <summary>
         /// 建構式
         /// </summary>
@@ -44,6 +51,15 @@ namespace GoBike.Service.Repository.Managers.Member
             IMongoDatabase db = client.GetDatabase(AppSettingHelper.Appsetting.MongoDBConfig.MemberDatabase);
             this.memberDatas = db.GetCollection<MemberData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Member);
             this.serialNumberDatas = db.GetCollection<SerialNumberData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.SerialNumber);
+
+            //// firebase
+            //var auth = "lhZwwaM0vNUkmGicMu5lyCNB8Aze5hJZQdbUQ4FS";
+            //var baseUrl = "https://gobike-2019.firebaseio.com/";
+            //var option = new FirebaseOptions()
+            //{
+            //    AuthTokenAsyncFactory = () => Task.FromResult(auth)
+            //};
+            //this.Firebase = new FirebaseClient(baseUrl, option);
         }
 
         /// <summary>
@@ -85,6 +101,14 @@ namespace GoBike.Service.Repository.Managers.Member
             try
             {
                 FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("Email", email);
+
+                //var result = await this.Firebase
+                //.Child("Member")
+                //.PostAsync(JsonConvert.SerializeObject(new Member()
+                //{
+                //    Name = "123"
+                //}));
+
                 return await this.memberDatas.Find(filter).FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -254,6 +278,15 @@ namespace GoBike.Service.Repository.Managers.Member
                 this.logger.LogError($"Verify Member List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return false;
             }
+        }
+
+        public class Member
+        {
+            [JsonProperty("Name")]
+            public string Name { get; set; }
+
+            [JsonProperty("Tag")]
+            public string Tag { get; set; }
         }
     }
 }

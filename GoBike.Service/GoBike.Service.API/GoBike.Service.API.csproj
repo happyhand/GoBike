@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="AutoMapperProfile\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

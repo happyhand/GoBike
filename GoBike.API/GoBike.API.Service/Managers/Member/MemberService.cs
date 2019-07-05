@@ -295,6 +295,73 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
+        /// 搜尋會員
+        /// </summary>
+        /// <param name="searchKey">searchKey</param>
+        /// <param name="searcher">searcher</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> SearchMember(string searchKey, string searcher)
+        {
+            try
+            {
+                MemberDto memberDto = new MemberDto();
+                //// 判斷 Search Key
+                if (searchKey.Contains("@"))
+                {
+                    memberDto.Email = searchKey;
+                }
+                else if (searchKey.Length == 6) //// 目前只能先寫死，待思考有沒有其他更好的方式
+                {
+                    memberDto.MemberID = searchKey;
+                }
+                else
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = false,
+                        Data = "無效的查詢參數."
+                    };
+                }
+
+                string postData = JsonConvert.SerializeObject(memberDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    MemberDto searchMemberDto = await httpResponseMessage.Content.ReadAsAsync<MemberDto>();
+                    if (!string.IsNullOrEmpty(searcher) && searcher.Equals(searchMemberDto.MemberID))
+                    {
+                        return new ResponseResultDto()
+                        {
+                            Ok = false,
+                            Data = "無法查詢會員本身資料."
+                        };
+                    }
+
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = searchMemberDto
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Member Error >>> SearchKey:{searchKey}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "搜尋會員發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 建立登入 Token
         /// </summary>
         /// <param name="email">email</param>

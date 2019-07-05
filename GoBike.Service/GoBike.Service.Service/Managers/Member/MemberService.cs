@@ -6,6 +6,8 @@ using GoBike.Service.Service.Interface.Member;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -395,6 +397,69 @@ namespace GoBike.Service.Service.Managers.Member
             {
                 this.logger.LogError($"Reset Password Error >>> Email:{memberDto.Email}\n{ex}");
                 return Tuple.Create(string.Empty, "會員重設密碼發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 搜尋會員
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>Tuple(MemberDto, string)</returns>
+        public async Task<Tuple<MemberDto, string>> SearchMember(MemberDto memberDto)
+        {
+            try
+            {
+                MemberData memberData = null;
+                if (!string.IsNullOrEmpty(memberDto.MemberID))
+                {
+                    memberData = await this.memberRepository.GetMemberDataByMemberID(memberDto.MemberID);
+                }
+                else if (!string.IsNullOrEmpty(memberDto.Email))
+                {
+                    memberData = await this.memberRepository.GetMemberDataByEmail(memberDto.Email);
+                }
+                else
+                {
+                    return Tuple.Create<MemberDto, string>(null, "無效的查詢參數.");
+                }
+
+                if (memberData == null)
+                {
+                    return Tuple.Create<MemberDto, string>(null, "無會員資料.");
+                }
+
+                return Tuple.Create(this.mapper.Map<MemberDto>(memberData), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Member Error >>> MemberID:{memberDto.MemberID} Email:{memberDto.Email}\n{ex}");
+                return Tuple.Create<MemberDto, string>(null, "搜尋會員發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 搜尋會員列表
+        /// </summary>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<MemberDto>, string>> SearchMemberList(IEnumerable<string> memberIDs)
+        {
+            try
+            {
+                if (memberIDs == null || !memberIDs.Any())
+                {
+                    this.logger.LogError($"Search Member List Error For Not Member IDs");
+
+                    return Tuple.Create<IEnumerable<MemberDto>, string>(new MemberDto[] { }, string.Empty);
+                }
+
+                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemberDataList(memberIDs);
+                return Tuple.Create(this.mapper.Map<IEnumerable<MemberDto>>(memberDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Member List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
+                return Tuple.Create<IEnumerable<MemberDto>, string>(null, "搜尋會員列表發生錯誤.");
             }
         }
 
