@@ -44,11 +44,20 @@ namespace GoBike.API.Service.Models.Member.Data
         /// </summary>
         public string Password { get; set; }
 
-        /// <summary>
-        /// Gets or sets Token
-        /// </summary>
-        public string Token { get; set; }
-
         #endregion Login Data
+
+        #region Info Data
+
+        /// <summary>
+        /// Gets or sets LatestRideDistance
+        /// </summary>
+        public double LatestRideDistance { get; set; }
+
+        /// <summary>
+        /// Gets or sets TotalRideDistance
+        /// </summary>
+        public double TotalRideDistance { get; set; }
+
+        #endregion Info Data
     }
 }

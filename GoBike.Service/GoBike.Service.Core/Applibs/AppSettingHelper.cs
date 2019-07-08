@@ -48,6 +48,11 @@
                 public string Member { get; set; }
 
                 /// <summary>
+                /// Gets or sets Ride
+                /// </summary>
+                public string Ride { get; set; }
+
+                /// <summary>
                 /// Gets or sets SerialNumber
                 /// </summary>
                 public string SerialNumber { get; set; }

@@ -7,12 +7,7 @@ namespace GoBike.Service.Service.Interface.Member
 {
     public interface IMemberService
     {
-        /// <summary>
-        /// 會員編輯
-        /// </summary>
-        /// <param name="memberDto">memberDto</param>
-        /// <returns>string</returns>
-        Task<string> EditData(MemberDto memberDto);
+        #region 註冊\登入
 
         /// <summary>
         /// 會員登入
@@ -43,6 +38,17 @@ namespace GoBike.Service.Service.Interface.Member
         /// <returns>string</returns>
         Task<string> Register(MemberDto memberDto, bool isVerifyPassword);
 
+        #endregion 註冊\登入
+
+        #region 會員資料
+
+        /// <summary>
+        /// 會員編輯
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>string</returns>
+        Task<string> EditData(MemberDto memberDto);
+
         /// <summary>
         /// 會員重設密碼
         /// </summary>
@@ -53,9 +59,9 @@ namespace GoBike.Service.Service.Interface.Member
         /// <summary>
         /// 搜尋會員
         /// </summary>
-        /// <param name="memberDto">memberDto</param>
+        /// <param name="searchMemberDto">searchMemberDto</param>
         /// <returns>Tuple(MemberDto, string)</returns>
-        Task<Tuple<MemberDto, string>> SearchMember(MemberDto memberDto);
+        Task<Tuple<MemberDto, string>> SearchMember(MemberDto searchMemberDto);
 
         /// <summary>
         /// 搜尋會員列表
@@ -63,5 +69,18 @@ namespace GoBike.Service.Service.Interface.Member
         /// <param name="memberIDs">memberIDs</param>
         /// <returns>Tuple(MemberDtos, string)</returns>
         Task<Tuple<IEnumerable<MemberDto>, string>> SearchMemberList(IEnumerable<string> memberIDs);
+
+        #endregion 會員資料
+
+        #region 騎乘資料
+
+        /// <summary>
+        /// 新增騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>string</returns>
+        Task<string> AddRideData(RideDto rideDto);
+
+        #endregion 騎乘資料
     }
 }

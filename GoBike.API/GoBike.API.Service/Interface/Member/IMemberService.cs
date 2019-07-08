@@ -9,12 +9,7 @@ namespace GoBike.API.Service.Interface.Member
     /// </summary>
     public interface IMemberService
     {
-        /// <summary>
-        /// 會員編輯
-        /// </summary>
-        /// <param name="memberDto">memberDto</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> EditData(MemberDto memberDto);
+        #region 註冊\登入
 
         /// <summary>
         /// 會員登入
@@ -55,6 +50,17 @@ namespace GoBike.API.Service.Interface.Member
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> Register(string email, string password);
 
+        #endregion 註冊\登入
+
+        #region 會員資料
+
+        /// <summary>
+        /// 會員編輯
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditData(MemberDto memberDto);
+
         /// <summary>
         /// 會員重設密碼
         /// </summary>
@@ -69,5 +75,18 @@ namespace GoBike.API.Service.Interface.Member
         /// <param name="searcher">searcher</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> SearchMember(string searchKey, string searcher);
+
+        #endregion 會員資料
+
+        #region 騎乘資料
+
+        /// <summary>
+        /// 新增騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> AddRideData(RideDto rideDto);
+
+        #endregion 騎乘資料
     }
 }

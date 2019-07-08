@@ -39,33 +39,7 @@ namespace GoBike.API.Service.Managers.Member
             this.mapper = mapper;
         }
 
-        /// <summary>
-        /// 會員編輯
-        /// </summary>
-        /// <param name="memberDto">memberDto</param>
-        /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> EditData(MemberDto memberDto)
-        {
-            try
-            {
-                string postData = JsonConvert.SerializeObject(memberDto);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/EditData", postData);
-                return new ResponseResultDto()
-                {
-                    Ok = httpResponseMessage.IsSuccessStatusCode,
-                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
-                };
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberDto)}\n{ex}");
-                return new ResponseResultDto()
-                {
-                    Ok = false,
-                    Data = "會員編輯發生錯誤."
-                };
-            }
-        }
+        #region 註冊\登入
 
         /// <summary>
         /// 會員登入
@@ -251,6 +225,66 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
+        /// 建立登入 Token
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="password">password</param>
+        /// <param name="fbToken">fbToken</param>
+        /// <param name="googleToken">googleToken</param>
+        /// <returns>string</returns>
+        private string CreateLoginToken(string email, string password, string fbToken, string googleToken)
+        {
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                return $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}";
+            }
+
+            if (!string.IsNullOrEmpty(fbToken))
+            {
+                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.FB)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(fbToken)}";
+            }
+
+            if (!string.IsNullOrEmpty(googleToken))
+            {
+                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.Google)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(googleToken)}";
+            }
+
+            return string.Empty;
+        }
+
+        #endregion 註冊\登入
+
+        #region 會員資料
+
+        /// <summary>
+        /// 會員編輯
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> EditData(MemberDto memberDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(memberDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/EditData", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(memberDto)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "會員編輯發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 會員重設密碼
         /// </summary>
         /// <param name="email">email</param>
@@ -361,32 +395,38 @@ namespace GoBike.API.Service.Managers.Member
             }
         }
 
+        #endregion 會員資料
+
+        #region 騎乘資料
+
         /// <summary>
-        /// 建立登入 Token
+        /// 新增騎乘資料
         /// </summary>
-        /// <param name="email">email</param>
-        /// <param name="password">password</param>
-        /// <param name="fbToken">fbToken</param>
-        /// <param name="googleToken">googleToken</param>
-        /// <returns>string</returns>
-        private string CreateLoginToken(string email, string password, string fbToken, string googleToken)
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AddRideData(RideDto rideDto)
         {
-            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            try
             {
-                return $"{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(password)}";
+                string postData = JsonConvert.SerializeObject(rideDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/AddRideData", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
             }
-
-            if (!string.IsNullOrEmpty(fbToken))
+            catch (Exception ex)
             {
-                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.FB)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(fbToken)}";
+                this.logger.LogError($"Add Ride Data Error >>> Data:{JsonConvert.SerializeObject(rideDto)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "新增騎乘資料發生錯誤."
+                };
             }
-
-            if (!string.IsNullOrEmpty(googleToken))
-            {
-                return $"{Utility.EncryptAES(CommonFlagHelper.CommonFlag.PlatformFlag.Google)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(email)}{CommonFlagHelper.CommonFlag.SeparateFlag}{Utility.EncryptAES(googleToken)}";
-            }
-
-            return string.Empty;
         }
+
+        #endregion 騎乘資料
     }
 }

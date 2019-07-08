@@ -34,16 +34,23 @@ namespace GoBike.Service.Service.Managers.Member
         private readonly IMemberRepository memberRepository;
 
         /// <summary>
+        /// rideRepository
+        /// </summary>
+        private readonly IRideRepository rideRepository;
+
+        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="memberRepository">memberRepository</param>
-        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository)
+        /// <param name="rideRepository">rideRepository</param>
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IRideRepository rideRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.memberRepository = memberRepository;
+            this.rideRepository = rideRepository;
         }
 
         #region 註冊\登入
@@ -405,18 +412,18 @@ namespace GoBike.Service.Service.Managers.Member
         /// </summary>
         /// <param name="memberDto">memberDto</param>
         /// <returns>Tuple(MemberDto, string)</returns>
-        public async Task<Tuple<MemberDto, string>> SearchMember(MemberDto memberDto)
+        public async Task<Tuple<MemberDto, string>> SearchMember(MemberDto searchMemberDto)
         {
             try
             {
                 MemberData memberData = null;
-                if (!string.IsNullOrEmpty(memberDto.MemberID))
+                if (!string.IsNullOrEmpty(searchMemberDto.MemberID))
                 {
-                    memberData = await this.memberRepository.GetMemberDataByMemberID(memberDto.MemberID);
+                    memberData = await this.memberRepository.GetMemberDataByMemberID(searchMemberDto.MemberID);
                 }
-                else if (!string.IsNullOrEmpty(memberDto.Email))
+                else if (!string.IsNullOrEmpty(searchMemberDto.Email))
                 {
-                    memberData = await this.memberRepository.GetMemberDataByEmail(memberDto.Email);
+                    memberData = await this.memberRepository.GetMemberDataByEmail(searchMemberDto.Email);
                 }
                 else
                 {
@@ -428,11 +435,13 @@ namespace GoBike.Service.Service.Managers.Member
                     return Tuple.Create<MemberDto, string>(null, "無會員資料.");
                 }
 
-                return Tuple.Create(this.mapper.Map<MemberDto>(memberData), string.Empty);
+                MemberDto memberDto = this.mapper.Map<MemberDto>(memberData);
+                await this.OnUpdateMemberRideData(memberDto);
+                return Tuple.Create(memberDto, string.Empty);
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Member Error >>> MemberID:{memberDto.MemberID} Email:{memberDto.Email}\n{ex}");
+                this.logger.LogError($"Search Member Error >>> MemberID:{searchMemberDto.MemberID} Email:{searchMemberDto.Email}\n{ex}");
                 return Tuple.Create<MemberDto, string>(null, "搜尋會員發生錯誤.");
             }
         }
@@ -454,12 +463,34 @@ namespace GoBike.Service.Service.Managers.Member
                 }
 
                 IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemberDataList(memberIDs);
-                return Tuple.Create(this.mapper.Map<IEnumerable<MemberDto>>(memberDatas), string.Empty);
+                IEnumerable<MemberDto> memberDtos = this.mapper.Map<IEnumerable<MemberDto>>(memberDatas);
+                foreach (MemberDto memberDto in memberDtos)
+                {
+                    await this.OnUpdateMemberRideData(memberDto);
+                }
+                return Tuple.Create(memberDtos, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Search Member List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return Tuple.Create<IEnumerable<MemberDto>, string>(null, "搜尋會員列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 更新會員騎乘資料
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        private async Task OnUpdateMemberRideData(MemberDto memberDto)
+        {
+            IEnumerable<RideData> rideDatas = await this.rideRepository.GetRideDataList(memberDto.MemberID);
+            if (rideDatas.Any())
+            {
+                memberDto.LatestRideDistance = rideDatas.OrderByDescending(options => options.CreateDate).FirstOrDefault().Distance;
+                foreach (RideData item in rideDatas)
+                {
+                    memberDto.TotalRideDistance += item.Distance;
+                }
             }
         }
 
@@ -493,5 +524,62 @@ namespace GoBike.Service.Service.Managers.Member
         }
 
         #endregion 會員資料
+
+        #region 騎乘資料
+
+        /// <summary>
+        /// 新增騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>string</returns>
+        public async Task<string> AddRideData(RideDto rideDto)
+        {
+            try
+            {
+                string verifyRideDataResult = this.VerifyRideData(rideDto);
+                if (!string.IsNullOrEmpty(verifyRideDataResult))
+                {
+                    return verifyRideDataResult;
+                }
+
+                RideData rideData = this.mapper.Map<RideData>(rideDto);
+                rideData.CreateDate = DateTime.Now;
+                bool isSuccess = await this.rideRepository.CreateRideData(rideData);
+                if (!isSuccess)
+                {
+                    return "新增騎乘資料失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Add Ride Data Error >>> Data:{JsonConvert.SerializeObject(rideDto)}\n{ex}");
+                return "新增騎乘資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 驗證騎乘資料
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <param name="isVerifyPassword">isVerifyPassword</param>
+        /// <returns>string</returns>
+        private string VerifyRideData(RideDto rideDto)
+        {
+            if (string.IsNullOrEmpty(rideDto.MemberID))
+            {
+                return "會員編號無效.";
+            }
+
+            if (rideDto.RideTime == 0)
+            {
+                return "無騎乘時間.";
+            }
+
+            return string.Empty;
+        }
+
+        #endregion 騎乘資料
     }
 }

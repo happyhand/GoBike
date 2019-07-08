@@ -41,12 +41,6 @@ namespace GoBike.Service.Repository.Models.Member
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Gets or sets LatestRideDistance
-        /// </summary>
-        [BsonElement("LatestRideDistance")]
-        public string LatestRideDistance { get; set; }
-
-        /// <summary>
         /// Gets or sets LoginDate
         /// </summary>
         [BsonElement("LoginDate")]
@@ -63,12 +57,6 @@ namespace GoBike.Service.Repository.Models.Member
         /// </summary>
         [BsonElement("Password")]
         public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets TotalRideDistance
-        /// </summary>
-        [BsonElement("TotalRideDistance")]
-        public string TotalRideDistance { get; set; }
 
         #endregion Login Data
     }

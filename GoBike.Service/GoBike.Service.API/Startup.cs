@@ -60,6 +60,7 @@ namespace GoBike.Service.API
         {
             services.AddSingleton<IMemberService, MemberService>();
             services.AddSingleton<IMemberRepository, MemberRepository>();
+            services.AddSingleton<IRideRepository, RideRepository>();
         }
 
         private void MongoDBSettingHandler()

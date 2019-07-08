@@ -50,8 +50,7 @@ namespace GoBike.API.App.Controllers.Member
         public async Task<IActionResult> Post(EditDataPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            MemberDto memberDto = new MemberDto() { Password = postData.Password };
-            memberDto.MemberID = memberID;
+            MemberDto memberDto = new MemberDto() { Password = postData.Password, MemberID = memberID };
             try
             {
                 ResponseResultDto responseResult = await this.memberService.EditData(memberDto);
