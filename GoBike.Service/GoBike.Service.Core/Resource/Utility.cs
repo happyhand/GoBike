@@ -111,10 +111,10 @@ namespace GoBike.Service.Core.Resource
 
         #endregion Email
 
-        #region 手機驗證
+        #region 行動電話驗證
 
         /// <summary>
-        /// 手機格式驗證
+        /// 行動電話格式驗證
         /// </summary>
         /// <param name="mobile">mobile</param>
         /// <returns>bool</returns>
@@ -123,6 +123,6 @@ namespace GoBike.Service.Core.Resource
             return Regex.IsMatch(mobile, @"^(09|8869|\+8869)\d{8}$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
 
-        #endregion 手機驗證
+        #endregion 行動電話驗證
     }
 }

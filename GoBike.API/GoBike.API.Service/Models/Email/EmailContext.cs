@@ -45,24 +45,46 @@ namespace GoBike.API.Service.Models.Email
         }
 
         /// <summary>
-        /// 取得驗證碼郵件內容
+        /// 取得忘記密碼驗證碼郵件內容
         /// </summary>
         /// <param name="email">email</param>
         /// <param name="verifierCode">verifierCode</param>
         /// <returns>EmailContext</returns>
-        public static EmailContext GetVerifierCodetEmailContext(string email, string verifierCode)
+        public static EmailContext GetVerifierCodetEmailContextForForgetPassword(string email, string verifierCode)
         {
             return new EmailContext()
             {
                 Address = email,
                 Body = $"<p>親愛的用戶您好</p>" +
                        $"<p>您於 <span style='font-weight:bold; color:blue;'>{DateTime.Now:yyyy/MM/dd HH:mm:ss}</span> 查詢密碼</p>" +
-                       $"<p>您的查詢驗證碼為</p>" +
+                       $"<p>您的驗證碼為</p>" +
                        $"<p><span style='font-weight:bold; color:blue;'>{verifierCode}</span></p>" +
                        $"<p>請於 <span style='font-weight:bold; color:blue;'>10分鐘</span> 內於APP輸入此驗證碼以獲取新密碼</p>" +
                        $"<br><br><br>" +
                        $"<p>※本電子郵件係由系統自動發送，請勿直接回覆本郵件。</p>",
                 Subject = "GoBike 查詢密碼"
+            };
+        }
+
+        /// <summary>
+        /// 取得綁定行動電話驗證碼郵件內容
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <param name="verifierCode">verifierCode</param>
+        /// <returns>EmailContext</returns>
+        public static EmailContext GetVerifierCodetEmailContextForMobileBind(string email, string verifierCode)
+        {
+            return new EmailContext()
+            {
+                Address = email,
+                Body = $"<p>親愛的用戶您好</p>" +
+                       $"<p>您於 <span style='font-weight:bold; color:blue;'>{DateTime.Now:yyyy/MM/dd HH:mm:ss}</span> 進行行動電話綁定作業</p>" +
+                       $"<p>您的驗證碼為</p>" +
+                       $"<p><span style='font-weight:bold; color:blue;'>{verifierCode}</span></p>" +
+                       $"<p>請於 <span style='font-weight:bold; color:blue;'>10分鐘</span> 內於APP輸入此驗證碼以綁定行動電話</p>" +
+                       $"<br><br><br>" +
+                       $"<p>※本電子郵件係由系統自動發送，請勿直接回覆本郵件。</p>",
+                Subject = "GoBike 行動電話綁定作業"
             };
         }
     }

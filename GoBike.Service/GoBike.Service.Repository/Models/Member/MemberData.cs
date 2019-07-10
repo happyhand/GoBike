@@ -9,7 +9,7 @@ namespace GoBike.Service.Repository.Models.Member
     /// </summary>
     public class MemberData
     {
-        #region Login Data
+        #region Register \ Login Data
 
         /// <summary>
         /// Gets or sets CreateDate
@@ -58,6 +58,64 @@ namespace GoBike.Service.Repository.Models.Member
         [BsonElement("Password")]
         public string Password { get; set; }
 
-        #endregion Login Data
+        #endregion Register \ Login Data
+
+        #region Info Data
+
+        /// <summary>
+        /// Gets or sets Birthday
+        /// </summary>
+        [BsonElement("Birthday")]
+        public string Birthday { get; set; }
+
+        /// <summary>
+        /// Gets or sets BodyHeight
+        /// </summary>
+        [BsonElement("BodyHeight")]
+        public double BodyHeight { get; set; }
+
+        /// <summary>
+        /// Gets or sets BodyWeight
+        /// </summary>
+        [BsonElement("BodyWeight")]
+        public double BodyWeight { get; set; }
+
+        /// <summary>
+        /// Gets or sets FrontCoverUrl
+        /// </summary>
+        [BsonElement("FrontCoverUrl")]
+        public string FrontCoverUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets Gender
+        /// </summary>
+        [BsonElement("Gender")]
+        public int Gender { get; set; }
+
+        /// <summary>
+        /// Gets or sets Mobile
+        /// </summary>
+        [BsonElement("Mobile")]
+        public string Mobile { get; set; }
+
+        /// <summary>
+        /// Gets or sets MoblieBindType
+        /// </summary>
+        [BsonElement("MoblieBindType")]
+        public int MoblieBindType { get; set; }
+
+        /// <summary>
+        /// Gets or sets NoticeType
+        /// </summary>
+        [BsonElement("NoticeType")]
+        public int NoticeType { get; set; }
+
+        /// <summary>
+        /// Gets or sets PhotoUrl
+        /// </summary>
+        [BsonElement("PhotoUrl")]
+        public string PhotoUrl { get; set; }
+
+        #endregion Info Data
     }
 }

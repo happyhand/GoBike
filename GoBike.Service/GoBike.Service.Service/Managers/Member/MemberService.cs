@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GoBike.Service.Core.Resource;
+using GoBike.Service.Core.Resource.Enum;
 using GoBike.Service.Repository.Interface.Member;
 using GoBike.Service.Repository.Models.Member;
 using GoBike.Service.Service.Interface.Member;
@@ -230,7 +231,7 @@ namespace GoBike.Service.Service.Managers.Member
                 Password = string.IsNullOrEmpty(memberDto.Password) ? string.Empty : Utility.EncryptAES(memberDto.Password),
                 LoginDate = createDate,
                 FBToken = memberDto.FBToken,
-                GoogleToken = memberDto.GoogleToken
+                GoogleToken = memberDto.GoogleToken,
             };
 
             return memberData;
@@ -519,6 +520,61 @@ namespace GoBike.Service.Service.Managers.Member
 
                 memberData.Password = Utility.EncryptAES(memberDto.Password);
             }
+
+            if (!string.IsNullOrEmpty(memberDto.Mobile))
+            {
+                if (!string.IsNullOrEmpty(memberData.Mobile))
+                {
+                    return "已綁定行動電話.";
+                }
+
+                if (memberDto.MoblieBindType == (int)MoblieBindType.Bind)
+                {
+                    if (!Utility.IsValidMobile(memberDto.Mobile))
+                    {
+                        return "行動電話格式錯誤.";
+                    }
+
+                    memberData.Mobile = memberDto.Mobile;
+                    memberData.MoblieBindType = (int)MoblieBindType.Bind;
+                }
+                else
+                {
+                    return "未採取綁定行動電話動作.";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(memberDto.Birthday))
+            {
+                memberData.Birthday = memberDto.Birthday;
+            }
+
+            if (memberDto.BodyHeight > 0)
+            {
+                memberData.BodyHeight = memberDto.BodyHeight;
+            }
+
+            if (memberDto.BodyWeight > 0)
+            {
+                memberData.BodyWeight = memberDto.BodyWeight;
+            }
+
+            if (memberDto.Gender != (int)GenderType.None)
+            {
+                memberData.Gender = memberDto.Gender;
+            }
+
+            if (!string.IsNullOrEmpty(memberDto.FrontCoverUrl))
+            {
+                memberData.FrontCoverUrl = memberDto.FrontCoverUrl;
+            }
+
+            if (!string.IsNullOrEmpty(memberDto.PhotoUrl))
+            {
+                memberData.PhotoUrl = memberDto.PhotoUrl;
+            }
+
+            //memberDto.NoticeType; //// 待確認
 
             return string.Empty;
         }

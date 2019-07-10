@@ -1,4 +1,5 @@
-﻿using GoBike.API.Service.Interface.Member;
+﻿using GoBike.API.Core.Resource.Enum;
+using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Response;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Member
 {
     /// <summary>
-    /// 忘記密碼
+    /// 忘記密碼功能
     /// </summary>
     [ApiController]
     public class ForgetPasswordController : ControllerBase
@@ -50,11 +51,11 @@ namespace GoBike.API.App.Controllers.Member
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/Member/[controller]")]
-        public async Task<IActionResult> GetVerifierCode(GetVerifierCodePostData postData)
+        public async Task<IActionResult> GetVerifierCode(ForgetPasswordGetVerifierCodePostData postData)
         {
             try
             {
-                string type = "password";
+                string type = VerifierType.ForgetPassword.ToString();
                 string verifierCode = await this.verifierService.GetVerifierCode(type, postData.Email);
                 if (string.IsNullOrEmpty(verifierCode))
                 {
@@ -62,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
                     return BadRequest("取得查詢密碼驗證碼失敗.");
                 }
 
-                EmailContext emailContext = EmailContext.GetVerifierCodetEmailContext(postData.Email, verifierCode);
+                EmailContext emailContext = EmailContext.GetVerifierCodetEmailContextForForgetPassword(postData.Email, verifierCode);
                 ResponseResultDto responseResult = await this.verifierService.SendVerifierCode(type, postData.Email, verifierCode, emailContext);
                 if (responseResult.Ok)
                 {
@@ -85,26 +86,23 @@ namespace GoBike.API.App.Controllers.Member
         /// <returns>IActionResult</returns>
         [HttpPost]
         [Route("api/Member/[controller]/VerifierCode")]
-        public async Task<IActionResult> ResetPassword(VerifierPostData postData)
+        public async Task<IActionResult> ResetPassword(ForgetPasswordVerifierPostData postData)
         {
             try
             {
-                string type = "password";
-                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(type, postData.Email, postData.VerifierCode);
+                bool isValidVerifierCode = await this.verifierService.IsValidVerifierCode(VerifierType.ForgetPassword.ToString(), postData.Email, postData.VerifierCode);
                 if (!isValidVerifierCode)
                 {
                     return BadRequest("驗證碼驗證失敗.");
                 }
-                else
-                {
-                    ResponseResultDto responseResult = await this.memberService.ResetPassword(postData.Email);
-                    if (responseResult.Ok)
-                    {
-                        return Ok(responseResult.Data);
-                    }
 
-                    return BadRequest(responseResult.Data);
+                ResponseResultDto responseResult = await this.memberService.ResetPassword(postData.Email);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
                 }
+
+                return BadRequest(responseResult.Data);
             }
             catch (Exception ex)
             {
@@ -116,7 +114,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// 請求產生驗證碼 Post 資料
         /// </summary>
-        public class GetVerifierCodePostData
+        public class ForgetPasswordGetVerifierCodePostData
         {
             /// <summary>
             /// Gets or sets MemberID
@@ -125,9 +123,9 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// 請求產生驗證碼 Post 資料
+        /// 驗證驗證碼 Post 資料
         /// </summary>
-        public class VerifierPostData
+        public class ForgetPasswordVerifierPostData
         {
             /// <summary>
             /// Gets or sets MemberID

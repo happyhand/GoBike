@@ -1,18 +1,18 @@
 ﻿namespace GoBike.API.Core.Resource.Enum
 {
     /// <summary>
-    /// 手機綁定類別資料
+    /// 驗證類別資料
     /// </summary>
-    public enum MoblieBindType
+    public enum VerifierType
     {
         /// <summary>
-        /// 未設定
+        /// 忘記密碼
         /// </summary>
-        None = 0,
+        ForgetPassword = 0,
 
         /// <summary>
-        /// 綁定
+        /// 綁定行動電話
         /// </summary>
-        Bind = 1
+        MobileBind = 1,
     }
 }

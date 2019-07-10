@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Member
 {
     /// <summary>
-    /// 會員登入
+    /// 會員登入功能
     /// </summary>
     [ApiController]
     public class LoginController : ApiController
