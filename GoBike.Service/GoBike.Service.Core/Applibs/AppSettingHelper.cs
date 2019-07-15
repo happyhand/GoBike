@@ -38,6 +38,11 @@
             public string MemberDatabase { get; set; }
 
             /// <summary>
+            /// Gets or sets TeamDatabase
+            /// </summary>
+            public string TeamDatabase { get; set; }
+
+            /// <summary>
             /// Collection 設定資料
             /// </summary>
             public class CollectionSetting
@@ -56,6 +61,11 @@
                 /// Gets or sets SerialNumber
                 /// </summary>
                 public string SerialNumber { get; set; }
+
+                /// <summary>
+                /// Gets or sets Team
+                /// </summary>
+                public string Team { get; set; }
             }
         }
 

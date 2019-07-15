@@ -41,12 +41,6 @@ namespace GoBike.Service.Repository.Models.Member
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Gets or sets LoginDate
-        /// </summary>
-        [BsonElement("LoginDate")]
-        public DateTime LoginDate { get; set; }
-
-        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         [BsonElement("MemberID")]
@@ -103,12 +97,6 @@ namespace GoBike.Service.Repository.Models.Member
         /// </summary>
         [BsonElement("MoblieBindType")]
         public int MoblieBindType { get; set; }
-
-        /// <summary>
-        /// Gets or sets NoticeType
-        /// </summary>
-        [BsonElement("NoticeType")]
-        public int NoticeType { get; set; }
 
         /// <summary>
         /// Gets or sets PhotoUrl

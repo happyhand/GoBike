@@ -14,7 +14,7 @@ namespace GoBike.API.App.Controllers.Member
     /// 忘記密碼功能
     /// </summary>
     [ApiController]
-    public class ForgetPasswordController : ControllerBase
+    public class ForgetPasswordController : ApiController
     {
         /// <summary>
         /// logger

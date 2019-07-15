@@ -45,7 +45,7 @@ namespace GoBike.Service.API.Controllers.Member
         {
             try
             {
-                Tuple<string, string> result = await this.memberService.LoginFB(memberDto);
+                Tuple<string, string> result = await this.memberService.LoginFB(memberDto, 0);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);
@@ -71,7 +71,7 @@ namespace GoBike.Service.API.Controllers.Member
         {
             try
             {
-                Tuple<string, string> result = await this.memberService.LoginGoogle(memberDto);
+                Tuple<string, string> result = await this.memberService.LoginGoogle(memberDto, 0);
                 if (string.IsNullOrEmpty(result.Item2))
                 {
                     return Ok(result.Item1);

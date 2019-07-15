@@ -1,39 +1,44 @@
 ﻿namespace GoBike.Service.Core.Resource.Enum
 {
     /// <summary>
-    /// 性別類別資料
+    /// 車隊審核狀態
     /// </summary>
-    public enum GenderType
+    public enum TeamExamineStatusType
     {
         /// <summary>
-        /// 未設定
+        /// 無設定
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// 女生
+        /// 關閉
         /// </summary>
-        Woman = 1,
+        Close = 1,
 
         /// <summary>
-        /// 男生
+        /// 開啟
         /// </summary>
-        Man = 2
+        Open = 2
     }
 
     /// <summary>
-    /// 行動電話綁定類別資料
+    /// 車隊搜尋狀態
     /// </summary>
-    public enum MoblieBindType
+    public enum TeamSearchStatusType
     {
         /// <summary>
-        /// 未設定
+        /// 無設定
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// 綁定
+        /// 關閉
         /// </summary>
-        Bind = 1
+        Close = 1,
+
+        /// <summary>
+        /// 開啟
+        /// </summary>
+        Open = 2
     }
 }

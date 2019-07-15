@@ -14,5 +14,10 @@
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
+
+        /// <summary>
+        /// Gets or sets OnlineType
+        /// </summary>
+        public int OnlineType { get; set; }
     }
 }

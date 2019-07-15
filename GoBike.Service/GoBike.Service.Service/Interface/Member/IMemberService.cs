@@ -20,15 +20,17 @@ namespace GoBike.Service.Service.Interface.Member
         /// 會員登入 (FB)
         /// </summary>
         /// <param name="memberDto">memberDto</param>
+        /// <param name="reTryCount">reTryCount</param>
         /// <returns>Tuple(string, string)</returns>
-        Task<Tuple<string, string>> LoginFB(MemberDto memberDto);
+        Task<Tuple<string, string>> LoginFB(MemberDto memberDto, int reTryCount);
 
         /// <summary>
         /// 會員登入 (Google)
         /// </summary>
         /// <param name="memberDto">memberDto</param>
+        /// <param name="reTryCount">reTryCount</param>
         /// <returns>Tuple(string, string)</returns>
-        Task<Tuple<string, string>> LoginGoogle(MemberDto memberDto);
+        Task<Tuple<string, string>> LoginGoogle(MemberDto memberDto, int reTryCount);
 
         /// <summary>
         /// 會員註冊

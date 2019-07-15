@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using GoBike.Service.Core.Applibs;
 using GoBike.Service.Repository.Interface.Member;
+using GoBike.Service.Repository.Interface.Team;
 using GoBike.Service.Repository.Managers.Member;
+using GoBike.Service.Repository.Managers.Team;
 using GoBike.Service.Service.Interface.Member;
 using GoBike.Service.Service.Managers.Member;
 using Microsoft.AspNetCore.Builder;
@@ -61,6 +63,7 @@ namespace GoBike.Service.API
             services.AddSingleton<IMemberService, MemberService>();
             services.AddSingleton<IMemberRepository, MemberRepository>();
             services.AddSingleton<IRideRepository, RideRepository>();
+            services.AddSingleton<ITeamRepository, TeamRepository>();
         }
 
         private void MongoDBSettingHandler()

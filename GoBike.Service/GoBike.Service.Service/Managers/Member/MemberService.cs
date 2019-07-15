@@ -87,12 +87,6 @@ namespace GoBike.Service.Service.Managers.Member
                     return Tuple.Create(string.Empty, "密碼驗證失敗.");
                 }
 
-                bool updateMemberLoginDateResult = await this.memberRepository.UpdateMemberLoginDate(memberData.MemberID, DateTime.Now);
-                if (!updateMemberLoginDateResult)
-                {
-                    return Tuple.Create(string.Empty, "會員登入失敗.");
-                }
-
                 return Tuple.Create(memberData.MemberID, string.Empty);
             }
             catch (Exception ex)
@@ -106,11 +100,19 @@ namespace GoBike.Service.Service.Managers.Member
         /// 會員登入 (FB)
         /// </summary>
         /// <param name="memberDto">memberDto</param>
+        /// <param name="reTryCount">reTryCount</param>
         /// <returns>Tuple(string, string)</returns>
-        public async Task<Tuple<string, string>> LoginFB(MemberDto memberDto)
+        public async Task<Tuple<string, string>> LoginFB(MemberDto memberDto, int reTryCount)
         {
             try
             {
+                int maxReTry = 5;
+                if (reTryCount > maxReTry)
+                {
+                    this.logger.LogError($"Login FB Fail For Re Try Count more {maxReTry} >>> FBToken:{memberDto.FBToken} ReTryCount:{reTryCount}");
+                    return Tuple.Create(string.Empty, "會員登入失敗.");
+                }
+
                 if (string.IsNullOrEmpty(memberDto.FBToken))
                 {
                     return Tuple.Create(string.Empty, "無效的登入驗證碼.");
@@ -119,12 +121,6 @@ namespace GoBike.Service.Service.Managers.Member
                 MemberData memberData = await this.memberRepository.GetMemberDataByFBToken(memberDto.FBToken);
                 if (memberData != null)
                 {
-                    bool updateMemberLoginDateResult = await this.memberRepository.UpdateMemberLoginDate(memberData.MemberID, DateTime.Now);
-                    if (!updateMemberLoginDateResult)
-                    {
-                        return Tuple.Create(string.Empty, "會員登入失敗.");
-                    }
-
                     return Tuple.Create(memberData.MemberID, string.Empty);
                 }
 
@@ -134,7 +130,7 @@ namespace GoBike.Service.Service.Managers.Member
                     return Tuple.Create(string.Empty, registerResult);
                 }
 
-                return await this.LoginFB(memberDto);
+                return await this.LoginFB(memberDto, reTryCount++);
             }
             catch (Exception ex)
             {
@@ -147,11 +143,19 @@ namespace GoBike.Service.Service.Managers.Member
         /// 會員登入 (Google)
         /// </summary>
         /// <param name="memberDto">memberDto</param>
+        /// <param name="reTryCount">reTryCount</param>
         /// <returns>Tuple(string, string)</returns>
-        public async Task<Tuple<string, string>> LoginGoogle(MemberDto memberDto)
+        public async Task<Tuple<string, string>> LoginGoogle(MemberDto memberDto, int reTryCount)
         {
             try
             {
+                int maxReTry = 5;
+                if (reTryCount > maxReTry)
+                {
+                    this.logger.LogError($"Login Google Fail For Re Try Count more {maxReTry} >>> GoogleToken:{memberDto.GoogleToken} ReTryCount:{reTryCount}");
+                    return Tuple.Create(string.Empty, "會員登入失敗.");
+                }
+
                 if (string.IsNullOrEmpty(memberDto.GoogleToken))
                 {
                     return Tuple.Create(string.Empty, "無效的登入驗證碼.");
@@ -160,12 +164,6 @@ namespace GoBike.Service.Service.Managers.Member
                 MemberData memberData = await this.memberRepository.GetMemberDataByGoogleToken(memberDto.GoogleToken);
                 if (memberData != null)
                 {
-                    bool updateMemberLoginDateResult = await this.memberRepository.UpdateMemberLoginDate(memberData.MemberID, DateTime.Now);
-                    if (!updateMemberLoginDateResult)
-                    {
-                        return Tuple.Create(string.Empty, "會員登入失敗.");
-                    }
-
                     return Tuple.Create(memberData.MemberID, string.Empty);
                 }
 
@@ -175,7 +173,7 @@ namespace GoBike.Service.Service.Managers.Member
                     return Tuple.Create(string.Empty, registerResult);
                 }
 
-                return await this.LoginGoogle(memberDto);
+                return await this.LoginGoogle(memberDto, reTryCount++);
             }
             catch (Exception ex)
             {
@@ -229,7 +227,6 @@ namespace GoBike.Service.Service.Managers.Member
                 CreateDate = createDate,
                 Email = memberDto.Email,
                 Password = string.IsNullOrEmpty(memberDto.Password) ? string.Empty : Utility.EncryptAES(memberDto.Password),
-                LoginDate = createDate,
                 FBToken = memberDto.FBToken,
                 GoogleToken = memberDto.GoogleToken,
             };
@@ -458,7 +455,7 @@ namespace GoBike.Service.Service.Managers.Member
             {
                 if (memberIDs == null || !memberIDs.Any())
                 {
-                    this.logger.LogError($"Search Member List Error For Not Member IDs");
+                    this.logger.LogError($"Search Member List Fail For Not Member IDs");
 
                     return Tuple.Create<IEnumerable<MemberDto>, string>(new MemberDto[] { }, string.Empty);
                 }
@@ -509,7 +506,7 @@ namespace GoBike.Service.Service.Managers.Member
                 //// 第三方串接無法修改密碼 (TODO 待討論)
                 if (string.IsNullOrEmpty(memberData.Password))
                 {
-                    this.logger.LogError($"Update Member Data Handler Error For Edit Other Platform Password.");
+                    this.logger.LogError($"Update Member Data Handler Fail For Edit Other Platform Password.");
                     return "修改密碼發生錯誤.";
                 }
 
@@ -573,8 +570,6 @@ namespace GoBike.Service.Service.Managers.Member
             {
                 memberData.PhotoUrl = memberDto.PhotoUrl;
             }
-
-            //memberDto.NoticeType; //// 待確認
 
             return string.Empty;
         }

@@ -9,6 +9,11 @@ namespace GoBike.Service.Repository.Models.Member
     /// </summary>
     public class RideData
     {
+        /// Gets or sets CityID
+        /// </summary>
+        [BsonElement("CityID")]
+        public int CityID { get; set; }
+
         /// <summary>
         /// Gets or sets Climb
         /// </summary>
@@ -19,11 +24,6 @@ namespace GoBike.Service.Repository.Models.Member
         /// </summary>
         [BsonElement("Content")]
         public string Content { get; set; }
-
-        /// Gets or sets County
-        /// </summary>
-        [BsonElement("County")]
-        public string County { get; set; }
 
         /// <summary>
         /// Gets or sets CreateDate

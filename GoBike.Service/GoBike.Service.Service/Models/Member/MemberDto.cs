@@ -30,11 +30,6 @@ namespace GoBike.Service.Repository.Models.Member
         public string GoogleToken { get; set; }
 
         /// <summary>
-        /// Gets or sets LoginDate
-        /// </summary>
-        public DateTime LoginDate { get; set; }
-
-        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
@@ -82,11 +77,6 @@ namespace GoBike.Service.Repository.Models.Member
         /// Gets or sets MoblieBindType
         /// </summary>
         public int MoblieBindType { get; set; }
-
-        /// <summary>
-        /// Gets or sets NoticeType
-        /// </summary>
-        public int NoticeType { get; set; }
 
         /// <summary>
         /// Gets or sets PhotoUrl

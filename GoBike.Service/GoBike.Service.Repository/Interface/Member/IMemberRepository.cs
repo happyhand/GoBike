@@ -1,5 +1,4 @@
 ﻿using GoBike.Service.Repository.Models.Member;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -58,14 +57,6 @@ namespace GoBike.Service.Repository.Interface.Member
         /// <param name="memberData">memberData</param>
         /// <returns>bool</returns>
         Task<bool> UpdateMemberData(MemberData memberData);
-
-        /// <summary>
-        /// 更新會員登入日期資料
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="loginDate">loginDate</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateMemberLoginDate(string memberID, DateTime loginDate);
 
         /// <summary>
         /// 驗證會員資料

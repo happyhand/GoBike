@@ -203,40 +203,6 @@ namespace GoBike.Service.Repository.Managers.Member
         }
 
         /// <summary>
-        /// 更新會員登入日期資料
-        /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <param name="loginDate">loginDate</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateMemberLoginDate(string memberID, DateTime loginDate)
-        {
-            try
-            {
-                FilterDefinition<MemberData> filter = Builders<MemberData>.Filter.Eq("MemberID", memberID);
-                UpdateDefinition<MemberData> update = Builders<MemberData>.Update.Set(data => data.LoginDate, loginDate);
-                UpdateResult result = await this.memberDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    this.logger.LogError($"Update Member Login Date Fail For IsAcknowledged >>> MemberID:{memberID} LoginDate:{loginDate.ToString()}");
-                    return false;
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    this.logger.LogError($"Update Member Login Date Fail For ModifiedCount >>> MemberID:{memberID} LoginDate:{loginDate.ToString()}");
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Update Member Login Date Error >>> MemberID:{memberID} LoginDate:{loginDate}\n{ex}");
-                return false;
-            }
-        }
-
-        /// <summary>
         /// 驗證會員資料
         /// </summary>
         /// <param name="memberIDs">memberIDs</param>
