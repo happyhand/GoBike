@@ -48,7 +48,7 @@ namespace GoBike.API.App.Controllers.Member
             try
             {
                 ResponseResultDto responseResult = await this.memberService.Login(postData.Token);
-                return this.HandleLoginResult(responseResult);
+                return await this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace GoBike.API.App.Controllers.Member
             try
             {
                 ResponseResultDto responseResult = await this.memberService.LoginFB(postData.Email, postData.Token);
-                return this.HandleLoginResult(responseResult);
+                return await this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
@@ -90,7 +90,7 @@ namespace GoBike.API.App.Controllers.Member
             try
             {
                 ResponseResultDto responseResult = await this.memberService.LoginGoogle(postData.Email, postData.Token);
-                return this.HandleLoginResult(responseResult);
+                return await this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
@@ -111,7 +111,7 @@ namespace GoBike.API.App.Controllers.Member
             try
             {
                 ResponseResultDto responseResult = await this.memberService.Login(postData.Email, postData.Password);
-                return this.HandleLoginResult(responseResult);
+                return await this.HandleLoginResult(responseResult);
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace GoBike.API.App.Controllers.Member
         /// </summary>
         /// <param name="responseResult">responseResult</param>
         /// <returns>IActionResult</returns>
-        private IActionResult HandleLoginResult(ResponseResultDto responseResult)
+        private async Task<IActionResult> HandleLoginResult(ResponseResultDto responseResult)
         {
             if (responseResult.Ok)
             {
@@ -133,7 +133,15 @@ namespace GoBike.API.App.Controllers.Member
                 string memberID = dataArr[0];
                 string token = dataArr[1];
                 this.HttpContext.Session.SetObject(CommonFlagHelper.CommonFlag.SessionFlag.MemberID, memberID);
-                return Ok(token);
+                ResponseResultDto recordSessionIDResult = await this.memberService.RecordSessionID(memberID, this.HttpContext.Session.Id);
+                if (recordSessionIDResult.Ok)
+                {
+                    return Ok(token);
+                }
+                else
+                {
+                    return BadRequest("會員登入失敗.");
+                }
             }
 
             return BadRequest(responseResult.Data);

@@ -8,6 +8,13 @@ namespace GoBike.API.Repository.Interface
     public interface IRedisRepository
     {
         /// <summary>
+        /// 刪除快取資料
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <returns>bool</returns>
+        Task<bool> DeleteCache(string cacheKey);
+
+        /// <summary>
         /// 讀取快取資料
         /// </summary>
         /// <param name="cacheKey">cacheKey</param>
@@ -29,5 +36,13 @@ namespace GoBike.API.Repository.Interface
         /// <param name="cacheTimes">cacheTimes</param>
         /// <returns>bool</returns>
         Task<bool> SetCache(string cacheKey, string dataJSON, TimeSpan cacheTimes);
+
+        /// <summary>
+        /// 更新快取資料到期時間
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <param name="time">time</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateCacheExpire(string cacheKey, TimeSpan time);
     }
 }

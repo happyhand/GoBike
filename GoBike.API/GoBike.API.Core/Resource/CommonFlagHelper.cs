@@ -52,6 +52,11 @@
         public class RedisSetting
         {
             /// <summary>
+            /// Gets or sets Session
+            /// </summary>
+            public string Session { get; set; }
+
+            /// <summary>
             /// Gets or sets VerifierCode
             /// </summary>
             public string VerifierCode { get; set; }

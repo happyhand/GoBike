@@ -12,6 +12,22 @@ namespace GoBike.API.Service.Interface.Member
         #region 註冊\登入
 
         /// <summary>
+        /// 刪除會員 Session ID
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DeleteSessionID(string memberID, string sessionID);
+
+        /// <summary>
+        /// 延長會員 Session ID 期限
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> ExtendSessionIDExpire(string memberID, string sessionID);
+
+        /// <summary>
         /// 會員登入
         /// </summary>
         /// <param name="email">email</param>
@@ -41,6 +57,14 @@ namespace GoBike.API.Service.Interface.Member
         /// <param name="token">token</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> LoginGoogle(string email, string token);
+
+        /// <summary>
+        /// 紀錄會員 Session ID
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> RecordSessionID(string memberID, string sessionID);
 
         /// <summary>
         /// 會員註冊

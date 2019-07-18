@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
+using GoBike.API.Repository.Interface;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Member.Data;
@@ -29,17 +30,100 @@ namespace GoBike.API.Service.Managers.Member
         private readonly IMapper mapper;
 
         /// <summary>
+        /// redisRepository
+        /// </summary>
+        private readonly IRedisRepository redisRepository;
+
+        /// <summary>
         /// 建構式
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
-        public MemberService(ILogger<MemberService> logger, IMapper mapper)
+        /// <param name="redisRepository">redisRepository</param>
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IRedisRepository redisRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
+            this.redisRepository = redisRepository;
         }
 
         #region 註冊\登入
+
+        /// <summary>
+        /// 刪除會員 Session ID
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteSessionID(string memberID, string sessionID)
+        {
+            try
+            {
+                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-{sessionID}-{memberID}";
+                bool result = await this.redisRepository.DeleteCache(cacheKey);
+                if (result)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = "刪除會員 Session ID 成功."
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除會員 Session ID 失敗."
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Session ID Error >>> MemberID:{memberID} SessionID:{sessionID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除會員 Session ID 發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 延長會員 Session ID 期限
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> ExtendSessionIDExpire(string memberID, string sessionID)
+        {
+            try
+            {
+                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-{sessionID}-{memberID}";
+                bool result = await this.redisRepository.UpdateCacheExpire(cacheKey, new TimeSpan(0, 10, 0));
+                if (result)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = "延長 Session ID 成功."
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "延長 Session ID 失敗."
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Extend Session ID Expire Error >>> MemberID:{memberID} SessionID:{sessionID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "延長 Session ID 發生錯誤."
+                };
+            }
+        }
 
         /// <summary>
         /// 會員登入
@@ -191,6 +275,44 @@ namespace GoBike.API.Service.Managers.Member
                 {
                     Ok = false,
                     Data = "會員登入發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 紀錄會員 Session ID
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <param name="sessionID">sessionID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RecordSessionID(string memberID, string sessionID)
+        {
+            try
+            {
+                string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-{sessionID}-{memberID}";
+                bool result = await this.redisRepository.SetCache(cacheKey, memberID, new TimeSpan(0, 0, 5));
+                if (result)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = "紀錄會員 Session ID 成功."
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "紀錄會員 Session ID 失敗."
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Record Session ID Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "紀錄會員 Session ID 發生錯誤."
                 };
             }
         }

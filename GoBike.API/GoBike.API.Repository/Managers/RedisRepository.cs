@@ -47,6 +47,24 @@ namespace GoBike.API.Repository.Managers
         }
 
         /// <summary>
+        /// 刪除快取資料
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <returns>bool</returns>
+        public async Task<bool> DeleteCache(string cacheKey)
+        {
+            try
+            {
+                return await this.database.KeyDeleteAsync(cacheKey);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Cache Error >>> CacheKey:{cacheKey}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 讀取快取資料
         /// </summary>
         /// <param name="cacheKey">cacheKey</param>
@@ -90,6 +108,24 @@ namespace GoBike.API.Repository.Managers
             catch (Exception ex)
             {
                 this.logger.LogError($"Set Cache Error >>> CacheKey:{cacheKey} DataJSON:{dataJSON}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新快取資料到期時間
+        /// </summary>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateCacheExpire(string cacheKey, TimeSpan time)
+        {
+            try
+            {
+                return await this.database.KeyExpireAsync(cacheKey, time);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Cache Expire Error >>> CacheKey:{cacheKey} TimeSpan:{time}\n{ex}");
                 return false;
             }
         }

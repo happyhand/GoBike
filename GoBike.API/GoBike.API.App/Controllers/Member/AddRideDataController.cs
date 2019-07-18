@@ -55,7 +55,7 @@ namespace GoBike.API.App.Controllers.Member
                 MemberID = memberID,
                 Climb = postData.Climb,
                 Content = postData.Content,
-                County = postData.County,
+                CityID = postData.CityID,
                 Distance = postData.Distance,
                 Level = postData.Level,
                 RideTime = postData.RideTime,
@@ -85,6 +85,11 @@ namespace GoBike.API.App.Controllers.Member
         public class RideDataPostData
         {
             /// <summary>
+            /// Gets or sets County
+            /// </summary>
+            public int CityID { get; set; }
+
+            /// <summary>
             /// Gets or sets Climb
             /// </summary>
             public double Climb { get; set; }
@@ -93,11 +98,6 @@ namespace GoBike.API.App.Controllers.Member
             /// Gets or sets Content
             /// </summary>
             public string Content { get; set; }
-
-            /// <summary>
-            /// Gets or sets County
-            /// </summary>
-            public string County { get; set; }
 
             /// <summary>
             /// Gets or sets Distance
