@@ -124,5 +124,19 @@ namespace GoBike.Service.Core.Resource
         }
 
         #endregion 行動電話驗證
+
+        #region 流水號
+
+        /// <summary>
+        /// 取得流水號 ID
+        /// </summary>
+        /// <param name="createDate">createDate</param>
+        /// <returns>string</returns>
+        public static string GetSerialID(DateTime createDate)
+        {
+            return $"{Guid.NewGuid().ToString().Substring(0, 6)}-{createDate:yyyy}-{createDate:MMdd}";
+        }
+
+        #endregion 流水號
     }
 }

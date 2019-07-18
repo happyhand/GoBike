@@ -61,6 +61,20 @@ namespace GoBike.Service.Repository.Interface.Team
         /// <returns>bool</returns>
         Task<bool> UpdateTeamData(TeamData teamData);
 
+        /// <summary>
+        /// 驗證車隊資料 (By TeamLeaderID)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <returns>bool</returns>
+        Task<bool> VerifyTeamDataByTeamLeaderID(string memberID);
+
+        /// <summary>
+        /// 驗證車隊資料 (By TeamName)
+        /// </summary>
+        /// <param name="teamName">teamName</param>
+        /// <returns>bool</returns>
+        Task<bool> VerifyTeamDataByTeamName(string teamName);
+
         #endregion 車隊資料
     }
 }

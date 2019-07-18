@@ -88,5 +88,14 @@ namespace GoBike.Service.Repository.Models.Team
         public IEnumerable<string> TeamViceLeaderIDs { get; set; }
 
         #endregion Management Data
+
+        #region Extra Data
+
+        /// <summary>
+        /// Gets or sets ExecutorID
+        /// </summary>
+        public string ExecutorID { get; set; }
+
+        #endregion Extra Data
     }
 }
