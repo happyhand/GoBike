@@ -86,6 +86,13 @@ namespace GoBike.API.Service.Interface.Member
         Task<ResponseResultDto> EditData(MemberDto memberDto);
 
         /// <summary>
+        /// 取得會員設定資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetSettingData(string memberID);
+
+        /// <summary>
         /// 會員重設密碼
         /// </summary>
         /// <param name="email">email</param>

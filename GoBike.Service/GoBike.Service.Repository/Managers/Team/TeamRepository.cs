@@ -111,6 +111,43 @@ namespace GoBike.Service.Repository.Managers.Team
         }
 
         /// <summary>
+        /// 取得車隊列表資料 (By CityID)
+        /// </summary>
+        /// <param name="cityID">cityID</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByCityID(int cityID)
+        {
+            try
+            {
+                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("CityID", cityID);
+                return await this.teamDatas.Find(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List By CityID Error >>> CityID:{cityID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊列表資料 (By CreateDate)
+        /// </summary>
+        /// <param name="createDate">createDate</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByCreateDate(TimeSpan timeSpan)
+        {
+            try
+            {
+                return await this.teamDatas.Find(data => (data.CreateDate - DateTime.Now) <= timeSpan).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List By CreateDate Error >>> TimeSpan:{timeSpan}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 取得車隊列表資料 (By TeamID)
         /// </summary>
         /// <param name="teamIDs">teamIDs</param>

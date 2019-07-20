@@ -10,6 +10,8 @@ namespace GoBike.API.App.AutoMapperProfile.Member
         public MemberProfile()
         {
             CreateMap<MemberDto, MemberSimpleInfoViewDto>();
+            CreateMap<MemberDto, MemberDetailInfoViewDto>();
+            CreateMap<MemberDto, MemberSettingInfoViewDto>();
             //CreateMap<MemberDto, MemberSimpleInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
             //CreateMap<MemberInfoDto, MemberCardInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));
             //CreateMap<MemberInfoDto, TeamMemberInfoViewDto>().ForMember(view => view.LastOnlineTime, info => info.MapFrom(data => this.CalculationLastOnlineTimeToHour(data.LoginDate)));

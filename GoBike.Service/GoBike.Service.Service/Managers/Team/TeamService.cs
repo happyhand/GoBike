@@ -90,12 +90,12 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 if (string.IsNullOrEmpty(teamDto.TeamID))
                 {
-                    return "無效的車隊編號.";
+                    return "車隊編號無效.";
                 }
 
                 if (string.IsNullOrEmpty(teamDto.ExecutorID))
                 {
-                    return "無效的執行者編號.";
+                    return "執行者編號無效.";
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
@@ -125,22 +125,22 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
-        /// 車隊編輯
+        /// 編輯車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>string</returns>
-        public async Task<string> EditData(TeamDto teamDto)
+        public async Task<string> EditTeamData(TeamDto teamDto)
         {
             try
             {
                 if (string.IsNullOrEmpty(teamDto.TeamID))
                 {
-                    return "無效的車隊編號.";
+                    return "車隊編號無效.";
                 }
 
                 if (string.IsNullOrEmpty(teamDto.ExecutorID))
                 {
-                    return "無效的執行者編號.";
+                    return "執行者編號無效.";
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
@@ -167,6 +167,96 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(teamDto)}\n{ex}");
                 return "車隊編輯發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 取得附近車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamDto>, string>> GetNearbyTeamList(TeamDto teamDto)
+        {
+            try
+            {
+                if (teamDto.CityID == (int)TeamCityID.None)
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "市區編號無效.");
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "執行者編號無效.");
+                }
+
+                int searchOpenStatus = (int)TeamSearchStatusType.Open;
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByCityID(teamDto.CityID);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Nearby Team List Error >>> CityID:{teamDto.CityID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得附近車隊列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得新創車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamDto>, string>> GetNewCreationTeamList(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "執行者編號無效.");
+                }
+
+                //// 時間定義待確認
+                TimeSpan timeSpan = new TimeSpan(30, 0, 0, 0, 0);
+                int searchOpenStatus = (int)TeamSearchStatusType.Open;
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByCreateDate(timeSpan);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get New Creation Team List Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得新創車隊列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 搜尋車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamDto>, string>> SearchTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.SearchKey))
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "搜尋關鍵字無效.");
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "執行者編號無效.");
+                }
+
+                int searchOpenStatus = (int)TeamSearchStatusType.Open;
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByTeamName(teamDto.SearchKey, false);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Team Error >>> SearchKey:{teamDto.SearchKey} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "搜尋車隊發生錯誤.");
             }
         }
 

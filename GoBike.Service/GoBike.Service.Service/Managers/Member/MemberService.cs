@@ -115,7 +115,7 @@ namespace GoBike.Service.Service.Managers.Member
 
                 if (string.IsNullOrEmpty(memberDto.FBToken))
                 {
-                    return Tuple.Create(string.Empty, "無效的登入驗證碼.");
+                    return Tuple.Create(string.Empty, "登入驗證碼無效.");
                 }
 
                 MemberData memberData = await this.memberRepository.GetMemberDataByFBToken(memberDto.FBToken);
@@ -158,7 +158,7 @@ namespace GoBike.Service.Service.Managers.Member
 
                 if (string.IsNullOrEmpty(memberDto.GoogleToken))
                 {
-                    return Tuple.Create(string.Empty, "無效的登入驗證碼.");
+                    return Tuple.Create(string.Empty, "登入驗證碼無效.");
                 }
 
                 MemberData memberData = await this.memberRepository.GetMemberDataByGoogleToken(memberDto.GoogleToken);
@@ -425,7 +425,7 @@ namespace GoBike.Service.Service.Managers.Member
                 }
                 else
                 {
-                    return Tuple.Create<MemberDto, string>(null, "無效的查詢參數.");
+                    return Tuple.Create<MemberDto, string>(null, "查詢參數無效.");
                 }
 
                 if (memberData == null)
@@ -434,7 +434,8 @@ namespace GoBike.Service.Service.Managers.Member
                 }
 
                 MemberDto memberDto = this.mapper.Map<MemberDto>(memberData);
-                await this.OnUpdateMemberRideData(memberDto);
+                IEnumerable<RideData> rideDataList = await this.rideRepository.GetRideDataList(memberData.MemberID);
+                memberDto.RideDtoList = this.mapper.Map<IEnumerable<RideDto>>(rideDataList);
                 return Tuple.Create(memberDto, string.Empty);
             }
             catch (Exception ex)
@@ -464,7 +465,8 @@ namespace GoBike.Service.Service.Managers.Member
                 IEnumerable<MemberDto> memberDtos = this.mapper.Map<IEnumerable<MemberDto>>(memberDatas);
                 foreach (MemberDto memberDto in memberDtos)
                 {
-                    await this.OnUpdateMemberRideData(memberDto);
+                    IEnumerable<RideData> rideDataList = await this.rideRepository.GetRideDataList(memberDto.MemberID);
+                    memberDto.RideDtoList = this.mapper.Map<IEnumerable<RideDto>>(rideDataList);
                 }
                 return Tuple.Create(memberDtos, string.Empty);
             }
@@ -472,23 +474,6 @@ namespace GoBike.Service.Service.Managers.Member
             {
                 this.logger.LogError($"Search Member List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
                 return Tuple.Create<IEnumerable<MemberDto>, string>(null, "搜尋會員列表發生錯誤.");
-            }
-        }
-
-        /// <summary>
-        /// 更新會員騎乘資料
-        /// </summary>
-        /// <param name="memberDto">memberDto</param>
-        private async Task OnUpdateMemberRideData(MemberDto memberDto)
-        {
-            IEnumerable<RideData> rideDatas = await this.rideRepository.GetRideDataList(memberDto.MemberID);
-            if (rideDatas.Any())
-            {
-                memberDto.LatestRideDistance = rideDatas.OrderByDescending(options => options.CreateDate).FirstOrDefault().Distance;
-                foreach (RideData item in rideDatas)
-                {
-                    memberDto.TotalRideDistance += item.Distance;
-                }
             }
         }
 
@@ -516,6 +501,11 @@ namespace GoBike.Service.Service.Managers.Member
                 }
 
                 memberData.Password = Utility.EncryptAES(memberDto.Password);
+            }
+
+            if (!string.IsNullOrEmpty(memberDto.Nickname))
+            {
+                memberData.Nickname = memberDto.Nickname;
             }
 
             if (!string.IsNullOrEmpty(memberDto.Mobile))

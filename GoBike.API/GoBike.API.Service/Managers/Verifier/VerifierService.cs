@@ -123,7 +123,7 @@ namespace GoBike.API.Service.Managers.Verifier
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.VerifierCode}-{type}-{email}-{VerifierCode}";
-                    bool isSetCache = await this.redisRepository.SetCache(cacheKey, VerifierCode, new TimeSpan(0, 10, 0));
+                    bool isSetCache = await this.redisRepository.SetCache(cacheKey, VerifierCode, TimeSpan.FromMinutes(10));
                     if (isSetCache)
                     {
                         return new ResponseResultDto()

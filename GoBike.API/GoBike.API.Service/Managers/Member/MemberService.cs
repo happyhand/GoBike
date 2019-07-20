@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
+using GoBike.API.Core.Resource.Enum;
 using GoBike.API.Repository.Interface;
 using GoBike.API.Service.Interface.Member;
 using GoBike.API.Service.Models.Email;
 using GoBike.API.Service.Models.Member.Data;
+using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -98,7 +101,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-{sessionID}-{memberID}";
-                bool result = await this.redisRepository.UpdateCacheExpire(cacheKey, new TimeSpan(0, 10, 0));
+                bool result = await this.redisRepository.UpdateCacheExpire(cacheKey, TimeSpan.FromMinutes(AppSettingHelper.Appsetting.SeesionDeadline));
                 if (result)
                 {
                     return new ResponseResultDto()
@@ -290,7 +293,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string cacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-{sessionID}-{memberID}";
-                bool result = await this.redisRepository.SetCache(cacheKey, memberID, new TimeSpan(0, 0, 5));
+                bool result = await this.redisRepository.SetCache(cacheKey, memberID, TimeSpan.FromMinutes(AppSettingHelper.Appsetting.SeesionDeadline));
                 if (result)
                 {
                     return new ResponseResultDto()
@@ -407,6 +410,44 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         /// <summary>
+        /// 取得會員設定資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetSettingData(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    MemberSettingViewDto memberSettingViewDto = await httpResponseMessage.Content.ReadAsAsync<MemberSettingViewDto>();
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = memberSettingViewDto
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Setting Data Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得會員設定資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 會員重設密碼
         /// </summary>
         /// <param name="email">email</param>
@@ -475,7 +516,7 @@ namespace GoBike.API.Service.Managers.Member
                     return new ResponseResultDto()
                     {
                         Ok = false,
-                        Data = "無效的查詢參數."
+                        Data = "查詢參數無效."
                     };
                 }
 
@@ -483,7 +524,7 @@ namespace GoBike.API.Service.Managers.Member
                 HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    MemberDto searchMemberDto = await httpResponseMessage.Content.ReadAsAsync<MemberDto>();
+                    MemberDetailInfoViewDto searchMemberDto = await httpResponseMessage.Content.ReadAsAsync<MemberDetailInfoViewDto>();
                     if (!string.IsNullOrEmpty(searcher) && searcher.Equals(searchMemberDto.MemberID))
                     {
                         return new ResponseResultDto()
@@ -492,6 +533,10 @@ namespace GoBike.API.Service.Managers.Member
                             Data = "無法查詢會員本身資料."
                         };
                     }
+
+                    string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-*-{searchMemberDto.MemberID}";
+                    string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
+                    searchMemberDto.OnlineType = string.IsNullOrEmpty(cacheKey) ? (int)OnlineStatusType.None : (int)OnlineStatusType.Online;
 
                     return new ResponseResultDto()
                     {

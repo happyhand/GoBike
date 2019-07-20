@@ -1,4 +1,5 @@
 ﻿using GoBike.Service.Repository.Models.Team;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,6 +32,20 @@ namespace GoBike.Service.Repository.Interface.Team
         /// <param name="teamID">teamID</param>
         /// <returns>TeamData</returns>
         Task<TeamData> GetTeamData(string teamID);
+
+        /// <summary>
+        /// 取得車隊列表資料 (By CityID)
+        /// </summary>
+        /// <param name="cityID">cityID</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListByCityID(int cityID);
+
+        /// <summary>
+        /// 取得車隊列表資料 (By CreateDate)
+        /// </summary>
+        /// <param name="createDate">createDate</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListByCreateDate(TimeSpan timeSpan);
 
         /// <summary>
         /// 取得車隊列表資料 (By TeamID)

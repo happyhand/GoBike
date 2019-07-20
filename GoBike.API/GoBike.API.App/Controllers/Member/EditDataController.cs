@@ -140,6 +140,11 @@ namespace GoBike.API.App.Controllers.Member
             public int Gender { get; set; }
 
             /// <summary>
+            /// Gets or sets Nickname
+            /// </summary>
+            public string Nickname { get; set; }
+
+            /// <summary>
             /// Gets or sets PhotoUrl
             /// </summary>
             public string PhotoUrl { get; set; }

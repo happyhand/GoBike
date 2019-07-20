@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Member
 {
     /// <summary>
-    /// 搜尋會員
+    /// 搜尋會員功能
     /// </summary>
-    [Route("api/Member/[controller]")]
+    [Route("api/Member/[controller]/[action]")]
     [ApiController]
     public class SearchMemberController : ApiController
     {
@@ -39,12 +39,38 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// 取得會員本身資料
+        /// 搜尋會員 - 搜尋其他會員資料
+        /// </summary>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        [CheckLoginActionFilter(true)]
+        public async Task<IActionResult> Other(SearchMemberPostData postData)
+        {
+            string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
+            try
+            {
+                ResponseResultDto responseResult = await this.memberService.SearchMember(postData.SearchKey, memberID);
+                if (responseResult.Ok)
+                {
+                    return Ok(responseResult.Data);
+                }
+
+                return BadRequest(responseResult.Data);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Other Member Error >>> SearchKey:{postData.SearchKey}\n{ex}");
+                return BadRequest("搜尋會員發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 搜尋會員 - 取得會員本身資料
         /// </summary>
         /// <returns>IActionResult</returns>
         [HttpGet]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Own()
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
@@ -65,17 +91,17 @@ namespace GoBike.API.App.Controllers.Member
         }
 
         /// <summary>
-        /// 搜尋其他會員資料
+        /// 搜尋會員 - 取得會員設定資料
         /// </summary>
         /// <returns>IActionResult</returns>
-        [HttpPost]
+        [HttpGet]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> Post(SearchMemberPostData postData)
+        public async Task<IActionResult> Setting()
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
             {
-                ResponseResultDto responseResult = await this.memberService.SearchMember(postData.SearchKey, memberID);
+                ResponseResultDto responseResult = await this.memberService.GetSettingData(memberID);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);
@@ -85,8 +111,8 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Search Appoint Member Error >>> SearchKey:{postData.SearchKey}\n{ex}");
-                return BadRequest("搜尋會員發生錯誤.");
+                this.logger.LogError($"Search Member Setting Error >>> MemberID:{memberID}\n{ex}");
+                return BadRequest("取得會員設定資料發生錯誤.");
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GoBike.Service.Repository.Models.Member
 {
@@ -79,6 +80,11 @@ namespace GoBike.Service.Repository.Models.Member
         public int MoblieBindType { get; set; }
 
         /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        public string Nickname { get; set; }
+
+        /// <summary>
         /// Gets or sets PhotoUrl
         /// </summary>
         public string PhotoUrl { get; set; }
@@ -88,14 +94,9 @@ namespace GoBike.Service.Repository.Models.Member
         #region Extra Data
 
         /// <summary>
-        /// Gets or sets LatestRideDistance
+        /// Gets or sets RideDtoList
         /// </summary>
-        public double LatestRideDistance { get; set; }
-
-        /// <summary>
-        /// Gets or sets TotalRideDistance
-        /// </summary>
-        public double TotalRideDistance { get; set; }
+        public IEnumerable<RideDto> RideDtoList { get; set; }
 
         #endregion Extra Data
     }

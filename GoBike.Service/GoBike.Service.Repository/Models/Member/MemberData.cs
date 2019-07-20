@@ -99,6 +99,12 @@ namespace GoBike.Service.Repository.Models.Member
         public int MoblieBindType { get; set; }
 
         /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        [BsonElement("Nickname")]
+        public string Nickname { get; set; }
+
+        /// <summary>
         /// Gets or sets PhotoUrl
         /// </summary>
         [BsonElement("PhotoUrl")]

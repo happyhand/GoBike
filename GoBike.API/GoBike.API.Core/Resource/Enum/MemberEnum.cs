@@ -15,4 +15,20 @@
         /// </summary>
         Bind = 1
     }
+
+    /// <summary>
+    /// 在線狀態類別資料
+    /// </summary>
+    public enum OnlineStatusType
+    {
+        /// <summary>
+        /// 未上線
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 在線
+        /// </summary>
+        Online = 1
+    }
 }

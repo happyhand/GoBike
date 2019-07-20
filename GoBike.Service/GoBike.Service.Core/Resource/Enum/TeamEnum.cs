@@ -1,7 +1,7 @@
 ﻿namespace GoBike.Service.Core.Resource.Enum
 {
     /// <summary>
-    /// 車隊搜尋狀態
+    /// 車隊市區ID
     /// </summary>
     public enum TeamCityID
     {

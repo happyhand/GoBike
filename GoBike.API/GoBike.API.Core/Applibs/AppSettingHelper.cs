@@ -10,6 +10,12 @@
         /// </summary>
         public static AppSettingHelper Appsetting;
 
+        #region Session 設定資料
+
+        public int SeesionDeadline { get; set; }
+
+        #endregion Session 設定資料
+
         #region Redis 設定資料
 
         /// <summary>

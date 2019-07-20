@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.IO;
 
 namespace GoBike.API.App
@@ -117,6 +118,7 @@ namespace GoBike.API.App
                 options.Cookie.Name = "Produce Session";
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.SameSite = SameSiteMode.None;
+                options.IdleTimeout = TimeSpan.FromMinutes(5);
             });
         }
 

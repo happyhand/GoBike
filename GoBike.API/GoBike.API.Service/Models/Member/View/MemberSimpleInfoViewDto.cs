@@ -6,18 +6,23 @@
     public class MemberSimpleInfoViewDto
     {
         /// <summary>
-        /// Gets or sets LastOnlineTime
-        /// </summary>
-        public int LastOnlineTime { get; set; }
-
-        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
 
         /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        public string Nickname { get; set; }
+
+        /// <summary>
         /// Gets or sets OnlineType
         /// </summary>
         public int OnlineType { get; set; }
+
+        /// <summary>
+        /// Gets or sets PhotoUrl
+        /// </summary>
+        public string PhotoUrl { get; set; }
     }
 }
