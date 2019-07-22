@@ -9,6 +9,7 @@ namespace GoBike.Service.Repository.Models.Member
     /// </summary>
     public class RideData
     {
+        /// <summary>
         /// Gets or sets CityID
         /// </summary>
         [BsonElement("CityID")]
@@ -20,6 +21,7 @@ namespace GoBike.Service.Repository.Models.Member
         [BsonElement("Climb")]
         public double Climb { get; set; }
 
+        /// <summary>
         /// Gets or sets Content
         /// </summary>
         [BsonElement("Content")]
@@ -48,20 +50,29 @@ namespace GoBike.Service.Repository.Models.Member
         [BsonElement("Level")]
         public int Level { get; set; }
 
+        /// <summary>
         /// Gets or sets MapUrl
         /// </summary>
         [BsonElement("MapUrl")]
         public string MapUrl { get; set; }
 
+        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         [BsonElement("MemberID")]
         public string MemberID { get; set; }
 
+        /// <summary>
         /// Gets or sets PhotoUrl
         /// </summary>
         [BsonElement("PhotoUrl")]
         public string PhotoUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets RideID
+        /// </summary>
+        [BsonElement("RideID")]
+        public string RideID { get; set; }
 
         /// <summary>
         /// Gets or sets RideTime
@@ -69,6 +80,7 @@ namespace GoBike.Service.Repository.Models.Member
         [BsonElement("RideTime")]
         public long RideTime { get; set; }
 
+        /// <summary>
         /// Gets or sets Title
         /// </summary>
         [BsonElement("Title")]

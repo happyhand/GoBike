@@ -584,7 +584,9 @@ namespace GoBike.Service.Service.Managers.Member
                 }
 
                 RideData rideData = this.mapper.Map<RideData>(rideDto);
-                rideData.CreateDate = DateTime.Now;
+                DateTime createDate = DateTime.Now;
+                rideData.CreateDate = createDate;
+                rideData.RideID = Utility.GetSerialID(createDate);
                 bool isSuccess = await this.rideRepository.CreateRideData(rideData);
                 if (!isSuccess)
                 {
@@ -597,6 +599,30 @@ namespace GoBike.Service.Service.Managers.Member
             {
                 this.logger.LogError($"Add Ride Data Error >>> Data:{JsonConvert.SerializeObject(rideDto)}\n{ex}");
                 return "新增騎乘資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>RideDto</returns>
+        public async Task<Tuple<RideDto, string>> GetRideData(RideDto rideDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(rideDto.RideID))
+                {
+                    return Tuple.Create<RideDto, string>(null, "騎乘編號無效.");
+                }
+
+                RideData rideData = await this.rideRepository.GetRideData(rideDto.RideID);
+                return Tuple.Create(this.mapper.Map<RideDto>(rideData), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Ride Data Error >>> RideID:{rideDto.RideID}\n{ex}");
+                return Tuple.Create<RideDto, string>(null, "取得騎乘資料發生錯誤.");
             }
         }
 
@@ -616,6 +642,36 @@ namespace GoBike.Service.Service.Managers.Member
             if (rideDto.RideTime == 0)
             {
                 return "無騎乘時間.";
+            }
+
+            if (rideDto.Distance == 0)
+            {
+                return "無騎乘距離.";
+            }
+
+            if (rideDto.Climb == 0)
+            {
+                return "無爬升高度.";
+            }
+
+            if (rideDto.CityID == (int)CityType.None)
+            {
+                return "未設定騎乘市區.";
+            }
+
+            if (rideDto.Level == (int)RideLevelType.None)
+            {
+                return "未設定騎乘等級.";
+            }
+
+            if (string.IsNullOrEmpty(rideDto.Title))
+            {
+                return "未輸入分享標題.";
+            }
+
+            if (string.IsNullOrEmpty(rideDto.Content))
+            {
+                return "未輸入分享內容.";
             }
 
             return string.Empty;

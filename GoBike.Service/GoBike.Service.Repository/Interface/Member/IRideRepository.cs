@@ -24,6 +24,13 @@ namespace GoBike.Service.Repository.Interface.Member
         Task<RideData> GetLatestRideData(string memberID);
 
         /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideID">rideID</param>
+        /// <returns>RideData</returns>
+        Task<RideData> GetRideData(string rideID);
+
+        /// <summary>
         /// 取得騎乘資料列表
         /// </summary>
         /// <param name="memberID">memberID</param>

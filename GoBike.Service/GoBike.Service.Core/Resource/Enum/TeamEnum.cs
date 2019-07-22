@@ -1,17 +1,6 @@
 ﻿namespace GoBike.Service.Core.Resource.Enum
 {
     /// <summary>
-    /// 車隊市區ID
-    /// </summary>
-    public enum TeamCityID
-    {
-        /// <summary>
-        /// 無設定
-        /// </summary>
-        None = 0
-    }
-
-    /// <summary>
     /// 車隊審核狀態
     /// </summary>
     public enum TeamExamineStatusType

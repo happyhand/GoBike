@@ -179,7 +179,7 @@ namespace GoBike.Service.Service.Managers.Team
         {
             try
             {
-                if (teamDto.CityID == (int)TeamCityID.None)
+                if (teamDto.CityID == (int)CityType.None)
                 {
                     return Tuple.Create<IEnumerable<TeamDto>, string>(null, "市區編號無效.");
                 }
@@ -226,6 +226,30 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 this.logger.LogError($"Get New Creation Team List Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
                 return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得新創車隊列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得會員的車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamDto>, string>> GetTeamDataListOfMember(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "執行者編號無效.");
+                }
+
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(teamDto.ExecutorID);
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(teamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List Of Member Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得會員的車隊列表發生錯誤.");
             }
         }
 
@@ -358,9 +382,9 @@ namespace GoBike.Service.Service.Managers.Team
                 }
             }
 
-            if (teamDto.CityID == (int)TeamCityID.None)
+            if (teamDto.CityID == (int)CityType.None)
             {
-                return "車隊所在地無效.";
+                return "未設定車隊所在地.";
             }
 
             if (string.IsNullOrEmpty(teamDto.TeamInfo))

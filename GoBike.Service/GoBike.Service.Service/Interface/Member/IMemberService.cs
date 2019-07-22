@@ -83,6 +83,13 @@ namespace GoBike.Service.Service.Interface.Member
         /// <returns>string</returns>
         Task<string> AddRideData(RideDto rideDto);
 
+        /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>RideDto</returns>
+        Task<Tuple<RideDto, string>> GetRideData(RideDto rideDto);
+
         #endregion 騎乘資料
     }
 }

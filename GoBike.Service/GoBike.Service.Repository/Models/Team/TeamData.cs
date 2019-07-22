@@ -30,6 +30,7 @@ namespace GoBike.Service.Repository.Models.Team
 
         #region Info Data
 
+        /// <summary>
         /// Gets or sets CityID
         /// </summary>
         [BsonElement("CityID")]

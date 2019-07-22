@@ -7,6 +7,7 @@ namespace GoBike.API.Service.Models.Member.Data
     /// </summary>
     public class RideDto
     {
+        /// <summary>
         /// Gets or sets CityID
         /// </summary>
         public int CityID { get; set; }
@@ -50,6 +51,11 @@ namespace GoBike.API.Service.Models.Member.Data
         /// Gets or sets PhotoUrl
         /// </summary>
         public string PhotoUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets RideID
+        /// </summary>
+        public string RideID { get; set; }
 
         /// <summary>
         /// Gets or sets RideTime

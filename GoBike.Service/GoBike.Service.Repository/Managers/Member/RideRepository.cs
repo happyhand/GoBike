@@ -76,6 +76,25 @@ namespace GoBike.Service.Repository.Managers.Member
         }
 
         /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideID">rideID</param>
+        /// <returns>RideData</returns>
+        public async Task<RideData> GetRideData(string rideID)
+        {
+            try
+            {
+                FilterDefinition<RideData> filter = Builders<RideData>.Filter.Eq("RideID", rideID);
+                return await this.rideDatas.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Ride Data Error >>> RideID:{rideID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 取得騎乘資料列表
         /// </summary>
         /// <param name="memberID">memberID</param>

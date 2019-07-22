@@ -199,7 +199,10 @@ namespace GoBike.Service.Repository.Managers.Team
         {
             try
             {
-                return await this.teamDatas.Find(data => data.TeamLeaderID.Equals(memberID) || data.TeamMemberIDs.Contains(memberID)).ToListAsync();
+                TeamData teamData = await this.teamDatas.Find(data => data.TeamLeaderID.Equals(memberID)).FirstOrDefaultAsync();
+                IEnumerable<TeamData> teamDataList = await this.teamDatas.Find(data => data.TeamMemberIDs.Contains(memberID)).ToListAsync();
+                teamDataList.Prepend(teamData);
+                return teamDataList.Prepend(teamData);
             }
             catch (Exception ex)
             {

@@ -1,5 +1,4 @@
-﻿using GoBike.API.Service.Models.Member.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GoBike.API.Service.Models.Member.View
 {
@@ -16,6 +15,6 @@ namespace GoBike.API.Service.Models.Member.View
         /// <summary>
         /// Gets or sets RideDtoList
         /// </summary>
-        public IEnumerable<RideDto> RideDtoList { get; set; }
+        public IEnumerable<RideSimpleInfoViewDto> RideDtoList { get; set; }
     }
 }
