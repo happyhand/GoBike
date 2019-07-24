@@ -93,6 +93,11 @@ namespace GoBike.Service.Repository.Models.Team
         #region Extra Data
 
         /// <summary>
+        /// Gets or sets ExaminerID
+        /// </summary>
+        public string ExaminerID { get; set; }
+
+        /// <summary>
         /// Gets or sets ExecutorID
         /// </summary>
         public string ExecutorID { get; set; }
@@ -101,6 +106,11 @@ namespace GoBike.Service.Repository.Models.Team
         /// Gets or sets SearchKey
         /// </summary>
         public string SearchKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets TargetID
+        /// </summary>
+        public string TargetID { get; set; }
 
         #endregion Extra Data
     }

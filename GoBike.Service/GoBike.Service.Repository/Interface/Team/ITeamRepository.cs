@@ -91,5 +91,40 @@ namespace GoBike.Service.Repository.Interface.Team
         Task<bool> VerifyTeamDataByTeamName(string teamName);
 
         #endregion 車隊資料
+
+        #region 車隊互動資料
+
+        /// <summary>
+        /// 取得會員的邀請加入車隊列表資料
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID);
+
+        /// <summary>
+        /// 更新申請加入名單資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs);
+
+        /// <summary>
+        /// 更新邀請加入名單資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberIDs">memberIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
+
+        /// <summary>
+        /// 更新車隊副隊長群
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
+
+        #endregion 車隊互動資料
     }
 }
