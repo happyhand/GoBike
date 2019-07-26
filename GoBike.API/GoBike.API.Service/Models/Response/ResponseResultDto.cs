@@ -14,5 +14,10 @@
         /// Gets or sets Ok
         /// </summary>
         public bool Ok { get; set; }
+
+        /// <summary>
+        /// Gets or sets Type
+        /// </summary>
+        public int Type { get; set; }
     }
 }

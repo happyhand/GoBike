@@ -28,6 +28,11 @@
             public CollectionSetting CollectionFlag { get; set; }
 
             /// <summary>
+            /// Gets or sets CommonDatabase
+            /// </summary>
+            public string CommonDatabase { get; set; }
+
+            /// <summary>
             /// Gets or sets ConnectionString
             /// </summary>
             public string ConnectionString { get; set; }
@@ -47,6 +52,11 @@
             /// </summary>
             public class CollectionSetting
             {
+                /// <summary>
+                /// Gets or sets City
+                /// </summary>
+                public string City { get; set; }
+
                 /// <summary>
                 /// Gets or sets Member
                 /// </summary>

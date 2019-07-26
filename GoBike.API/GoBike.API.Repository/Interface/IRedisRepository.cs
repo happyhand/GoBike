@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace GoBike.API.Repository.Interface
 {
+    /// <summary>
+    /// Redis 資料庫
+    /// </summary>
     public interface IRedisRepository
     {
         /// <summary>
