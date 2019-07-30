@@ -112,6 +112,11 @@ namespace GoBike.Service.Repository.Models.Team
         /// </summary>
         public string TargetID { get; set; }
 
+        /// <summary>
+        /// Gets or sets TargetIDs
+        /// </summary>
+        public IEnumerable<string> TargetIDs { get; set; }
+
         #endregion Extra Data
     }
 }

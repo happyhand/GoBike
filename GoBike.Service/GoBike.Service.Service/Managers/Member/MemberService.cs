@@ -606,7 +606,7 @@ namespace GoBike.Service.Service.Managers.Member
         /// 取得騎乘資料
         /// </summary>
         /// <param name="rideDto">rideDto</param>
-        /// <returns>RideDto</returns>
+        /// <returns>Tuple(RideDto, string)</returns>
         public async Task<Tuple<RideDto, string>> GetRideData(RideDto rideDto)
         {
             try

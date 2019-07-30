@@ -174,14 +174,14 @@ namespace GoBike.Service.Service.Managers.Team
         /// 取得附近車隊資料列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
-        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        /// <returns>Tuple(TeamDtos, string)</returns>
         public async Task<Tuple<IEnumerable<TeamDto>, string>> GetNearbyTeamDataList(TeamDto teamDto)
         {
             try
             {
                 if (teamDto.CityID == (int)CityType.None)
                 {
-                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "市區編號無效.");
+                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "無法查詢該市區附近車隊.");
                 }
 
                 int searchOpenStatus = (int)TeamSearchStatusType.Open;
@@ -199,7 +199,7 @@ namespace GoBike.Service.Service.Managers.Team
         /// <summary>
         /// 取得新創車隊資料列表
         /// </summary>
-        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        /// <returns>Tuple(TeamDtos, string)</returns>
         public async Task<Tuple<IEnumerable<TeamDto>, string>> GetNewCreationTeamDataList()
         {
             try
@@ -246,23 +246,29 @@ namespace GoBike.Service.Service.Managers.Team
         /// 取得會員的車隊列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
-        /// <returns>Tuple(TeamInfoDtos, string)</returns>
-        public async Task<Tuple<IEnumerable<TeamDto>, string>> GetTeamDataListOfMember(TeamDto teamDto)
+        /// <returns>Tuple(TeamDtos Of List , string)</returns>
+        public async Task<Tuple<IEnumerable<IEnumerable<TeamDto>>, string>> GetTeamDataListOfMember(TeamDto teamDto)
         {
             try
             {
                 if (string.IsNullOrEmpty(teamDto.ExecutorID))
                 {
-                    return Tuple.Create<IEnumerable<TeamDto>, string>(null, "會員編號無效.");
+                    return Tuple.Create<IEnumerable<IEnumerable<TeamDto>>, string>(null, "會員編號無效.");
                 }
 
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(teamDto.ExecutorID);
-                return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(teamDatas), string.Empty);
+                IEnumerable<TeamData> invietTeamDatas = await this.teamRepository.GetTeamDataListOfInviteJoin(teamDto.ExecutorID);
+                IEnumerable<IEnumerable<TeamDto>> teamDtos = new List<IEnumerable<TeamDto>>()
+                {
+                    this.mapper.Map<IEnumerable<TeamDto>>(teamDatas),
+                    this.mapper.Map<IEnumerable<TeamDto>>(invietTeamDatas)
+                };
+                return Tuple.Create(teamDtos, string.Empty);
             }
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List Of Member Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
-                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得會員的車隊列表發生錯誤.");
+                return Tuple.Create<IEnumerable<IEnumerable<TeamDto>>, string>(null, "取得會員的車隊列表發生錯誤.");
             }
         }
 
@@ -270,7 +276,7 @@ namespace GoBike.Service.Service.Managers.Team
         /// 搜尋車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
-        /// <returns>Tuple(TeamInfoDtos, string)</returns>
+        /// <returns>Tuple(TeamDtos, string)</returns>
         public async Task<Tuple<IEnumerable<TeamDto>, string>> SearchTeam(TeamDto teamDto)
         {
             try
@@ -447,19 +453,23 @@ namespace GoBike.Service.Service.Managers.Team
                     return "車隊不存在.";
                 }
 
+                if (teamData.TeamLeaderID.Equals(teamDto.ExecutorID) || teamData.TeamMemberIDs.Contains(teamDto.ExecutorID))
+                {
+                    return "已加入車隊.";
+                }
+
+                if (teamData.TeamInviteJoinIDs.Contains(teamDto.ExecutorID))
+                {
+                    return "車隊已邀請加入.";
+                }
+
                 if (teamData.ExamineStatus == (int)TeamExamineStatusType.Close)
                 {
                     return await this.JoinTeam(teamDto, false);
                 }
 
-                if (teamData.TeamLeaderID.Equals(teamDto.TargetID) || teamData.TeamMemberIDs.Contains(teamDto.TargetID))
-                {
-                    return "會員已加入車隊.";
-                }
-
-                bool updateTeamPlayerIDsResult = Utility.UpdateListHandler(teamData.TeamApplyForJoinIDs, teamDto.TargetID, true);
-                bool updateTeamInviteJoinIDsResult = Utility.UpdateListHandler(teamData.TeamInviteJoinIDs, teamDto.TargetID, false);
-                if (updateTeamPlayerIDsResult || updateTeamInviteJoinIDsResult)
+                bool updateTeamPlayerIDsResult = Utility.UpdateListHandler(teamData.TeamApplyForJoinIDs, teamDto.ExecutorID, true);
+                if (updateTeamPlayerIDsResult)
                 {
                     bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
                     if (!updateTeamDataResult)
@@ -472,7 +482,7 @@ namespace GoBike.Service.Service.Managers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Apply For Join Team Error >>> TeamID:{teamDto.TeamID} TargetID:{teamDto.TargetID}\n{ex}");
+                this.logger.LogError($"Apply For Join Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
                 return "申請加入車隊發生錯誤.";
             }
         }
@@ -522,6 +532,133 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
+        /// 強制離開車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> ForceLeaveTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExaminerID))
+                {
+                    return "無法進行強制離開車隊審核.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.TargetID))
+                {
+                    return "對方的會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (teamDto.TeamLeaderID.Equals(teamDto.TargetID))
+                {
+                    return "無法將車隊隊長強制離開車隊.";
+                }
+
+                if (!teamDto.TeamMemberIDs.Contains(teamDto.TargetID))
+                {
+                    return "對方未加入車隊.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExaminerID) && !teamData.TeamViceLeaderIDs.Contains(teamDto.ExaminerID))
+                {
+                    return "無強制會員離開車隊權限.";
+                }
+
+                bool updateTeamPlayerIDsResult = Utility.UpdateListHandler(teamData.TeamMemberIDs, teamDto.TargetID, false);
+                bool updateTeamViceLeaderIDsResult = Utility.UpdateListHandler(teamData.TeamViceLeaderIDs, teamDto.TargetID, false);
+                if (updateTeamPlayerIDsResult || updateTeamViceLeaderIDsResult)
+                {
+                    bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
+                    if (!updateTeamDataResult)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Force Leave Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return "強制離開車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 邀請多人加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> InviteManyJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExaminerID))
+                {
+                    return "無法進行邀請加入車隊審核.";
+                }
+
+                if (teamDto.TargetIDs == null || !teamDto.TargetIDs.Any())
+                {
+                    return "未邀請會員加入.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExaminerID) && !teamData.TeamViceLeaderIDs.Contains(teamDto.ExaminerID))
+                {
+                    return "無邀請會員加入車隊權限.";
+                }
+
+                IEnumerable<string> teamApplyForJoinIDs = teamData.TeamApplyForJoinIDs;
+                IEnumerable<string> targetIDs = teamDto.TargetIDs;
+                IEnumerable<string> validTargetIDs = targetIDs.Where(targetID => !teamData.TeamLeaderID.Equals(targetID) && !teamData.TeamMemberIDs.Contains(targetID) && !teamApplyForJoinIDs.Contains(targetID));
+                if (!validTargetIDs.Any())
+                {
+                    return "無會員可邀請加入車隊.";
+                }
+
+                bool updateTeamInviteJoinIDsResult = Utility.UpdateListHandler(teamData.TeamInviteJoinIDs, validTargetIDs, true);
+                if (updateTeamInviteJoinIDsResult)
+                {
+                    bool result = await this.teamRepository.UpdateTeamInviteJoinIDs(teamData.TeamID, teamData.TeamInviteJoinIDs);
+                    if (!result)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Invite Many Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetIDs:{JsonConvert.SerializeObject(teamDto.TargetIDs)}\n{ex}");
+                return "邀請多人加入車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
         /// 加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -566,6 +703,298 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 this.logger.LogError($"Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID} IsInvite:{isInvite}\n{ex}");
                 return "加入車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 離開車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> LeaveTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return "會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (teamDto.ExecutorID.Equals(teamData.TeamLeaderID))
+                {
+                    return "請先移交車隊隊長職務.";
+                }
+
+                if (!teamDto.TeamMemberIDs.Contains(teamDto.ExecutorID))
+                {
+                    return "未加入車隊.";
+                }
+
+                bool updateTeamPlayerIDsResult = Utility.UpdateListHandler(teamData.TeamMemberIDs, teamDto.ExecutorID, false);
+                bool updateTeamViceLeaderIDsResult = Utility.UpdateListHandler(teamData.TeamViceLeaderIDs, teamDto.ExecutorID, false);
+                if (updateTeamPlayerIDsResult || updateTeamViceLeaderIDsResult)
+                {
+                    bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
+                    if (!updateTeamDataResult)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Leave Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return "離開車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 拒絕申請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> RejectApplyForJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExaminerID))
+                {
+                    return "無法進行拒絕申請加入車隊審核.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.TargetID))
+                {
+                    return "對方的會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (teamData.TeamMemberIDs.Contains(teamDto.TargetID))
+                {
+                    return "對方已加入車隊.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExaminerID) && !teamData.TeamViceLeaderIDs.Contains(teamDto.ExaminerID))
+                {
+                    return "無拒絕會員申請加入車隊權限.";
+                }
+
+                bool updateTeamApplyForJoinIDsResult = Utility.UpdateListHandler(teamData.TeamApplyForJoinIDs, teamDto.TargetID, false);
+                if (updateTeamApplyForJoinIDsResult)
+                {
+                    bool result = await this.teamRepository.UpdateTeamApplyForJoinIDs(teamData.TeamID, teamData.TeamApplyForJoinIDs);
+                    if (!result)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Apply For Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return "拒絕申請加入車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 拒絕邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> RejectInviteJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return "會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                bool updateTeamInviteJoinIDsResult = Utility.UpdateListHandler(teamData.TeamInviteJoinIDs, teamDto.ExecutorID, false);
+                if (updateTeamInviteJoinIDsResult)
+                {
+                    bool result = await this.teamRepository.UpdateTeamInviteJoinIDs(teamData.TeamID, teamData.TeamInviteJoinIDs);
+                    if (!result)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Invite Join Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return "拒絕邀請加入車隊發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 更新車隊隊長
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        public async Task<string> UpdateTeamLeader(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExaminerID))
+                {
+                    return "無法進行更新車隊隊長審核.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.TargetID))
+                {
+                    return "對方的會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExaminerID))
+                {
+                    return "非車隊隊長無法移交隊長職務.";
+                }
+
+                if (teamDto.ExaminerID.Equals(teamDto.TargetID))
+                {
+                    return "移交隊長職務對象無法為本人.";
+                }
+
+                if (!teamData.TeamMemberIDs.Contains(teamDto.TargetID))
+                {
+                    return "對方未加入車隊.";
+                }
+
+                bool isMultipleTeam = await this.teamRepository.VerifyTeamDataByTeamLeaderID(teamDto.TargetID);
+                if (isMultipleTeam)
+                {
+                    return "無法指定其他車隊隊長.";
+                }
+
+                Utility.UpdateListHandler(teamDto.TeamMemberIDs, teamData.TeamLeaderID, true);
+                Utility.UpdateListHandler(teamDto.TeamMemberIDs, teamDto.TargetID, false);
+                teamData.TeamLeaderID = teamDto.TargetID;
+                bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
+                if (!updateTeamDataResult)
+                {
+                    return "車隊資料更新失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Team Leader Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return "更新車隊隊長發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 更新車隊副隊長
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <param name="isAdd">isAdd</param>
+        /// <returns>string</returns>
+        public async Task<string> UpdateTeamViceLeader(TeamDto teamDto, bool isAdd)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExaminerID))
+                {
+                    return "無法進行更新車隊副隊長審核.";
+                }
+
+                if (string.IsNullOrEmpty(teamDto.TargetID))
+                {
+                    return "對方的會員編號無效.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExaminerID))
+                {
+                    return $"非車隊隊長無法{(isAdd ? "指定" : "卸除")}車隊副隊長.";
+                }
+
+                if (teamDto.ExaminerID.Equals(teamDto.TargetID))
+                {
+                    return $"{(isAdd ? "指定" : "卸除")}車隊副隊長對象無法為本人.";
+                }
+
+                if (isAdd && !teamData.TeamMemberIDs.Contains(teamDto.TargetID))
+                {
+                    return "對方未加入車隊.";
+                }
+
+                bool updateTeamViceLeaderIDsResult = Utility.UpdateListHandler(teamData.TeamViceLeaderIDs, teamDto.TargetID, isAdd);
+                if (updateTeamViceLeaderIDsResult)
+                {
+                    bool result = await this.teamRepository.UpdateTeamViceLeaders(teamData.TeamID, teamData.TeamViceLeaderIDs);
+                    if (!result)
+                    {
+                        return "車隊資料更新失敗.";
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Team Vice Leader Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return "更新車隊副隊長發生錯誤.";
             }
         }
 
