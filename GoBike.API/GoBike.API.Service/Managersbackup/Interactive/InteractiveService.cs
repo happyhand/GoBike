@@ -13,7 +13,7 @@
 //using System.Net.Http;
 //using System.Threading.Tasks;
 
-//namespace GoBike.API.Service.Managers.Interactive
+//namespace GoBike.API.Service.Managersbackup.Interactive
 //{
 //    /// <summary>
 //    /// 互動服務

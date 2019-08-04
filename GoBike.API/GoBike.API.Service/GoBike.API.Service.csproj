@@ -22,4 +22,8 @@
     <ProjectReference Include="..\GoBike.API.Repository\GoBike.API.Repository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Team\View\" />
+  </ItemGroup>
+
 </Project>

@@ -8,8 +8,10 @@ using GoBike.Service.Repository.Managers.Member;
 using GoBike.Service.Repository.Managers.Team;
 using GoBike.Service.Service.Interface.Common;
 using GoBike.Service.Service.Interface.Member;
+using GoBike.Service.Service.Interface.Team;
 using GoBike.Service.Service.Managers.Common;
 using GoBike.Service.Service.Managers.Member;
+using GoBike.Service.Service.Managers.Team;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +68,7 @@ namespace GoBike.Service.API
         {
             services.AddSingleton<ICommonService, CommonService>();
             services.AddSingleton<IMemberService, MemberService>();
+            services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<ICommonRepository, CommonRepository>();
             services.AddSingleton<IMemberRepository, MemberRepository>();
             services.AddSingleton<IRideRepository, RideRepository>();

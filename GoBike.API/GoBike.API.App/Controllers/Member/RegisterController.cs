@@ -41,7 +41,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public async Task<IActionResult> Post(PostData postData)
+        public async Task<IActionResult> Post(RegisterPostData postData)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace GoBike.API.App.Controllers.Member
         /// <summary>
         /// Post 資料
         /// </summary>
-        public class PostData
+        public class RegisterPostData
         {
             /// <summary>
             /// Gets or sets Email

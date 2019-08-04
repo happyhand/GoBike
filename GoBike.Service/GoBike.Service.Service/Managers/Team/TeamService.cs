@@ -125,7 +125,7 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
-        /// 編輯車隊
+        /// 編輯車隊資料
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>string</returns>
@@ -165,8 +165,8 @@ namespace GoBike.Service.Service.Managers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data Error >>> Data:{JsonConvert.SerializeObject(teamDto)}\n{ex}");
-                return "車隊編輯發生錯誤.";
+                this.logger.LogError($"Edit Team Data Error >>> Data:{JsonConvert.SerializeObject(teamDto)}\n{ex}");
+                return "編輯車隊資料發生錯誤.";
             }
         }
 

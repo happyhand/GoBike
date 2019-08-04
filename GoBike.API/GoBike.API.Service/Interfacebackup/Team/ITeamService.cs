@@ -3,7 +3,7 @@ using GoBike.API.Service.Models.Team.Command;
 using GoBike.API.Service.Models.Team.Command.Data;
 using System.Threading.Tasks;
 
-namespace GoBike.API.Service.Interface.Team
+namespace GoBike.API.Service.Interfacebackup.Team
 {
     /// <summary>
     /// 車隊服務

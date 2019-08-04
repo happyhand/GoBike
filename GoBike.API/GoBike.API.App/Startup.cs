@@ -5,9 +5,11 @@ using GoBike.API.Repository.Interface;
 using GoBike.API.Repository.Managers;
 using GoBike.API.Service.Interface.Common;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Interface.Team;
 using GoBike.API.Service.Interface.Verifier;
 using GoBike.API.Service.Managers.Common;
 using GoBike.API.Service.Managers.Member;
+using GoBike.API.Service.Managers.Team;
 using GoBike.API.Service.Managers.Verifier;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -99,10 +101,10 @@ namespace GoBike.API.App
         {
             services.AddSingleton<ICommonService, CommonService>();
             services.AddSingleton<IMemberService, MemberService>();
+            services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<IVerifierService, VerifierService>();
             services.AddSingleton<IRedisRepository, RedisRepository>();
             //services.AddSingleton<IInteractiveService, InteractiveService>();
-            //services.AddSingleton<ITeamService, TeamService>();
         }
 
         /// <summary>
