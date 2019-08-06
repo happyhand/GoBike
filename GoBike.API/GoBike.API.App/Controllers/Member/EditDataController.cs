@@ -50,18 +50,18 @@ namespace GoBike.API.App.Controllers.Member
         public async Task<IActionResult> Info(EditInfoPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            MemberDto memberDto = new MemberDto()
-            {
-                MemberID = memberID,
-                Birthday = postData.Birthday,
-                BodyHeight = postData.BodyHeight,
-                BodyWeight = postData.BodyWeight,
-                Gender = postData.Gender,
-                FrontCoverUrl = postData.FrontCoverUrl,
-                PhotoUrl = postData.PhotoUrl
-            };
             try
             {
+                MemberDto memberDto = new MemberDto()
+                {
+                    MemberID = memberID,
+                    Birthday = postData.Birthday,
+                    BodyHeight = postData.BodyHeight,
+                    BodyWeight = postData.BodyWeight,
+                    Gender = postData.Gender,
+                    FrontCoverUrl = postData.FrontCoverUrl,
+                    PhotoUrl = postData.PhotoUrl
+                };
                 ResponseResultDto responseResult = await this.memberService.EditData(memberDto);
                 if (responseResult.Ok)
                 {
@@ -72,7 +72,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data For Info Error >>> Data:{JsonConvert.SerializeObject(memberDto)}\n{ex}");
+                this.logger.LogError($"Edit Data For Info Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("會員編輯發生錯誤.");
             }
         }
@@ -87,13 +87,13 @@ namespace GoBike.API.App.Controllers.Member
         public async Task<IActionResult> Password(EditPasswordPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            MemberDto memberDto = new MemberDto()
-            {
-                MemberID = memberID,
-                Password = postData.Password
-            };
             try
             {
+                MemberDto memberDto = new MemberDto()
+                {
+                    MemberID = memberID,
+                    Password = postData.Password
+                };
                 ResponseResultDto responseResult = await this.memberService.EditData(memberDto);
                 if (responseResult.Ok)
                 {

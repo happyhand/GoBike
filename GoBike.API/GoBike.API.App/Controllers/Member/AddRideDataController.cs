@@ -50,20 +50,19 @@ namespace GoBike.API.App.Controllers.Member
         public async Task<IActionResult> Post(RideDataPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            RideDto rideDto = new RideDto()
-            {
-                MemberID = memberID,
-                Climb = postData.Climb,
-                Content = postData.Content,
-                CityID = postData.CityID,
-                Distance = postData.Distance,
-                Level = postData.Level,
-                RideTime = postData.RideTime,
-                Title = postData.Title
-            };
-
             try
             {
+                RideDto rideDto = new RideDto()
+                {
+                    MemberID = memberID,
+                    Climb = postData.Climb,
+                    Content = postData.Content,
+                    CityID = postData.CityID,
+                    Distance = postData.Distance,
+                    Level = postData.Level,
+                    RideTime = postData.RideTime,
+                    Title = postData.Title
+                };
                 ResponseResultDto responseResult = await this.memberService.AddRideData(rideDto);
                 if (responseResult.Ok)
                 {
@@ -74,7 +73,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Ride Data Error >>> Data:{JsonConvert.SerializeObject(rideDto)}\n{ex}");
+                this.logger.LogError($"Add Ride Data Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("新增騎乘資料發生錯誤.");
             }
         }

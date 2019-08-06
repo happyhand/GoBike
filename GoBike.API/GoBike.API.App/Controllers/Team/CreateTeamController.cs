@@ -50,20 +50,19 @@ namespace GoBike.API.App.Controllers.Team
         public async Task<IActionResult> Post(CreateTeamPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
-            TeamDto teamDto = new TeamDto()
-            {
-                TeamName = postData.TeamName,
-                CityID = postData.CityID,
-                TeamInfo = postData.TeamInfo,
-                SearchStatus = postData.SearchStatus,
-                ExamineStatus = postData.ExamineStatus,
-                FrontCoverUrl = postData.FrontCoverUrl,
-                PhotoUrl = postData.PhotoUrl,
-                ExecutorID = memberID
-            };
-
             try
             {
+                TeamDto teamDto = new TeamDto()
+                {
+                    TeamName = postData.TeamName,
+                    CityID = postData.CityID,
+                    TeamInfo = postData.TeamInfo,
+                    SearchStatus = postData.SearchStatus,
+                    ExamineStatus = postData.ExamineStatus,
+                    FrontCoverUrl = postData.FrontCoverUrl,
+                    PhotoUrl = postData.PhotoUrl,
+                    ExecutorID = memberID
+                };
                 ResponseResultDto responseResult = await this.teamService.CreateTeam(teamDto);
                 if (responseResult.Ok)
                 {
@@ -74,7 +73,7 @@ namespace GoBike.API.App.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Create Team Error >>> Data:{JsonConvert.SerializeObject(teamDto)}\n{ex}");
+                this.logger.LogError($"Create Team Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("建立車隊發生錯誤.");
             }
         }

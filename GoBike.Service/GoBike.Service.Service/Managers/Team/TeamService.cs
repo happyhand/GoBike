@@ -243,7 +243,7 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
-        /// 取得會員的車隊列表
+        /// 取得會員的車隊資料列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>Tuple(TeamDtos Of List , string)</returns>
@@ -268,7 +268,7 @@ namespace GoBike.Service.Service.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List Of Member Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
-                return Tuple.Create<IEnumerable<IEnumerable<TeamDto>>, string>(null, "取得會員的車隊列表發生錯誤.");
+                return Tuple.Create<IEnumerable<IEnumerable<TeamDto>>, string>(null, "取得會員的車隊資料列表發生錯誤.");
             }
         }
 

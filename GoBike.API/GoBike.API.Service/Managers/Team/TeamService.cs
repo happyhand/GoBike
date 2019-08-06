@@ -4,9 +4,11 @@ using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Team;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Team.Data;
+using GoBike.API.Service.Models.Team.View;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -90,6 +92,80 @@ namespace GoBike.API.Service.Managers.Team
                 {
                     Ok = false,
                     Data = "編輯車隊資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得會員的車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/GetTeamDataListOfMember", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<IEnumerable<TeamSimpleInfoView>>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team List Of Member Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得會員的車隊列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 搜尋車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> SearchTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/SearchTeam", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Team Error >>> ExecutorID:{teamDto.ExecutorID} SearchKey:{teamDto.SearchKey}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "搜尋車隊發生錯誤."
                 };
             }
         }

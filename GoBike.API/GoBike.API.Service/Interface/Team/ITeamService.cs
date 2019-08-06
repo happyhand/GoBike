@@ -22,5 +22,19 @@ namespace GoBike.API.Service.Interface.Team
         /// <param name="teamDto">teamDto</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> EditTeamData(TeamDto teamDto);
+
+        /// <summary>
+        /// 取得會員的車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto);
+
+        /// <summary>
+        /// 搜尋車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> SearchTeam(TeamDto teamDto);
     }
 }

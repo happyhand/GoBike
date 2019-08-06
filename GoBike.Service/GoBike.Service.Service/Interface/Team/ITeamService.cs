@@ -51,7 +51,7 @@ namespace GoBike.Service.Service.Interface.Team
         Task<Tuple<TeamDto, string>> GetTeamData(TeamDto teamDto);
 
         /// <summary>
-        /// 取得會員的車隊列表
+        /// 取得會員的車隊資料列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>Tuple(TeamDtos Of List , string)</returns>
