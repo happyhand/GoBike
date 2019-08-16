@@ -41,6 +41,118 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
+        /// 同意邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AgreeInviteJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Invite/AgreeInvite", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Agree Invite Join Team Error >>> Data:{JsonConvert.SerializeObject(teamDto)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "同意邀請加入車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 允許申請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AllowApplyForJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/ApplyFor/AllowJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Allow Apply For Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 允許邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> AllowInviteJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Invite/AllowJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Allow Invite Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 申請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> ApplyForJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/ApplyFor/RequestJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Apply For Join Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 建立車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -129,6 +241,72 @@ namespace GoBike.API.Service.Managers.Team
                 {
                     Ok = false,
                     Data = "取得會員的車隊列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> InviteJoinTeam(TeamDto teamDto)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// 拒絕申請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RejectApplyForJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/ApplyFor/RejectJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Apply For Join Team Error >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "拒絕申請加入車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 拒絕邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RejectInviteJoinTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Invite/RejectJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Reject Invite For Join Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "拒絕邀請加入車隊發生錯誤."
                 };
             }
         }

@@ -166,7 +166,7 @@ namespace GoBike.Service.Repository.Managers.Member
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Member Data List Error >>> MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return null;
+                return new List<MemberData>();
             }
         }
 

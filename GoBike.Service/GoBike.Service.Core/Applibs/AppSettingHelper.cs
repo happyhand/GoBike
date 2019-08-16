@@ -76,6 +76,11 @@
                 /// Gets or sets Team
                 /// </summary>
                 public string Team { get; set; }
+
+                /// <summary>
+                /// Gets or sets TeamInteractive
+                /// </summary>
+                public string TeamInteractive { get; set; }
             }
         }
 

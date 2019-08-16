@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace GoBike.Service.Repository.Models.Team
 {
+    /// <summary>
+    /// 車隊資料
+    /// </summary>
     public class TeamData
     {
         #region Register Data
@@ -75,18 +78,6 @@ namespace GoBike.Service.Repository.Models.Team
         #endregion Info Data
 
         #region Management Data
-
-        /// <summary>
-        /// Gets or sets TeamApplyForJoinIDs
-        /// </summary>
-        [BsonElement("TeamApplyForJoinIDs")]
-        public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamInviteJoinIDs
-        /// </summary>
-        [BsonElement("TeamInviteJoinIDs")]
-        public IEnumerable<string> TeamInviteJoinIDs { get; set; }
 
         /// <summary>
         /// Gets or sets TeamLeaderID

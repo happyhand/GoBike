@@ -69,6 +69,13 @@ namespace GoBike.Service.Service.Interface.Team
         #region 互動資料
 
         /// <summary>
+        /// 同意邀請加入車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>string</returns>
+        Task<string> AgreeInviteJoinTeam(TeamDto teamDto);
+
+        /// <summary>
         /// 申請加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>

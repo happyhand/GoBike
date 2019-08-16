@@ -95,35 +95,55 @@ namespace GoBike.Service.Repository.Interface.Team
         #region 車隊互動資料
 
         /// <summary>
-        /// 取得會員的邀請加入車隊列表資料
+        /// 建立多筆車隊互動資料
+        /// </summary>
+        /// <param name="teamInteractiveDatas">teamInteractiveDatas</param>
+        /// <returns>bool</returns>
+        Task<bool> CreateManyTeamInteractiveData(IEnumerable<TeamInteractiveData> teamInteractiveDatas);
+
+        /// <summary>
+        /// 建立車隊互動資料
+        /// </summary>
+        /// <param name="teamInteractiveData">teamInteractiveData</param>
+        /// <returns>bool</returns>
+        Task<bool> CreateTeamInteractiveData(TeamInteractiveData teamInteractiveData);
+
+        /// <summary>
+        /// 刪除車隊互動資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>bool</returns>
+        Task<bool> DeleteTeamInteractiveData(string teamID, string memberID);
+
+        /// <summary>
+        /// 取得指定的車隊互動資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamInteractiveData</returns>
+        Task<TeamInteractiveData> GetAppointTeamInteractiveData(string teamID, string memberID);
+
+        /// <summary>
+        /// 取得會員的車隊互動資料列表資料
         /// </summary>
         /// <param name="memberID">memberID</param>
         /// <returns>TeamDatas</returns>
-        Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID);
+        Task<IEnumerable<TeamInteractiveData>> GetTeamInteractiveDataListOfMember(string memberID);
 
         /// <summary>
-        /// 更新申請加入名單資料
+        /// 取得車隊的車隊互動資料列表
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs);
+        /// <returns>TeamInteractiveDatas</returns>
+        Task<IEnumerable<TeamInteractiveData>> GetTeamInteractiveDataListOfTeam(string teamID);
 
         /// <summary>
-        /// 更新邀請加入名單資料
+        /// 更新車隊互動資料
         /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
+        /// <param name="teamInteractiveData">teamInteractiveData</param>
         /// <returns>bool</returns>
-        Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs);
-
-        /// <summary>
-        /// 更新車隊副隊長群
-        /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
-        /// <returns>bool</returns>
-        Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs);
+        Task<bool> UpdateTeamInteractiveData(TeamInteractiveData teamInteractiveData);
 
         #endregion 車隊互動資料
     }

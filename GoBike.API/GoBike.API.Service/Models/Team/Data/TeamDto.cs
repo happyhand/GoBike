@@ -64,16 +64,6 @@ namespace GoBike.API.Service.Models.Team.Data
         #region Management Data
 
         /// <summary>
-        /// Gets or sets TeamApplyForJoinIDs
-        /// </summary>
-        public IEnumerable<string> TeamApplyForJoinIDs { get; set; }
-
-        /// <summary>
-        /// Gets or sets TeamInviteJoinIDs
-        /// </summary>
-        public IEnumerable<string> TeamInviteJoinIDs { get; set; }
-
-        /// <summary>
         /// Gets or sets TeamLeaderID
         /// </summary>
         public string TeamLeaderID { get; set; }

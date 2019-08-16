@@ -22,9 +22,14 @@ namespace GoBike.Service.Repository.Managers.Team
         private readonly ILogger<TeamRepository> logger;
 
         /// <summary>
-        /// memberDatas
+        /// teamDatas
         /// </summary>
         private readonly IMongoCollection<TeamData> teamDatas;
+
+        /// <summary>
+        /// teamInteractiveDatas
+        /// </summary>
+        private readonly IMongoCollection<TeamInteractiveData> teamInteractiveDatas;
 
         /// <summary>
         /// 建構式
@@ -36,6 +41,7 @@ namespace GoBike.Service.Repository.Managers.Team
             IMongoClient client = new MongoClient(AppSettingHelper.Appsetting.MongoDBConfig.ConnectionString);
             IMongoDatabase db = client.GetDatabase(AppSettingHelper.Appsetting.MongoDBConfig.TeamDatabase);
             this.teamDatas = db.GetCollection<TeamData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Team);
+            this.teamInteractiveDatas = db.GetCollection<TeamInteractiveData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.TeamInteractive);
         }
 
         #region 車隊資料
@@ -125,7 +131,7 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List By CityID Error >>> CityID:{cityID}\n{ex}");
-                return null;
+                return new List<TeamData>();
             }
         }
 
@@ -143,7 +149,7 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List By CreateDate Error >>> TimeSpan:{timeSpan}\n{ex}");
-                return null;
+                return new List<TeamData>();
             }
         }
 
@@ -162,7 +168,7 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List By TeamID Error >>> TeamIDs:{JsonConvert.SerializeObject(teamIDs)}\n{ex}");
-                return null;
+                return new List<TeamData>();
             }
         }
 
@@ -186,7 +192,7 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List By TeamName Error >>> TeamName:{teamName} IsStrict:{isStrict}\n{ex}");
-                return null;
+                return new List<TeamData>();
             }
         }
 
@@ -206,7 +212,7 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List Of Member Error >>> MemberID:{memberID}\n{ex}");
-                return null;
+                return new List<TeamData>();
             }
         }
 
@@ -285,113 +291,150 @@ namespace GoBike.Service.Repository.Managers.Team
         #region 車隊互動資料
 
         /// <summary>
-        /// 取得會員的邀請加入車隊列表資料
+        /// 建立多筆車隊互動資料
         /// </summary>
-        /// <param name="memberID">memberID</param>
-        /// <returns>TeamDatas</returns>
-        public async Task<IEnumerable<TeamData>> GetTeamDataListOfInviteJoin(string memberID)
+        /// <param name="teamInteractiveDatas">teamInteractiveDatas</param>
+        /// <returns>bool</returns>
+        public async Task<bool> CreateManyTeamInteractiveData(IEnumerable<TeamInteractiveData> teamInteractiveDatas)
         {
             try
             {
-                return await this.teamDatas.Find(data => data.TeamInviteJoinIDs.Contains(memberID)).ToListAsync();
+                await this.teamInteractiveDatas.InsertManyAsync(teamInteractiveDatas);
+                return true;
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get Team Data List Of Invite Join Error >>> MemberID:{memberID}\n{ex}");
+                this.logger.LogError($"Create Many Team Interactive Data Error >>> Data:{JsonConvert.SerializeObject(teamInteractiveDatas)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 建立車隊互動資料
+        /// </summary>
+        /// <param name="teamInteractiveData">teamInteractiveData</param>
+        /// <returns>bool</returns>
+        public async Task<bool> CreateTeamInteractiveData(TeamInteractiveData teamInteractiveData)
+        {
+            try
+            {
+                await this.teamInteractiveDatas.InsertOneAsync(teamInteractiveData);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Create Team Interactive Data Error >>> Data:{JsonConvert.SerializeObject(teamInteractiveData)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 刪除車隊互動資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>bool</returns>
+        public async Task<bool> DeleteTeamInteractiveData(string teamID, string memberID)
+        {
+            try
+            {
+                DeleteResult result = await this.teamInteractiveDatas.DeleteManyAsync(data => data.TeamID.Equals(teamID) && data.MemberID.Equals(memberID));
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Review Join Team Data Fail For IsAcknowledged >>> TeamID:{teamID} MemberID:{memberID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Review Join Team Data For DeletedCount >>> TeamID:{teamID} MemberID:{memberID}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Review Join Team Data Error >>> TeamID:{teamID} MemberID:{memberID}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 取得指定的車隊互動資料
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamInteractiveData</returns>
+        public async Task<TeamInteractiveData> GetAppointTeamInteractiveData(string teamID, string memberID)
+        {
+            try
+            {
+                return await this.teamInteractiveDatas.Find(data => data.TeamID.Equals(teamID) && data.MemberID.Equals(memberID)).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Interactive Data Of Team Error >>> TeamID:{teamID} MemberID:{memberID}\n{ex}");
                 return null;
             }
         }
 
         /// <summary>
-        /// 更新申請加入名單資料
+        /// 取得會員的車隊互動資料列表資料
         /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateTeamApplyForJoinIDs(string teamID, IEnumerable<string> memberIDs)
+        /// <param name="memberID">memberID</param>
+        /// <returns>TeamInteractiveDatas</returns>
+        public async Task<IEnumerable<TeamInteractiveData>> GetTeamInteractiveDataListOfMember(string memberID)
         {
             try
             {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamApplyForJoinIDs, memberIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    this.logger.LogError($"Update Team Apply For Join IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    this.logger.LogError($"Update Team Apply For Join IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                return true;
+                return await this.teamInteractiveDatas.Find(data => data.MemberID.Equals(memberID)).ToListAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Apply For Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return false;
+                this.logger.LogError($"Get Team Interactive Data List Of Member Error >>> MemberID:{memberID}\n{ex}");
+                return new List<TeamInteractiveData>();
             }
         }
 
         /// <summary>
-        /// 更新邀請加入名單資料
+        /// 取得車隊的車隊互動資料列表
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <param name="memberIDs">memberIDs</param>
-        /// <returns>bool</returns>
-        public async Task<bool> UpdateTeamInviteJoinIDs(string teamID, IEnumerable<string> memberIDs)
+        /// <returns>TeamInteractiveDatas</returns>
+        public async Task<IEnumerable<TeamInteractiveData>> GetTeamInteractiveDataListOfTeam(string teamID)
         {
             try
             {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamInviteJoinIDs, memberIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
-                if (!result.IsAcknowledged)
-                {
-                    this.logger.LogError($"Update Team Invite Join IDs Fail For IsAcknowledged >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                if (result.ModifiedCount == 0)
-                {
-                    this.logger.LogError($"Update Team Invite Join IDs Fail For ModifiedCount >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}");
-                    return false;
-                }
-
-                return true;
+                return await this.teamInteractiveDatas.Find(data => data.TeamID.Equals(teamID)).ToListAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Invite Join IDs Error >>> TeamID:{teamID} MemberIDs:{JsonConvert.SerializeObject(memberIDs)}\n{ex}");
-                return false;
+                this.logger.LogError($"Get Team Interactive Data List Of Team Error >>> TeamID:{teamID}\n{ex}");
+                return new List<TeamInteractiveData>();
             }
         }
 
         /// <summary>
-        /// 更新車隊副隊長群
+        /// 更新車隊互動資料
         /// </summary>
-        /// <param name="teamID">teamID</param>
-        /// <param name="teamViceLeaderIDs">teamViceLeaderIDs</param>
+        /// <param name="teamInteractiveData">teamInteractiveData</param>
         /// <returns>bool</returns>
-        public async Task<bool> UpdateTeamViceLeaders(string teamID, IEnumerable<string> teamViceLeaderIDs)
+        public async Task<bool> UpdateTeamInteractiveData(TeamInteractiveData teamInteractiveData)
         {
             try
             {
-                FilterDefinition<TeamData> filter = Builders<TeamData>.Filter.Eq("TeamID", teamID);
-                UpdateDefinition<TeamData> update = Builders<TeamData>.Update.Set(data => data.TeamViceLeaderIDs, teamViceLeaderIDs);
-                UpdateResult result = await this.teamDatas.UpdateOneAsync(filter, update);
+                FilterDefinition<TeamInteractiveData> filter = Builders<TeamInteractiveData>.Filter.Eq("_id", teamInteractiveData.Id);
+                ReplaceOneResult result = await this.teamInteractiveDatas.ReplaceOneAsync(filter, teamInteractiveData);
                 if (!result.IsAcknowledged)
                 {
-                    this.logger.LogError($"Update Team Vice Leaders Fail For IsAcknowledged >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    this.logger.LogError($"Update Team Interactive Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(teamInteractiveData)}");
                     return false;
                 }
 
                 if (result.ModifiedCount == 0)
                 {
-                    this.logger.LogError($"Update Team Vice Leaders Fail For ModifiedCount >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}");
+                    this.logger.LogError($"Update Team Interactive Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(teamInteractiveData)}");
                     return false;
                 }
 
@@ -399,7 +442,7 @@ namespace GoBike.Service.Repository.Managers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Update Team Vice Leaders Error >>> TeamID:{teamID} TeamViceLeaderIDs:{JsonConvert.SerializeObject(teamViceLeaderIDs)}\n{ex}");
+                this.logger.LogError($"Update Team Interactive Data Error >>> Data:{JsonConvert.SerializeObject(teamInteractiveData)}\n{ex}");
                 return false;
             }
         }
