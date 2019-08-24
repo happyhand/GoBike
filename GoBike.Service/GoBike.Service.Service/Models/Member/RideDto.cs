@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GoBike.Service.Repository.Models.Member
+namespace GoBike.Service.Service.Models.Member
 {
     /// <summary>
     /// 騎乘資料

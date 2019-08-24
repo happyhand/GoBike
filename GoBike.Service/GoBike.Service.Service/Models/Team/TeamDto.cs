@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GoBike.Service.Repository.Models.Team
+namespace GoBike.Service.Service.Models.Team
 {
     /// <summary>
     /// 車隊資料

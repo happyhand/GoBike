@@ -46,7 +46,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> AllowJoin(AllowJoinPostData postData)
+        public async Task<IActionResult> AllowJoin(AllowApplyForJoinPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
@@ -79,7 +79,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> RejectJoin(RejectJoinPostData postData)
+        public async Task<IActionResult> RejectJoin(RejectApplyForJoinPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
@@ -112,7 +112,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <returns>IActionResult</returns>
         [HttpPost]
         [CheckLoginActionFilter(true)]
-        public async Task<IActionResult> RequestJoin(RequestJoinPostData postData)
+        public async Task<IActionResult> RequestJoin(RequestApplyForJoinPostData postData)
         {
             string memberID = this.HttpContext.Session.GetObject<string>(CommonFlagHelper.CommonFlag.SessionFlag.MemberID);
             try
@@ -140,7 +140,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <summary>
         /// 允許申請加入 Post 資料
         /// </summary>
-        public class AllowJoinPostData
+        public class AllowApplyForJoinPostData
         {
             /// <summary>
             /// Gets or sets TargetID
@@ -156,7 +156,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <summary>
         /// 拒絕申請加入 Post 資料
         /// </summary>
-        public class RejectJoinPostData
+        public class RejectApplyForJoinPostData
         {
             /// <summary>
             /// Gets or sets TargetID
@@ -172,7 +172,7 @@ namespace GoBike.API.App.Controllers.Team
         /// <summary>
         /// 請求加入 Post 資料
         /// </summary>
-        public class RequestJoinPostData
+        public class RequestApplyForJoinPostData
         {
             /// <summary>
             /// Gets or sets TeamID

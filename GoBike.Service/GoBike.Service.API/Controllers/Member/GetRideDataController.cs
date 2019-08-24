@@ -1,5 +1,5 @@
-﻿using GoBike.Service.Repository.Models.Member;
-using GoBike.Service.Service.Interface.Member;
+﻿using GoBike.Service.Service.Interface.Member;
+using GoBike.Service.Service.Models.Member;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;

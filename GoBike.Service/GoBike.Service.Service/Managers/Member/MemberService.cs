@@ -4,6 +4,7 @@ using GoBike.Service.Core.Resource.Enum;
 using GoBike.Service.Repository.Interface.Member;
 using GoBike.Service.Repository.Models.Member;
 using GoBike.Service.Service.Interface.Member;
+using GoBike.Service.Service.Models.Member;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

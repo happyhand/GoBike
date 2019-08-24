@@ -1,4 +1,4 @@
-﻿using GoBike.Service.Repository.Models.Team;
+﻿using GoBike.Service.Service.Models.Team;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

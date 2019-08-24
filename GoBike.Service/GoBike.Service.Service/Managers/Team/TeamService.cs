@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using GoBike.Service.Core.Applibs;
 using GoBike.Service.Core.Resource;
 using GoBike.Service.Core.Resource.Enum;
 using GoBike.Service.Repository.Interface.Team;
 using GoBike.Service.Repository.Models.Team;
 using GoBike.Service.Service.Interface.Team;
+using GoBike.Service.Service.Models.Team;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -18,6 +20,11 @@ namespace GoBike.Service.Service.Managers.Team
     /// </summary>
     public class TeamService : ITeamService
     {
+        /// <summary>
+        /// System
+        /// </summary>
+        private const string SYSTEM_FLAG = "System";
+
         /// <summary>
         /// logger
         /// </summary>
@@ -431,7 +438,7 @@ namespace GoBike.Service.Service.Managers.Team
 
         #endregion 車隊資料
 
-        #region 互動資料
+        #region 車隊互動資料
 
         /// <summary>
         /// 同意邀請加入車隊
@@ -1149,6 +1156,177 @@ namespace GoBike.Service.Service.Managers.Team
             return string.Empty;
         }
 
-        #endregion 互動資料
+        #endregion 車隊互動資料
+
+        #region 車隊公告資料
+
+        /// <summary>
+        /// 建立車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        public async Task<string> CreateTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
+        {
+            try
+            {
+                string verifyCreateTeamAnnouncementResult = this.VerifyCreateTeamAnnouncement(teamAnnouncementDto);
+                if (!string.IsNullOrEmpty(verifyCreateTeamAnnouncementResult))
+                {
+                    return verifyCreateTeamAnnouncementResult;
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamAnnouncementDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamAnnouncementDto.MemberID.Equals(SYSTEM_FLAG))
+                {
+                    //// 非系統公告
+                    if (!teamData.TeamLeaderID.Equals(teamAnnouncementDto.MemberID) || !teamData.TeamViceLeaderIDs.Contains(teamAnnouncementDto.MemberID))
+                    {
+                        return "無建立車隊公告資料權限.";
+                    }
+                }
+
+                DateTime createDate = DateTime.Now;
+                TeamAnnouncementData teamAnnouncementData = this.mapper.Map<TeamAnnouncementData>(teamAnnouncementDto);
+                teamAnnouncementData.CreateDate = createDate;
+                teamAnnouncementData.AnnouncementID = Utility.GetSerialID(createDate);
+                teamAnnouncementData.SaveDeadline = createDate.AddDays(teamAnnouncementDto.LimitDate);
+                bool isSuccess = await this.teamRepository.CreateTeamAnnouncementData(teamAnnouncementData);
+                if (!isSuccess)
+                {
+                    return "建立車隊公告資料失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Create Team Announcement Data Error >>> Data:{JsonConvert.SerializeObject(teamAnnouncementDto)}\n{ex}");
+                return "建立車隊公告資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 編輯車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        public async Task<string> EditTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamAnnouncementDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamAnnouncementDto.MemberID))
+                {
+                    return "無法進行編輯車隊公告資料審核.";
+                }
+
+                if (teamAnnouncementDto.MemberID.Equals(SYSTEM_FLAG))
+                {
+                    return "無法編輯系統公告.";
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamAnnouncementDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamAnnouncementDto.MemberID) || !teamData.TeamViceLeaderIDs.Contains(teamAnnouncementDto.MemberID))
+                {
+                    return "無編輯車隊公告資料權限.";
+                }
+
+                TeamAnnouncementData teamAnnouncementData = await this.teamRepository.GetTeamAnnouncementData(teamAnnouncementDto.AnnouncementID);
+                if (teamAnnouncementData == null)
+                {
+                    return "車隊公告資料不存在.";
+                }
+
+                string updateTeamAnnouncementDataHandlerResult = this.UpdateTeamAnnouncementDataHandler(teamAnnouncementDto, teamAnnouncementData);
+                if (!string.IsNullOrEmpty(updateTeamAnnouncementDataHandlerResult))
+                {
+                    return updateTeamAnnouncementDataHandlerResult;
+                }
+
+                bool updateTeamAnnouncementDataResult = await this.teamRepository.UpdateTeamAnnouncementData(teamAnnouncementData);
+                if (!updateTeamAnnouncementDataResult)
+                {
+                    return "車隊公告資料更新失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Edit Team Announcement Data Error >>> Data:{JsonConvert.SerializeObject(teamAnnouncementDto)}\n{ex}");
+                return "編輯車隊公告資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 車隊公告資料更新處理
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamData">teamData</param>
+        private string UpdateTeamAnnouncementDataHandler(TeamAnnouncementDto teamAnnouncementDto, TeamAnnouncementData teamAnnouncementData)
+        {
+            if (teamAnnouncementDto.Context.Length > AppSettingHelper.Appsetting.TeamAnnouncementMaxLength)
+            {
+                return $"公告內容字數不得超過 {AppSettingHelper.Appsetting.TeamAnnouncementMaxLength} 字元.";
+            }
+
+            if (!string.IsNullOrEmpty(teamAnnouncementDto.Context))
+            {
+                teamAnnouncementData.Context = teamAnnouncementDto.Context;
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 驗證車隊公告建立資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        private string VerifyCreateTeamAnnouncement(TeamAnnouncementDto teamAnnouncementDto)
+        {
+            if (string.IsNullOrEmpty(teamAnnouncementDto.TeamID))
+            {
+                return "車隊編號無效.";
+            }
+
+            if (string.IsNullOrEmpty(teamAnnouncementDto.MemberID))
+            {
+                return "無法進行建立車隊公告資料審核.";
+            }
+
+            if (string.IsNullOrEmpty(teamAnnouncementDto.Context))
+            {
+                return "請輸入公告內容.";
+            }
+
+            if (teamAnnouncementDto.Context.Length > AppSettingHelper.Appsetting.TeamAnnouncementMaxLength)
+            {
+                return $"公告內容字數不得超過 {AppSettingHelper.Appsetting.TeamAnnouncementMaxLength} 字元.";
+            }
+
+            if (teamAnnouncementDto.LimitDate == 0)
+            {
+                return "請指定公告天數.";
+            }
+
+            return string.Empty;
+        }
+
+        #endregion 車隊公告資料
     }
 }

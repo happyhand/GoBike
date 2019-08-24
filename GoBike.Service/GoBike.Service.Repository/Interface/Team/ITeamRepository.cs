@@ -146,5 +146,44 @@ namespace GoBike.Service.Repository.Interface.Team
         Task<bool> UpdateTeamInteractiveData(TeamInteractiveData teamInteractiveData);
 
         #endregion 車隊互動資料
+
+        #region 車隊公告資料
+
+        /// <summary>
+        /// 建立車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementData">teamAnnouncementData</param>
+        /// <returns>bool</returns>
+        Task<bool> CreateTeamAnnouncementData(TeamAnnouncementData teamAnnouncementData);
+
+        /// <summary>
+        /// 刪除車隊資料
+        /// </summary>
+        /// <param name="announcementID">announcementID</param>
+        /// <returns>bool</returns>
+        Task<bool> DeleteTeamAnnouncementData(string announcementID);
+
+        /// <summary>
+        /// 取得公告資料
+        /// </summary>
+        /// <param name="announcementID">announcementID</param>
+        /// <returns>AnnouncementData</returns>
+        Task<TeamAnnouncementData> GetTeamAnnouncementData(string announcementID);
+
+        /// <summary>
+        /// 取得車隊公告資料列表
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>AnnouncementDatas</returns>
+        Task<IEnumerable<TeamAnnouncementData>> GetTeamAnnouncementDataListOfTeam(string teamID);
+
+        /// <summary>
+        /// 更新車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementData">teamAnnouncementData</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamAnnouncementData(TeamAnnouncementData teamAnnouncementData);
+
+        #endregion 車隊公告資料
     }
 }

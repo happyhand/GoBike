@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GoBike.Service.Repository.Models.Member
+namespace GoBike.Service.Service.Models.Member
 {
     /// <summary>
     /// 會員資料

@@ -10,6 +10,11 @@
         /// </summary>
         public static AppSettingHelper Appsetting;
 
+        /// <summary>
+        /// Gets or sets TeamAnnouncementMaxLength
+        /// </summary>
+        public int TeamAnnouncementMaxLength { get; set; }
+
         #region MongoDB 設定資料
 
         /// <summary>
@@ -76,6 +81,11 @@
                 /// Gets or sets Team
                 /// </summary>
                 public string Team { get; set; }
+
+                /// <summary>
+                /// Gets or sets TeamAnnouncement
+                /// </summary>
+                public string TeamAnnouncement { get; set; }
 
                 /// <summary>
                 /// Gets or sets TeamInteractive

@@ -1,4 +1,4 @@
-﻿using GoBike.Service.Repository.Models.Member;
+﻿using GoBike.Service.Service.Models.Member;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
