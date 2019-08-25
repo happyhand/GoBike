@@ -577,6 +577,7 @@ namespace GoBike.Service.Service.Managers.Team
                 TeamInteractiveData teamInteractiveData = await this.teamRepository.GetAppointTeamInteractiveData(teamDto.TeamID, teamDto.ExecutorID);
                 if (teamInteractiveData == null)
                 {
+                    //// 如果沒車隊互動資料了，就當作已經取消申請加入
                     this.logger.LogWarning($"Cancel Apply For Join Team Fail For TeamInteractiveData Not Exist >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}");
                     return string.Empty;
                 }
@@ -865,6 +866,14 @@ namespace GoBike.Service.Service.Managers.Team
                     return "對方的會員編號無效.";
                 }
 
+                TeamInteractiveData teamInteractiveData = await this.teamRepository.GetAppointTeamInteractiveData(teamDto.TeamID, teamDto.TargetID);
+                if (teamInteractiveData == null)
+                {
+                    //// 如果沒車隊互動資料了，就當作已經拒絕申請加入
+                    this.logger.LogWarning($"Reject Apply For Join Team Fail For TeamInteractiveData Not Exist >>> TeamID:{teamDto.TeamID} ExaminerID:{teamDto.ExaminerID} TargetID:{teamDto.TargetID}");
+                    return string.Empty;
+                }
+
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
                 if (teamData == null)
                 {
@@ -915,13 +924,15 @@ namespace GoBike.Service.Service.Managers.Team
                     return "會員編號無效.";
                 }
 
-                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
-                if (teamData == null)
+                TeamInteractiveData teamInteractiveData = await this.teamRepository.GetAppointTeamInteractiveData(teamDto.TeamID, teamDto.ExecutorID);
+                if (teamInteractiveData == null)
                 {
-                    return "車隊不存在.";
+                    //// 如果沒車隊互動資料了，就當作已經拒絕邀請加入
+                    this.logger.LogWarning($"Reject Invite Join Team Fail For TeamInteractiveData Not Exist >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}");
+                    return string.Empty;
                 }
 
-                bool isSuccess = await this.teamRepository.DeleteTeamInteractiveData(teamData.TeamID, teamDto.ExecutorID);
+                bool isSuccess = await this.teamRepository.DeleteTeamInteractiveData(teamDto.TeamID, teamDto.ExecutorID);
                 if (!isSuccess)
                 {
                     return "拒絕邀請加入車隊失敗.";
@@ -1211,6 +1222,68 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
+        /// 刪除車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        public async Task<string> DeleteTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamAnnouncementDto.TeamID))
+                {
+                    return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamAnnouncementDto.AnnouncementID))
+                {
+                    return "車隊公告編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamAnnouncementDto.MemberID))
+                {
+                    return "無法進行刪除車隊公告資料審核.";
+                }
+
+                if (teamAnnouncementDto.MemberID.Equals(SYSTEM_FLAG))
+                {
+                    return "無法刪除系統公告.";
+                }
+
+                TeamAnnouncementData teamAnnouncementData = await this.teamRepository.GetTeamAnnouncementData(teamAnnouncementDto.AnnouncementID);
+                if (teamAnnouncementData == null)
+                {
+                    //// 如果沒車隊公告資料了，就當作已經刪除掉
+                    return string.Empty;
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamAnnouncementDto.TeamID);
+                if (teamData == null)
+                {
+                    return "車隊不存在.";
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamAnnouncementDto.MemberID) || !teamData.TeamViceLeaderIDs.Contains(teamAnnouncementDto.MemberID))
+                {
+                    return "無刪除車隊公告資料權限.";
+                }
+
+                bool deleteTeamAnnouncementDataResult = await this.teamRepository.DeleteTeamAnnouncementData(teamAnnouncementDto.AnnouncementID);
+                if (!deleteTeamAnnouncementDataResult)
+                {
+                    return "刪除車隊公告資料失敗.";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Team Announcement Data Error >>> TeamID:{teamAnnouncementDto.TeamID} AnnouncementID:{teamAnnouncementDto.AnnouncementID} MemberID:{teamAnnouncementDto.MemberID}\n{ex}");
+                return "刪除車隊公告資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
         /// 編輯車隊公告資料
         /// </summary>
         /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
@@ -1222,6 +1295,11 @@ namespace GoBike.Service.Service.Managers.Team
                 if (string.IsNullOrEmpty(teamAnnouncementDto.TeamID))
                 {
                     return "車隊編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(teamAnnouncementDto.AnnouncementID))
+                {
+                    return "車隊公告編號無效.";
                 }
 
                 if (string.IsNullOrEmpty(teamAnnouncementDto.MemberID))
