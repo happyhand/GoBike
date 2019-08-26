@@ -1,6 +1,22 @@
 ﻿namespace GoBike.Service.Core.Resource.Enum
 {
     /// <summary>
+    /// 車隊公告編輯類別資料
+    /// </summary>
+    public enum TeamAnnouncementEditType
+    {
+        /// <summary>
+        /// 未設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 可編輯
+        /// </summary>
+        Edit = 1
+    }
+
+    /// <summary>
     /// 車隊審核狀態類別資料
     /// </summary>
     public enum TeamExamineStatusType

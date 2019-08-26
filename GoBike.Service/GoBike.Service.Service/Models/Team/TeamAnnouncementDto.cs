@@ -33,6 +33,11 @@ namespace GoBike.Service.Service.Models.Team
         public string MemberID { get; set; }
 
         /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        public string Nickname { get; set; }
+
+        /// <summary>
         /// Gets or sets SaveDeadline
         /// </summary>
         public DateTime SaveDeadline { get; set; }
@@ -41,5 +46,14 @@ namespace GoBike.Service.Service.Models.Team
         /// Gets or sets TeamID
         /// </summary>
         public string TeamID { get; set; }
+
+        #region Extra Data
+
+        /// <summary>
+        /// Gets or sets EditType
+        /// </summary>
+        public int EditType { get; set; }
+
+        #endregion Extra Data
     }
 }

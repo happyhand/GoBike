@@ -2,7 +2,9 @@
 using GoBike.Service.Core.Applibs;
 using GoBike.Service.Core.Resource;
 using GoBike.Service.Core.Resource.Enum;
+using GoBike.Service.Repository.Interface.Member;
 using GoBike.Service.Repository.Interface.Team;
+using GoBike.Service.Repository.Models.Member;
 using GoBike.Service.Repository.Models.Team;
 using GoBike.Service.Service.Interface.Team;
 using GoBike.Service.Service.Models.Team;
@@ -36,6 +38,11 @@ namespace GoBike.Service.Service.Managers.Team
         private readonly IMapper mapper;
 
         /// <summary>
+        /// memberRepository
+        /// </summary>
+        private readonly IMemberRepository memberRepository;
+
+        /// <summary>
         /// teamRepository
         /// </summary>
         private readonly ITeamRepository teamRepository;
@@ -46,10 +53,11 @@ namespace GoBike.Service.Service.Managers.Team
         /// <param name="logger">logger</param>
         /// <param name="mapper">mapper</param>
         /// <param name="teamRepository">teamRepository</param>
-        public TeamService(ILogger<TeamService> logger, IMapper mapper, ITeamRepository teamRepository)
+        public TeamService(ILogger<TeamService> logger, IMapper mapper, IMemberRepository memberRepository, ITeamRepository teamRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
+            this.memberRepository = memberRepository;
             this.teamRepository = teamRepository;
         }
 
@@ -102,7 +110,7 @@ namespace GoBike.Service.Service.Managers.Team
 
                 if (string.IsNullOrEmpty(teamDto.ExecutorID))
                 {
-                    return "會員編號無效.";
+                    return "無法進行解散車隊審核.";
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
@@ -147,7 +155,7 @@ namespace GoBike.Service.Service.Managers.Team
 
                 if (string.IsNullOrEmpty(teamDto.ExecutorID))
                 {
-                    return "會員編號無效.";
+                    return "無法進行編輯車隊資料審核.";
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
@@ -278,6 +286,56 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 this.logger.LogError($"Get Team Data List Of Member Error >>> ExecutorID:{teamDto.ExecutorID}\n{ex}");
                 return Tuple.Create<IEnumerable<IEnumerable<TeamDto>>, string>(null, "取得會員的車隊資料列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊通知
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(dynamic list, string)</returns>
+        public async Task<Tuple<IEnumerable<dynamic>, string>> GetTeamNotify(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "車隊編號無效.");
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "無法進行取得車隊通知審核.");
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "車隊不存在.");
+                }
+
+                IEnumerable<TeamInteractiveDto> teamInteractiveDtos = new List<TeamInteractiveDto>();
+                IEnumerable<TeamAnnouncementData> teamAnnouncementDatas = await this.teamRepository.GetTeamAnnouncementDataListOfTeam(teamDto.TeamID);
+                IEnumerable<TeamAnnouncementDto> teamAnnouncementDtos = this.mapper.Map<IEnumerable<TeamAnnouncementDto>>(teamAnnouncementDatas);
+                if (teamData.TeamLeaderID.Equals(teamDto.ExecutorID) || teamData.TeamViceLeaderIDs.Contains(teamDto.ExecutorID))
+                {
+                    foreach (TeamAnnouncementDto teamAnnouncementDto in teamAnnouncementDtos)
+                    {
+                        teamAnnouncementDto.EditType = (int)TeamAnnouncementEditType.Edit;
+                    }
+
+                    IEnumerable<TeamInteractiveData> teamInteractiveDatas = await this.teamRepository.GetTeamInteractiveDataListOfTeam(teamDto.TeamID);
+                    teamInteractiveDtos = this.mapper.Map<IEnumerable<TeamInteractiveDto>>(teamInteractiveDatas.Where(options => options.ReviewFlag == (int)TeamReviewStatusType.Review));
+                }
+
+                //// TODO 待討論會員加入通知如何實現
+                IEnumerable<dynamic> notifies = new List<dynamic>() { teamInteractiveDtos, teamAnnouncementDtos };
+                return Tuple.Create(notifies, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Notify Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<dynamic>, string>(null, "取得車隊通知發生錯誤.");
             }
         }
 
@@ -1186,6 +1244,12 @@ namespace GoBike.Service.Service.Managers.Team
                     return verifyCreateTeamAnnouncementResult;
                 }
 
+                MemberData memberData = await this.memberRepository.GetMemberDataByMemberID(teamAnnouncementDto.MemberID);
+                if (memberData == null)
+                {
+                    return "會員不存在.";
+                }
+
                 TeamData teamData = await this.teamRepository.GetTeamData(teamAnnouncementDto.TeamID);
                 if (teamData == null)
                 {
@@ -1205,6 +1269,7 @@ namespace GoBike.Service.Service.Managers.Team
                 TeamAnnouncementData teamAnnouncementData = this.mapper.Map<TeamAnnouncementData>(teamAnnouncementDto);
                 teamAnnouncementData.CreateDate = createDate;
                 teamAnnouncementData.AnnouncementID = Utility.GetSerialID(createDate);
+                teamAnnouncementData.Nickname = teamAnnouncementDto.MemberID.Equals(SYSTEM_FLAG) ? "系統公告" : memberData.Nickname;
                 teamAnnouncementData.SaveDeadline = createDate.AddDays(teamAnnouncementDto.LimitDate);
                 bool isSuccess = await this.teamRepository.CreateTeamAnnouncementData(teamAnnouncementData);
                 if (!isSuccess)
