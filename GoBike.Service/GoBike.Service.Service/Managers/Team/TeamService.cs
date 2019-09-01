@@ -220,11 +220,30 @@ namespace GoBike.Service.Service.Managers.Team
             try
             {
                 //// 時間定義待確認
-                TimeSpan timeSpan = new TimeSpan(30, 0, 0, 0, 0);
+                TimeSpan timeSpan = new TimeSpan(AppSettingHelper.Appsetting.NewCreationOfDays, 0, 0, 0, 0);
                 int searchOpenStatus = (int)TeamSearchStatusType.Open;
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByCreateDate(timeSpan);
                 IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
                 return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get New Creation Team Data List Error\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得新創車隊列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得推薦車隊資料列表
+        /// </summary>
+        /// <returns>Tuple(TeamDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamDto>, string>> GetRecommendationTeamDataList()
+        {
+            try
+            {
+                //// TODO
+                IEnumerable<TeamDto> teams = new List<TeamDto>();
+                return Tuple.Create(teams, string.Empty);
             }
             catch (Exception ex)
             {
@@ -272,12 +291,15 @@ namespace GoBike.Service.Service.Managers.Team
                 }
 
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListOfMember(teamDto.ExecutorID);
+                IEnumerable<TeamData> teamLeaderDatas = teamDatas.Where(data => data.TeamLeaderID.Equals(teamDto.ExecutorID));
+                IEnumerable<TeamData> teamMemberDatas = teamDatas.Except(teamLeaderDatas);
                 IEnumerable<TeamInteractiveData> teamInteractiveDatas = await this.teamRepository.GetTeamInteractiveDataListOfMember(teamDto.ExecutorID);
                 IEnumerable<string> inviteTeamIDs = teamInteractiveDatas.Select(data => data.TeamID).Distinct();
                 IEnumerable<TeamData> invietTeamDatas = await this.teamRepository.GetTeamDataListByTeamID(inviteTeamIDs);
                 IEnumerable<IEnumerable<TeamDto>> teamDtos = new List<IEnumerable<TeamDto>>()
                 {
-                    this.mapper.Map<IEnumerable<TeamDto>>(teamDatas),
+                    this.mapper.Map<IEnumerable<TeamDto>>(teamLeaderDatas),
+                    this.mapper.Map<IEnumerable<TeamDto>>(teamMemberDatas),
                     this.mapper.Map<IEnumerable<TeamDto>>(invietTeamDatas)
                 };
                 return Tuple.Create(teamDtos, string.Empty);
@@ -386,7 +408,7 @@ namespace GoBike.Service.Service.Managers.Team
                 PhotoUrl = teamDto.PhotoUrl,
                 TeamLeaderID = teamDto.ExecutorID,
                 TeamViceLeaderIDs = new List<string>(),
-                TeamMemberIDs = new List<string>()
+                TeamMemberIDs = new List<string>() { teamDto.ExecutorID }
             };
 
             return teamData;
@@ -570,7 +592,7 @@ namespace GoBike.Service.Service.Managers.Team
                     return "車隊不存在.";
                 }
 
-                if (teamData.TeamLeaderID.Equals(teamDto.ExecutorID) || teamData.TeamMemberIDs.Contains(teamDto.ExecutorID))
+                if (teamData.TeamMemberIDs.Contains(teamDto.ExecutorID))
                 {
                     return "已加入車隊.";
                 }
@@ -1056,8 +1078,6 @@ namespace GoBike.Service.Service.Managers.Team
                     return "無法指定其他車隊隊長.";
                 }
 
-                Utility.UpdateListHandler(teamDto.TeamMemberIDs, teamData.TeamLeaderID, true);
-                Utility.UpdateListHandler(teamDto.TeamMemberIDs, teamDto.TargetID, false);
                 teamData.TeamLeaderID = teamDto.TargetID;
                 bool updateTeamDataResult = await this.teamRepository.UpdateTeamData(teamData);
                 if (!updateTeamDataResult)
@@ -1170,7 +1190,7 @@ namespace GoBike.Service.Service.Managers.Team
         /// <returns>string</returns>
         private async Task<string> VerifyJoinTeam(TeamData teamData, string examinerID, string targetID, bool isInvite)
         {
-            if (teamData.TeamLeaderID.Equals(targetID) || teamData.TeamMemberIDs.Contains(targetID))
+            if (teamData.TeamMemberIDs.Contains(targetID))
             {
                 return "會員已加入車隊.";
             }
@@ -1208,7 +1228,7 @@ namespace GoBike.Service.Service.Managers.Team
                         return "該會員未申請加入車隊.";
                     }
 
-                    if (!teamData.TeamLeaderID.Equals(examinerID) && !teamData.TeamMemberIDs.Contains(examinerID))
+                    if (!teamData.TeamLeaderID.Equals(examinerID) && !teamData.TeamViceLeaderIDs.Contains(examinerID))
                     {
                         return "無車隊審核權限.";
                     }

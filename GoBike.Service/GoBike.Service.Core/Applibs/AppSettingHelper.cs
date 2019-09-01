@@ -11,6 +11,11 @@
         public static AppSettingHelper Appsetting;
 
         /// <summary>
+        /// Gets or sets NewCreationOfDays
+        /// </summary>
+        public int NewCreationOfDays { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamAnnouncementMaxLength
         /// </summary>
         public int TeamAnnouncementMaxLength { get; set; }

@@ -536,7 +536,7 @@ namespace GoBike.API.Service.Managers.Member
 
                     string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-*-{searchMemberDto.MemberID}";
                     string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
-                    searchMemberDto.OnlineType = string.IsNullOrEmpty(cacheKey) ? (int)OnlineStatusType.None : (int)OnlineStatusType.Online;
+                    searchMemberDto.OnlineType = string.IsNullOrEmpty(cacheKey) ? (int)OnlineStatusType.Offline : (int)OnlineStatusType.Online;
 
                     return new ResponseResultDto()
                     {

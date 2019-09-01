@@ -44,6 +44,12 @@ namespace GoBike.Service.Service.Interface.Team
         Task<Tuple<IEnumerable<TeamDto>, string>> GetNewCreationTeamDataList();
 
         /// <summary>
+        /// 取得推薦車隊資料列表
+        /// </summary>
+        /// <returns>Tuple(TeamDtos, string)</returns>
+        Task<Tuple<IEnumerable<TeamDto>, string>> GetRecommendationTeamDataList();
+
+        /// <summary>
         /// 取得車隊資料
         /// </summary>
         /// <param name="teamDto">teamDto</param>

@@ -9,6 +9,47 @@ namespace GoBike.API.Service.Interface.Team
     /// </summary>
     public interface ITeamService
     {
+        #region 車隊資訊
+
+        /// <summary>
+        /// 建立車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> CreateTeam(TeamDto teamDto);
+
+        /// <summary>
+        /// 編輯車隊資料
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditTeamData(TeamDto teamDto);
+
+        /// <summary>
+        /// 取得車隊資料
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetTeamData(TeamDto teamDto);
+
+        /// <summary>
+        /// 取得會員的車隊列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto);
+
+        /// <summary>
+        /// 搜尋車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> SearchTeam(TeamDto teamDto);
+
+        #endregion 車隊資訊
+
+        #region 車隊互動
+
         /// <summary>
         /// 同意邀請加入車隊
         /// </summary>
@@ -38,27 +79,6 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> ApplyForJoinTeam(TeamDto teamDto);
 
         /// <summary>
-        /// 建立車隊
-        /// </summary>
-        /// <param name="teamDto">teamDto</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> CreateTeam(TeamDto teamDto);
-
-        /// <summary>
-        /// 編輯車隊資料
-        /// </summary>
-        /// <param name="teamDto">teamDto</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> EditTeamData(TeamDto teamDto);
-
-        /// <summary>
-        /// 取得會員的車隊列表
-        /// </summary>
-        /// <param name="teamDto">teamDto</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto);
-
-        /// <summary>
         /// 邀請加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -79,11 +99,6 @@ namespace GoBike.API.Service.Interface.Team
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> RejectInviteJoinTeam(TeamDto teamDto);
 
-        /// <summary>
-        /// 搜尋車隊
-        /// </summary>
-        /// <param name="teamDto">teamDto</param>
-        /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> SearchTeam(TeamDto teamDto);
+        #endregion 車隊互動
     }
 }
