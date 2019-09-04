@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 namespace GoBike.API.App.Controllers.Team
 {
     /// <summary>
-    /// 取得會員的車隊列表
+    /// 取得會員的車隊資料列表
     /// </summary>
     [Route("api/Team/[controller]")]
     [ApiController]
-    public class GetTeamListOfMemberController : ApiController
+    public class GetTeamDataListOfMemberController : ApiController
     {
         /// <summary>
         /// logger
         /// </summary>
-        private readonly ILogger<GetTeamListOfMemberController> logger;
+        private readonly ILogger<GetTeamDataListOfMemberController> logger;
 
         /// <summary>
         /// teamService
@@ -33,7 +33,7 @@ namespace GoBike.API.App.Controllers.Team
         /// </summary>
         /// <param name="logger">logger</param>
         /// <param name="teamService">teamService</param>
-        public GetTeamListOfMemberController(ILogger<GetTeamListOfMemberController> logger, ITeamService teamService)
+        public GetTeamDataListOfMemberController(ILogger<GetTeamDataListOfMemberController> logger, ITeamService teamService)
         {
             this.logger = logger;
             this.teamService = teamService;
@@ -55,7 +55,7 @@ namespace GoBike.API.App.Controllers.Team
                     ExecutorID = memberID
                 };
 
-                ResponseResultDto responseResult = await this.teamService.GetTeamListOfMember(teamDto);
+                ResponseResultDto responseResult = await this.teamService.GetTeamDataListOfMember(teamDto);
                 if (responseResult.Ok)
                 {
                     return Ok(responseResult.Data);
@@ -66,7 +66,7 @@ namespace GoBike.API.App.Controllers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team List Of Member Error >>> ExecutorID:{memberID}\n{ex}");
-                return BadRequest("取得會員的車隊列表發生錯誤.");
+                return BadRequest("取得會員的車隊資料列表發生錯誤.");
             }
         }
     }

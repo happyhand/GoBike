@@ -222,7 +222,7 @@ namespace GoBike.Service.Service.Managers.Team
                 //// 時間定義待確認
                 TimeSpan timeSpan = new TimeSpan(AppSettingHelper.Appsetting.NewCreationOfDays, 0, 0, 0, 0);
                 int searchOpenStatus = (int)TeamSearchStatusType.Open;
-                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByCreateDate(timeSpan);
+                IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByTimeLimit(timeSpan);
                 IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
                 return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
             }
@@ -247,8 +247,8 @@ namespace GoBike.Service.Service.Managers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Get New Creation Team Data List Error\n{ex}");
-                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得新創車隊列表發生錯誤.");
+                this.logger.LogError($"Get Recommendation Team Data List Error\n{ex}");
+                return Tuple.Create<IEnumerable<TeamDto>, string>(null, "取得推薦車隊資料列表發生錯誤.");
             }
         }
 

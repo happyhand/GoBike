@@ -41,13 +41,6 @@ namespace GoBike.Service.Repository.Interface.Team
         Task<IEnumerable<TeamData>> GetTeamDataListByCityID(int cityID);
 
         /// <summary>
-        /// 取得車隊列表資料 (By CreateDate)
-        /// </summary>
-        /// <param name="createDate">createDate</param>
-        /// <returns>TeamDatas</returns>
-        Task<IEnumerable<TeamData>> GetTeamDataListByCreateDate(TimeSpan timeSpan);
-
-        /// <summary>
         /// 取得車隊列表資料 (By TeamID)
         /// </summary>
         /// <param name="teamIDs">teamIDs</param>
@@ -61,6 +54,13 @@ namespace GoBike.Service.Repository.Interface.Team
         /// <param name="isStrict">isStrict</param>
         /// <returns>TeamDatas</returns>
         Task<IEnumerable<TeamData>> GetTeamDataListByTeamName(string teamName, bool isStrict);
+
+        /// <summary>
+        /// 取得車隊列表資料 (By CreateDate)
+        /// </summary>
+        /// <param name="timeSpan">timeSpan</param>
+        /// <returns>TeamDatas</returns>
+        Task<IEnumerable<TeamData>> GetTeamDataListByTimeLimit(TimeSpan timeSpan);
 
         /// <summary>
         /// 取得會員的車隊列表資料

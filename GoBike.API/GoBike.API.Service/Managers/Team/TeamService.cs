@@ -101,6 +101,113 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
+        /// 取得附近車隊資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetNearbyTeamDataList(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/GetNearbyTeamDataList", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Nearby Team Data List Error >>> CityID:{teamDto.CityID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得附近車隊資料列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得新創車隊資料列表
+        /// </summary>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetNewCreationTeamDataList()
+        {
+            try
+            {
+                HttpResponseMessage httpResponseMessage = await Utility.ApiGet(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/GetNewCreationTeamDataList");
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get New Creation Team Data List Error\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得新創車隊資料列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得推薦車隊資料列表
+        /// </summary>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetRecommendationTeamDataList()
+        {
+            try
+            {
+                HttpResponseMessage httpResponseMessage = await Utility.ApiGet(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/GetRecommendationTeamDataList");
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Recommendation Team Data List Error\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得推薦車隊資料列表發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 取得車隊資料
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -160,11 +267,11 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
-        /// 取得會員的車隊列表
+        /// 取得會員的車隊資料列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>ResponseResultDto</returns>
-        public async Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto)
+        public async Task<ResponseResultDto> GetTeamDataListOfMember(TeamDto teamDto)
         {
             try
             {
@@ -191,7 +298,7 @@ namespace GoBike.API.Service.Managers.Team
                 return new ResponseResultDto()
                 {
                     Ok = false,
-                    Data = "取得會員的車隊列表發生錯誤."
+                    Data = "取得會員的車隊資料列表發生錯誤."
                 };
             }
         }
@@ -384,7 +491,25 @@ namespace GoBike.API.Service.Managers.Team
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> InviteJoinTeam(TeamDto teamDto)
         {
-            return null;
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Invite/RequestJoin", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Invite Join Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID} TargetIDs:{JsonConvert.SerializeObject(teamDto.TargetIDs)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "邀請加入車隊發生錯誤."
+                };
+            }
         }
 
         /// <summary>

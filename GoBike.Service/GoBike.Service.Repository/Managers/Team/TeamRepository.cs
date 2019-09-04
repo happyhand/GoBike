@@ -142,24 +142,6 @@ namespace GoBike.Service.Repository.Managers.Team
         }
 
         /// <summary>
-        /// 取得車隊列表資料 (By CreateDate)
-        /// </summary>
-        /// <param name="createDate">createDate</param>
-        /// <returns>TeamDatas</returns>
-        public async Task<IEnumerable<TeamData>> GetTeamDataListByCreateDate(TimeSpan timeSpan)
-        {
-            try
-            {
-                return await this.teamDatas.Find(data => (data.CreateDate - DateTime.Now) <= timeSpan).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Team Data List By CreateDate Error >>> TimeSpan:{timeSpan}\n{ex}");
-                return new List<TeamData>();
-            }
-        }
-
-        /// <summary>
         /// 取得車隊列表資料 (By TeamID)
         /// </summary>
         /// <param name="teamIDs">teamIDs</param>
@@ -198,6 +180,25 @@ namespace GoBike.Service.Repository.Managers.Team
             catch (Exception ex)
             {
                 this.logger.LogError($"Get Team Data List By TeamName Error >>> TeamName:{teamName} IsStrict:{isStrict}\n{ex}");
+                return new List<TeamData>();
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊列表資料 (By CreateDate)
+        /// </summary>
+        /// <param name="timeSpan">timeSpan</param>
+        /// <returns>TeamDatas</returns>
+        public async Task<IEnumerable<TeamData>> GetTeamDataListByTimeLimit(TimeSpan timeSpan)
+        {
+            try
+            {
+                DateTime limitDateTime = DateTime.Now - timeSpan;
+                return await this.teamDatas.Find(data => data.CreateDate > limitDateTime).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Data List By Time Limit Error >>> TimeSpan:{timeSpan}\n{ex}");
                 return new List<TeamData>();
             }
         }

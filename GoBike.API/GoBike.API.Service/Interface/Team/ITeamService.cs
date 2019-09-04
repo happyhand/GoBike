@@ -26,6 +26,25 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> EditTeamData(TeamDto teamDto);
 
         /// <summary>
+        /// 取得附近車隊資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetNearbyTeamDataList(TeamDto teamDto);
+
+        /// <summary>
+        /// 取得新創車隊資料列表
+        /// </summary>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetNewCreationTeamDataList();
+
+        /// <summary>
+        /// 取得推薦車隊資料列表
+        /// </summary>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetRecommendationTeamDataList();
+
+        /// <summary>
         /// 取得車隊資料
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -33,11 +52,11 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> GetTeamData(TeamDto teamDto);
 
         /// <summary>
-        /// 取得會員的車隊列表
+        /// 取得會員的車隊資料列表
         /// </summary>
         /// <param name="teamDto">teamDto</param>
         /// <returns>ResponseResultDto</returns>
-        Task<ResponseResultDto> GetTeamListOfMember(TeamDto teamDto);
+        Task<ResponseResultDto> GetTeamDataListOfMember(TeamDto teamDto);
 
         /// <summary>
         /// 搜尋車隊
