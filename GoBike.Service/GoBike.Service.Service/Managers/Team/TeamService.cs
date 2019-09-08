@@ -743,6 +743,47 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
+        /// 取得車隊互動資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInteractiveDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamInteractiveDto>, string>> GetTeamInteractiveDataList(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return Tuple.Create<IEnumerable<TeamInteractiveDto>, string>(null, "車隊編號無效.");
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamInteractiveDto>, string>(null, "無法進行取得車隊互動資料審核.");
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return Tuple.Create<IEnumerable<TeamInteractiveDto>, string>(null, "車隊不存在.");
+                }
+
+                if (!teamData.TeamLeaderID.Equals(teamDto.ExecutorID) && !teamData.TeamViceLeaderIDs.Contains(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamInteractiveDto>, string>(null, "無取得車隊互動資料權限.");
+                }
+
+                IEnumerable<TeamInteractiveData> teamInteractiveDatas = await this.teamRepository.GetTeamInteractiveDataListOfTeam(teamData.TeamID);
+                IEnumerable<TeamInteractiveData> waitReviewTeamInteractiveDatas = teamInteractiveDatas.Where(data => data.ReviewFlag == (int)TeamReviewStatusType.Review);
+                return Tuple.Create(this.mapper.Map<IEnumerable<TeamInteractiveDto>>(waitReviewTeamInteractiveDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Interactive Data List Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamInteractiveDto>, string>(null, "取得車隊互動資料列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 邀請多人加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -1432,6 +1473,47 @@ namespace GoBike.Service.Service.Managers.Team
             {
                 this.logger.LogError($"Edit Team Announcement Data Error >>> Data:{JsonConvert.SerializeObject(teamAnnouncementDto)}\n{ex}");
                 return "編輯車隊公告資料發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊公告資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamAnnouncementDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<TeamAnnouncementDto>, string>> GetTeamAnnouncementDataList(TeamDto teamDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(teamDto.TeamID))
+                {
+                    return Tuple.Create<IEnumerable<TeamAnnouncementDto>, string>(null, "車隊編號無效.");
+                }
+
+                if (string.IsNullOrEmpty(teamDto.ExecutorID))
+                {
+                    return Tuple.Create<IEnumerable<TeamAnnouncementDto>, string>(null, "無法進行取得車隊公告資料審核.");
+                }
+
+                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
+                if (teamData == null)
+                {
+                    return Tuple.Create<IEnumerable<TeamAnnouncementDto>, string>(null, "車隊不存在.");
+                }
+
+                IEnumerable<TeamAnnouncementData> teamAnnouncementDatas = await this.teamRepository.GetTeamAnnouncementDataListOfTeam(teamData.TeamID);
+                IEnumerable<TeamAnnouncementDto> teamAnnouncementDtos = this.mapper.Map<IEnumerable<TeamAnnouncementDto>>(teamAnnouncementDatas);
+                foreach (TeamAnnouncementDto teamAnnouncementDto in teamAnnouncementDtos)
+                {
+                    teamAnnouncementDto.EditType = teamData.TeamLeaderID.Equals(teamDto.ExecutorID) || teamData.TeamViceLeaderIDs.Contains(teamDto.ExecutorID) ? (int)TeamAnnouncementEditType.Edit : (int)TeamAnnouncementEditType.None;
+                }
+
+                return Tuple.Create(teamAnnouncementDtos, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Announcement Data List Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return Tuple.Create<IEnumerable<TeamAnnouncementDto>, string>(null, "取得車隊公告資料列表發生錯誤.");
             }
         }
 

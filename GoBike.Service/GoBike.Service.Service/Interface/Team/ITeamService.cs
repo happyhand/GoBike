@@ -103,6 +103,13 @@ namespace GoBike.Service.Service.Interface.Team
         Task<string> ForceLeaveTeam(TeamDto teamDto);
 
         /// <summary>
+        /// 取得車隊互動資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamInteractiveDtos, string)</returns>
+        Task<Tuple<IEnumerable<TeamInteractiveDto>, string>> GetTeamInteractiveDataList(TeamDto teamDto);
+
+        /// <summary>
         /// 邀請多人加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
@@ -154,5 +161,37 @@ namespace GoBike.Service.Service.Interface.Team
         Task<string> UpdateTeamViceLeader(TeamDto teamDto, bool isAdd);
 
         #endregion 互動資料
+
+        #region 車隊公告資料
+
+        /// <summary>
+        /// 建立車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        Task<string> CreateTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        /// <summary>
+        /// 刪除車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        Task<string> DeleteTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        /// <summary>
+        /// 編輯車隊公告資料
+        /// </summary>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
+        /// <returns>string</returns>
+        Task<string> EditTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        /// <summary>
+        /// 取得車隊公告資料列表
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>Tuple(TeamAnnouncementDtos, string)</returns>
+        Task<Tuple<IEnumerable<TeamAnnouncementDto>, string>> GetTeamAnnouncementDataList(TeamDto teamDto);
+
+        #endregion 車隊公告資料
     }
 }
