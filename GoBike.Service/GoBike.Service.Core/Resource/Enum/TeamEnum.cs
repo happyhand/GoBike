@@ -89,4 +89,35 @@
         /// </summary>
         Open = 2
     }
+
+    /// <summary>
+    /// 車隊加入狀態類型資料
+    /// </summary>
+    public enum TeamJoinStatusType
+    {
+        /// <summary>
+        /// 未加入
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 已申請
+        /// </summary>
+        ApplyFor = 1,
+
+        /// <summary>
+        /// 被邀請
+        /// </summary>
+        BeInvited = 2,
+
+        /// <summary>
+        /// 等待邀請審核
+        /// </summary>
+        WaitInviteExamined = 3,
+
+        /// <summary>
+        /// 已加入
+        /// </summary>
+        Join = 4
+    }
 }

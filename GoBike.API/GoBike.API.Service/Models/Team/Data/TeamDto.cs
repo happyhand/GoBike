@@ -107,6 +107,11 @@ namespace GoBike.API.Service.Models.Team.Data
         /// </summary>
         public IEnumerable<string> TargetIDs { get; set; }
 
+        /// <summary>
+        /// Gets or sets JoinStatus
+        /// </summary>
+        public int JoinStatus { get; set; }
+
         #endregion Extra Data
     }
 }

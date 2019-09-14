@@ -239,7 +239,6 @@ namespace GoBike.API.Service.Managers.Team
                         }
 
                         teamNoJoinInfoView.MemberList = teamMemberList;
-                        teamNoJoinInfoView.JoinStatus = (int)TeamJoinStatusType.None;
 
                         return new ResponseResultDto()
                         {

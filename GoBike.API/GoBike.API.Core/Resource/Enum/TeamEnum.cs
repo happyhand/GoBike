@@ -26,22 +26,6 @@
         Leader = 3
     }
 
-    /// <summary>
-    /// 車隊加入狀態類型資料
-    /// </summary>
-    public enum TeamJoinStatusType
-    {
-        /// <summary>
-        /// 未加入
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// 已加入
-        /// </summary>
-        Join = 1
-    }
-
     ///// <summary>
     ///// 會員更新【尚有未處理的車隊邀請】狀態
     ///// </summary>

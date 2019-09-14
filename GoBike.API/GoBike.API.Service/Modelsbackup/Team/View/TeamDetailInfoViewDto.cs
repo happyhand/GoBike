@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace GoBike.API.Service.Models.Team.View
+﻿namespace GoBike.API.Service.Models.Team.View
 {
+    /**
     /// <summary>
     /// 車隊明細資訊可視資料
     /// </summary>
@@ -42,4 +41,5 @@ namespace GoBike.API.Service.Models.Team.View
         /// </summary>
         public IEnumerable<TeamMemberInfoViewDto> TeamMemberList { get; set; }
     }
+    */
 }

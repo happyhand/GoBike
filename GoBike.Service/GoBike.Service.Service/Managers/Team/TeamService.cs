@@ -267,7 +267,21 @@ namespace GoBike.Service.Service.Managers.Team
                 }
 
                 TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
-                return Tuple.Create(this.mapper.Map<TeamDto>(teamData), string.Empty);
+                TeamDto targetTeamDto = this.mapper.Map<TeamDto>(teamData);
+                TeamInteractiveData teamInteractiveData = await this.teamRepository.GetAppointTeamInteractiveData(teamData.TeamID, teamDto.ExecutorID);
+                if (teamInteractiveData != null)
+                {
+                    targetTeamDto.JoinStatus = teamInteractiveData.InteractiveType == (int)TeamInteractiveType.Invite ?
+                        teamInteractiveData.ReviewFlag == (int)TeamReviewStatusType.Review ?
+                        (int)TeamJoinStatusType.WaitInviteExamined : (int)TeamJoinStatusType.BeInvited :
+                        (int)TeamJoinStatusType.ApplyFor;
+                }
+                else
+                {
+                    targetTeamDto.JoinStatus = teamData.TeamMemberIDs.Contains(teamDto.ExecutorID) ? (int)TeamJoinStatusType.Join : (int)TeamJoinStatusType.None;
+                }
+
+                return Tuple.Create(targetTeamDto, string.Empty);
             }
             catch (Exception ex)
             {
