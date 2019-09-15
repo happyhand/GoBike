@@ -360,8 +360,11 @@ namespace GoBike.Service.Service.Managers.Team
                         teamAnnouncementDto.EditType = (int)TeamAnnouncementEditType.Edit;
                     }
 
-                    IEnumerable<TeamInteractiveData> teamInteractiveDatas = await this.teamRepository.GetTeamInteractiveDataListOfTeam(teamDto.TeamID);
-                    teamInteractiveDtos = this.mapper.Map<IEnumerable<TeamInteractiveDto>>(teamInteractiveDatas.Where(options => options.ReviewFlag == (int)TeamReviewStatusType.Review));
+                    Tuple<IEnumerable<TeamInteractiveDto>, string> getTeamInteractiveDataListResult = await this.GetTeamInteractiveDataList(teamDto);
+                    if (string.IsNullOrEmpty(getTeamInteractiveDataListResult.Item2))
+                    {
+                        teamInteractiveDtos = getTeamInteractiveDataListResult.Item1;
+                    }
                 }
 
                 //// TODO 待討論會員加入通知如何實現
@@ -788,7 +791,12 @@ namespace GoBike.Service.Service.Managers.Team
 
                 IEnumerable<TeamInteractiveData> teamInteractiveDatas = await this.teamRepository.GetTeamInteractiveDataListOfTeam(teamData.TeamID);
                 IEnumerable<TeamInteractiveData> waitReviewTeamInteractiveDatas = teamInteractiveDatas.Where(data => data.ReviewFlag == (int)TeamReviewStatusType.Review);
-                return Tuple.Create(this.mapper.Map<IEnumerable<TeamInteractiveDto>>(waitReviewTeamInteractiveDatas), string.Empty);
+                IEnumerable<TeamInteractiveDto> waitReviewTeamInteractiveDtos = this.mapper.Map<IEnumerable<TeamInteractiveDto>>(waitReviewTeamInteractiveDatas);
+                foreach (TeamInteractiveDto waitReviewTeamInteractiveDto in waitReviewTeamInteractiveDtos)
+                {
+                    this.TeamInteractiveDtoHandler(waitReviewTeamInteractiveDto);
+                }
+                return Tuple.Create(waitReviewTeamInteractiveDtos, string.Empty);
             }
             catch (Exception ex)
             {
@@ -1233,6 +1241,22 @@ namespace GoBike.Service.Service.Managers.Team
                 InteractiveType = isInvite ? (int)TeamInteractiveType.Invite : (int)TeamInteractiveType.ApplyFor,
                 ReviewFlag = isInvite ? (int)TeamReviewStatusType.None : (int)TeamReviewStatusType.Review
             };
+        }
+
+        /// <summary>
+        /// 車隊互動資料處理
+        /// </summary>
+        /// <param name="teamInteractiveDto">teamInteractiveDto</param>
+        private async void TeamInteractiveDtoHandler(TeamInteractiveDto teamInteractiveDto)
+        {
+            MemberData memberData = await this.memberRepository.GetMemberDataByMemberID(teamInteractiveDto.MemberID);
+            teamInteractiveDto.Nickname = memberData.Nickname;
+            teamInteractiveDto.PhotoUrl = memberData.PhotoUrl;
+            if (!string.IsNullOrEmpty(teamInteractiveDto.InviteID))
+            {
+                MemberData inviteData = await this.memberRepository.GetMemberDataByMemberID(teamInteractiveDto.InviteID);
+                teamInteractiveDto.InviteNickname = inviteData.Nickname;
+            }
         }
 
         /// <summary>

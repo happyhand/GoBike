@@ -46,5 +46,14 @@ namespace GoBike.API.Service.Models.Team.Data
         /// Gets or sets TeamID
         /// </summary>
         public string TeamID { get; set; }
+
+        #region Extra Data
+
+        /// <summary>
+        /// Gets or sets EditType
+        /// </summary>
+        public int EditType { get; set; }
+
+        #endregion Extra Data
     }
 }

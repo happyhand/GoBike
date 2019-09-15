@@ -1,9 +1,40 @@
-﻿namespace GoBike.API.Service.Models.Team.View
+﻿using System;
+
+namespace GoBike.API.Service.Models.Team.View
 {
     /// <summary>
-    /// 車隊公告可視資料
+    /// 車隊公告資訊可視資料
     /// </summary>
     public class TeamAnnouncementInfoView
     {
+        /// <summary>
+        /// Gets or sets AnnouncementID
+        /// </summary>
+        public string AnnouncementID { get; set; }
+
+        /// <summary>
+        /// Gets or sets Context
+        /// </summary>
+        public string Context { get; set; }
+
+        /// <summary>
+        /// Gets or sets CreateDate
+        /// </summary>
+        public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets EditType
+        /// </summary>
+        public int EditType { get; set; }
+
+        /// <summary>
+        /// Gets or sets LimitDate
+        /// </summary>
+        public int LimitDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        public string Nickname { get; set; }
     }
 }

@@ -23,19 +23,9 @@ namespace GoBike.API.Service.Models.Team.Data
         public string InviteID { get; set; }
 
         /// <summary>
-        /// Gets or sets InviteNickname
-        /// </summary>
-        public string InviteNickname { get; set; }
-
-        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         public string MemberID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Nickname
-        /// </summary>
-        public string Nickname { get; set; }
 
         /// <summary>
         /// Gets or sets ReviewFlag
@@ -46,5 +36,24 @@ namespace GoBike.API.Service.Models.Team.Data
         /// Gets or sets TeamID
         /// </summary>
         public string TeamID { get; set; }
+
+        #region Extra Data
+
+        /// <summary>
+        /// Gets or sets InviteNickname
+        /// </summary>
+        public string InviteNickname { get; set; }
+
+        /// <summary>
+        /// Gets or sets Nickname
+        /// </summary>
+        public string Nickname { get; set; }
+
+        /// <summary>
+        /// Gets or sets PhotoUrl
+        /// </summary>
+        public string PhotoUrl { get; set; }
+
+        #endregion Extra Data
     }
 }

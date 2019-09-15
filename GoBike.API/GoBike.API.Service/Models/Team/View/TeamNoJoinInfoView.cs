@@ -3,7 +3,7 @@
 namespace GoBike.API.Service.Models.Team.View
 {
     /// <summary>
-    /// 車隊未加入可視資料
+    /// 車隊未加入資訊可視資料
     /// </summary>
     public class TeamNoJoinInfoView
     {
