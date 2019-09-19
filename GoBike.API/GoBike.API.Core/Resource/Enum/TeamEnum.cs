@@ -26,6 +26,22 @@
         Leader = 3
     }
 
+    /// <summary>
+    /// 車隊互動類別資料
+    /// </summary>
+    public enum TeamInteractiveType
+    {
+        /// <summary>
+        /// 申請
+        /// </summary>
+        ApplyFor = 1,
+
+        /// <summary>
+        /// 邀請
+        /// </summary>
+        Invite = 2
+    }
+
     ///// <summary>
     ///// 會員更新【尚有未處理的車隊邀請】狀態
     ///// </summary>

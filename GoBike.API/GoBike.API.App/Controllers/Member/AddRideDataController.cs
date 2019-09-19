@@ -73,7 +73,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Ride Data Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
+                this.logger.LogError($"Add Ride Data Error >>> MemberID:{memberID} PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("新增騎乘資料發生錯誤.");
             }
         }

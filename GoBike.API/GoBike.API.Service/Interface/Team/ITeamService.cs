@@ -119,5 +119,30 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> RejectInviteJoinTeam(TeamDto teamDto);
 
         #endregion 車隊互動
+
+        #region 車隊公告
+
+        /// <summary>
+        /// 建立車隊公告資料
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> CreateTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        /// <summary>
+        /// 刪除車隊公告資料
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DeleteTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        /// <summary>
+        /// 編輯車隊公告資料
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
+
+        #endregion 車隊公告
     }
 }

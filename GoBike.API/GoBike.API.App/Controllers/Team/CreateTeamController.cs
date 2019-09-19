@@ -73,7 +73,7 @@ namespace GoBike.API.App.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Create Team Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
+                this.logger.LogError($"Create Team Error >>> MemberID:{memberID} PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("建立車隊發生錯誤.");
             }
         }

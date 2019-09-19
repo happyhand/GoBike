@@ -3,7 +3,7 @@
     /// <summary>
     /// 車隊互動資訊可視資料
     /// </summary>
-    public class TeamInteractiveInfoView
+    public class TeamInteractiveInfoViewDto
     {
         /// <summary>
         /// Gets or sets InteractiveType

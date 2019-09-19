@@ -72,7 +72,7 @@ namespace GoBike.API.App.Controllers.Member
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Data For Info Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
+                this.logger.LogError($"Edit Data For Info Error >>> MemberID:{memberID} PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("會員編輯發生錯誤.");
             }
         }

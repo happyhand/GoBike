@@ -72,7 +72,7 @@ namespace GoBike.API.App.Controllers.Team
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Edit Team Data Error >>> PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
+                this.logger.LogError($"Edit Team Data Error >>> MemberID:{memberID} PostData:{JsonConvert.SerializeObject(postData)}\n{ex}");
                 return BadRequest("編輯車隊資料發生錯誤.");
             }
         }

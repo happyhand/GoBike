@@ -5,7 +5,7 @@ namespace GoBike.API.Service.Models.Team.View
     /// <summary>
     /// 車隊公告資訊可視資料
     /// </summary>
-    public class TeamAnnouncementInfoView
+    public class TeamAnnouncementInfoViewDto
     {
         /// <summary>
         /// Gets or sets AnnouncementID

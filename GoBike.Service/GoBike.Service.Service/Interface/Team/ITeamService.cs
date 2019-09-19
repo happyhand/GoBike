@@ -72,7 +72,7 @@ namespace GoBike.Service.Service.Interface.Team
 
         #endregion 車隊資料
 
-        #region 互動資料
+        #region 車隊互動資料
 
         /// <summary>
         /// 同意邀請加入車隊
@@ -160,7 +160,7 @@ namespace GoBike.Service.Service.Interface.Team
         /// <returns>string</returns>
         Task<string> UpdateTeamViceLeader(TeamDto teamDto, bool isAdd);
 
-        #endregion 互動資料
+        #endregion 車隊互動資料
 
         #region 車隊公告資料
 

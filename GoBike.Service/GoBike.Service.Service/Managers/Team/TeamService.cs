@@ -326,59 +326,6 @@ namespace GoBike.Service.Service.Managers.Team
         }
 
         /// <summary>
-        /// 取得車隊通知
-        /// </summary>
-        /// <param name="teamDto">teamDto</param>
-        /// <returns>Tuple(dynamic list, string)</returns>
-        public async Task<Tuple<IEnumerable<dynamic>, string>> GetTeamNotify(TeamDto teamDto)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(teamDto.TeamID))
-                {
-                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "車隊編號無效.");
-                }
-
-                if (string.IsNullOrEmpty(teamDto.ExecutorID))
-                {
-                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "無法進行取得車隊通知審核.");
-                }
-
-                TeamData teamData = await this.teamRepository.GetTeamData(teamDto.TeamID);
-                if (teamData == null)
-                {
-                    return Tuple.Create<IEnumerable<dynamic>, string>(null, "車隊不存在.");
-                }
-
-                IEnumerable<TeamInteractiveDto> teamInteractiveDtos = new List<TeamInteractiveDto>();
-                IEnumerable<TeamAnnouncementData> teamAnnouncementDatas = await this.teamRepository.GetTeamAnnouncementDataListOfTeam(teamDto.TeamID);
-                IEnumerable<TeamAnnouncementDto> teamAnnouncementDtos = this.mapper.Map<IEnumerable<TeamAnnouncementDto>>(teamAnnouncementDatas);
-                if (teamData.TeamLeaderID.Equals(teamDto.ExecutorID) || teamData.TeamViceLeaderIDs.Contains(teamDto.ExecutorID))
-                {
-                    foreach (TeamAnnouncementDto teamAnnouncementDto in teamAnnouncementDtos)
-                    {
-                        teamAnnouncementDto.EditType = (int)TeamAnnouncementEditType.Edit;
-                    }
-
-                    Tuple<IEnumerable<TeamInteractiveDto>, string> getTeamInteractiveDataListResult = await this.GetTeamInteractiveDataList(teamDto);
-                    if (string.IsNullOrEmpty(getTeamInteractiveDataListResult.Item2))
-                    {
-                        teamInteractiveDtos = getTeamInteractiveDataListResult.Item1;
-                    }
-                }
-
-                //// TODO 待討論會員加入通知如何實現
-                IEnumerable<dynamic> notifies = new List<dynamic>() { teamInteractiveDtos, teamAnnouncementDtos };
-                return Tuple.Create(notifies, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Get Team Notify Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
-                return Tuple.Create<IEnumerable<dynamic>, string>(null, "取得車隊通知發生錯誤.");
-            }
-        }
-
-        /// <summary>
         /// 搜尋車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
