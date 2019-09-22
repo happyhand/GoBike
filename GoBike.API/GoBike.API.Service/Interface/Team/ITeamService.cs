@@ -105,6 +105,13 @@ namespace GoBike.API.Service.Interface.Team
         Task<ResponseResultDto> InviteJoinTeam(TeamDto teamDto);
 
         /// <summary>
+        /// 離開車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> LeaveTeam(TeamDto teamDto);
+
+        /// <summary>
         /// 拒絕申請加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>

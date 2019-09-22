@@ -1,21 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GoBike.Service.Service.Models.Team
 {
     /// <summary>
-    /// 車隊公告資料
+    /// 車隊活動資料
     /// </summary>
-    public class TeamAnnouncementDto
+    public class TeamEventDto
     {
         /// <summary>
-        /// Gets or sets AnnouncementID
+        /// Gets or sets Altitude
         /// </summary>
-        public string AnnouncementID { get; set; }
-
-        /// <summary>
-        /// Gets or sets Context
-        /// </summary>
-        public string Context { get; set; }
+        public long Altitude { get; set; }
 
         /// <summary>
         /// Gets or sets CreateDate
@@ -23,9 +19,19 @@ namespace GoBike.Service.Service.Models.Team
         public DateTime CreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets LimitDate
+        /// Gets or sets Distance
         /// </summary>
-        public int LimitDate { get; set; }
+        public long Distance { get; set; }
+
+        /// <summary>
+        /// Gets or sets EventDate
+        /// </summary>
+        public DateTime EventDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets EventID
+        /// </summary>
+        public string EventID { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID
@@ -33,9 +39,14 @@ namespace GoBike.Service.Service.Models.Team
         public string MemberID { get; set; }
 
         /// <summary>
-        /// Gets or sets SaveDeadline
+        /// Gets or sets RoadLines (TODO)
         /// </summary>
-        public DateTime SaveDeadline { get; set; }
+        public IEnumerable<dynamic> RoadLines { get; set; }
+
+        /// <summary>
+        /// Gets or sets RoadRemarks (TODO)
+        /// </summary>
+        public IEnumerable<dynamic> RoadRemarks { get; set; }
 
         /// <summary>
         /// Gets or sets TeamID

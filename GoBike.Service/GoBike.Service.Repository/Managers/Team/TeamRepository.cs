@@ -32,6 +32,11 @@ namespace GoBike.Service.Repository.Managers.Team
         private readonly IMongoCollection<TeamData> teamDatas;
 
         /// <summary>
+        /// teamEventDatas
+        /// </summary>
+        private readonly IMongoCollection<TeamEventData> teamEventDatas;
+
+        /// <summary>
         /// teamInteractiveDatas
         /// </summary>
         private readonly IMongoCollection<TeamInteractiveData> teamInteractiveDatas;
@@ -48,6 +53,7 @@ namespace GoBike.Service.Repository.Managers.Team
             this.teamDatas = db.GetCollection<TeamData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.Team);
             this.teamInteractiveDatas = db.GetCollection<TeamInteractiveData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.TeamInteractive);
             this.teamAnnouncementDatas = db.GetCollection<TeamAnnouncementData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.TeamAnnouncement);
+            this.teamEventDatas = db.GetCollection<TeamEventData>(AppSettingHelper.Appsetting.MongoDBConfig.CollectionFlag.TeamEvent);
         }
 
         #region 車隊資料
@@ -477,7 +483,7 @@ namespace GoBike.Service.Repository.Managers.Team
         }
 
         /// <summary>
-        /// 刪除車隊資料
+        /// 刪除車隊公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
         /// <returns>bool</returns>
@@ -512,7 +518,7 @@ namespace GoBike.Service.Repository.Managers.Team
         /// 取得公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
-        /// <returns>AnnouncementData</returns>
+        /// <returns>TeamAnnouncementData</returns>
         public async Task<TeamAnnouncementData> GetTeamAnnouncementData(string announcementID)
         {
             try
@@ -531,7 +537,7 @@ namespace GoBike.Service.Repository.Managers.Team
         /// 取得車隊公告資料列表
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <returns>AnnouncementDatas</returns>
+        /// <returns>TeamAnnouncementDatas</returns>
         public async Task<IEnumerable<TeamAnnouncementData>> GetTeamAnnouncementDataListOfTeam(string teamID)
         {
             try
@@ -579,5 +585,128 @@ namespace GoBike.Service.Repository.Managers.Team
         }
 
         #endregion 車隊公告資料
+
+        #region 車隊活動資料
+
+        /// <summary>
+        /// 建立車隊活動資料
+        /// </summary>
+        /// <param name="teamEventData">teamEventData</param>
+        /// <returns>bool</returns>
+        public async Task<bool> CreateTeamEventData(TeamEventData teamEventData)
+        {
+            try
+            {
+                await this.teamEventDatas.InsertOneAsync(teamEventData);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Create Team Event Data Error >>> Data:{JsonConvert.SerializeObject(teamEventData)}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 刪除車隊活動資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <returns>bool</returns>
+        public async Task<bool> DeleteTeamEventData(string eventID)
+        {
+            try
+            {
+                FilterDefinition<TeamEventData> filter = Builders<TeamEventData>.Filter.Eq("EventID", eventID);
+                DeleteResult result = await this.teamEventDatas.DeleteManyAsync(filter);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Delete Team Event Data Fail For IsAcknowledged >>> EventID:{eventID}");
+                    return false;
+                }
+
+                if (result.DeletedCount == 0)
+                {
+                    this.logger.LogError($"Delete Team Event Data Fail For DeletedCount >>> EventID:{eventID}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Team Event Data Error >>> EventID:{eventID}\n{ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 取得活動資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <returns>TeamEventData</returns>
+        public async Task<TeamEventData> GetTeamEventData(string eventID)
+        {
+            try
+            {
+                return await this.teamEventDatas.Find(data => data.EventID.Equals(eventID) && data.EventDate.CompareTo(DateTime.Now) >= 0).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Event Data Error >>> EventID:{eventID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊活動資料列表
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>TeamEventDatas</returns>
+        public async Task<IEnumerable<TeamEventData>> GetTeamEventDataListOfTeam(string teamID)
+        {
+            try
+            {
+                return await this.teamEventDatas.Find(data => data.TeamID.Equals(teamID) && data.EventDate.CompareTo(DateTime.Now) >= 0).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Event Data List Of Team Error >>> TeamID:{teamID}\n{ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 更新車隊公告資料
+        /// </summary>
+        /// <param name="teamEventData">teamEventData</param>
+        /// <returns>bool</returns>
+        public async Task<bool> UpdateTeamEventData(TeamEventData teamEventData)
+        {
+            try
+            {
+                FilterDefinition<TeamEventData> filter = Builders<TeamEventData>.Filter.Eq("_id", teamEventData.Id);
+                ReplaceOneResult result = await this.teamEventDatas.ReplaceOneAsync(filter, teamEventData);
+                if (!result.IsAcknowledged)
+                {
+                    this.logger.LogError($"Update Team Event Data Fail For IsAcknowledged >>> Data:{JsonConvert.SerializeObject(teamEventData)}");
+                    return false;
+                }
+
+                if (result.ModifiedCount == 0)
+                {
+                    this.logger.LogError($"Update Team Event Data Fail For ModifiedCount >>> Data:{JsonConvert.SerializeObject(teamEventData)}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Update Team Event Data Error >>> Data:{JsonConvert.SerializeObject(teamEventData)}\n{ex}");
+                return false;
+            }
+        }
+
+        #endregion 車隊活動資料
     }
 }

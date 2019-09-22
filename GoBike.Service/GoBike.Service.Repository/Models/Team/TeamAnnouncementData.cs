@@ -45,12 +45,6 @@ namespace GoBike.Service.Repository.Models.Team
         public string MemberID { get; set; }
 
         /// <summary>
-        /// Gets or sets Nickname
-        /// </summary>
-        [BsonElement("Nickname")]
-        public string Nickname { get; set; }
-
-        /// <summary>
         /// Gets or sets SaveDeadline
         /// </summary>
         [BsonElement("SaveDeadline")]

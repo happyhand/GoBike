@@ -157,7 +157,7 @@ namespace GoBike.Service.Repository.Interface.Team
         Task<bool> CreateTeamAnnouncementData(TeamAnnouncementData teamAnnouncementData);
 
         /// <summary>
-        /// 刪除車隊資料
+        /// 刪除車隊公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
         /// <returns>bool</returns>
@@ -167,14 +167,14 @@ namespace GoBike.Service.Repository.Interface.Team
         /// 取得公告資料
         /// </summary>
         /// <param name="announcementID">announcementID</param>
-        /// <returns>AnnouncementData</returns>
+        /// <returns>TeamAnnouncementData</returns>
         Task<TeamAnnouncementData> GetTeamAnnouncementData(string announcementID);
 
         /// <summary>
         /// 取得車隊公告資料列表
         /// </summary>
         /// <param name="teamID">teamID</param>
-        /// <returns>AnnouncementDatas</returns>
+        /// <returns>TeamAnnouncementDatas</returns>
         Task<IEnumerable<TeamAnnouncementData>> GetTeamAnnouncementDataListOfTeam(string teamID);
 
         /// <summary>
@@ -185,5 +185,44 @@ namespace GoBike.Service.Repository.Interface.Team
         Task<bool> UpdateTeamAnnouncementData(TeamAnnouncementData teamAnnouncementData);
 
         #endregion 車隊公告資料
+
+        #region 車隊活動資料
+
+        /// <summary>
+        /// 建立車隊活動資料
+        /// </summary>
+        /// <param name="teamEventData">teamEventData</param>
+        /// <returns>bool</returns>
+        Task<bool> CreateTeamEventData(TeamEventData teamEventData);
+
+        /// <summary>
+        /// 刪除車隊活動資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <returns>bool</returns>
+        Task<bool> DeleteTeamEventData(string eventID);
+
+        /// <summary>
+        /// 取得活動資料
+        /// </summary>
+        /// <param name="eventID">eventID</param>
+        /// <returns>TeamEventData</returns>
+        Task<TeamEventData> GetTeamEventData(string eventID);
+
+        /// <summary>
+        /// 取得車隊活動資料列表
+        /// </summary>
+        /// <param name="teamID">teamID</param>
+        /// <returns>TeamEventDatas</returns>
+        Task<IEnumerable<TeamEventData>> GetTeamEventDataListOfTeam(string teamID);
+
+        /// <summary>
+        /// 更新車隊公告資料
+        /// </summary>
+        /// <param name="teamEventData">teamEventData</param>
+        /// <returns>bool</returns>
+        Task<bool> UpdateTeamEventData(TeamEventData teamEventData);
+
+        #endregion 車隊活動資料
     }
 }

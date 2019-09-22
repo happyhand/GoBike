@@ -545,6 +545,34 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         /// <summary>
+        /// 離開車隊
+        /// </summary>
+        /// <param name="teamDto">teamDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> LeaveTeam(TeamDto teamDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/LeaveTeam", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Leave Team Error >>> TeamID:{teamDto.TeamID} ExecutorID:{teamDto.ExecutorID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "離開車隊發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
         /// 拒絕申請加入車隊
         /// </summary>
         /// <param name="teamDto">teamDto</param>
