@@ -132,24 +132,70 @@ namespace GoBike.API.Service.Interface.Team
         /// <summary>
         /// 建立車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> CreateTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
 
         /// <summary>
         /// 刪除車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> DeleteTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
 
         /// <summary>
         /// 編輯車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> EditTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto);
 
         #endregion 車隊公告
+
+        #region 車隊活動
+
+        /// <summary>
+        /// 建立車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> CreateTeamEventData(TeamEventDto teamEventDto);
+
+        /// <summary>
+        /// 刪除車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> DeleteTeamEventData(TeamEventDto teamEventDto);
+
+        /// <summary>
+        /// 編輯車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> EditTeamEventData(TeamEventDto teamEventDto);
+
+        /// <summary>
+        /// 取得車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetTeamEventData(TeamEventDto teamEventDto);
+
+        /// <summary>
+        /// 加入車隊活動
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> JoinTeamEvent(TeamEventDto teamEventDto);
+
+        /// <summary>
+        /// 離開車隊活動
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> LeaveTeamEvent(TeamEventDto teamEventDto);
+
+        #endregion 車隊活動
     }
 }

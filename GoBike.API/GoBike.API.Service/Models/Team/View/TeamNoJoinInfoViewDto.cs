@@ -5,7 +5,7 @@ namespace GoBike.API.Service.Models.Team.View
     /// <summary>
     /// 車隊未加入資訊可視資料
     /// </summary>
-    public class TeamNoJoinInfoView
+    public class TeamNoJoinInfoViewDto
     {
         /// <summary>
         /// Gets or sets FrontCoverUrl
@@ -20,7 +20,7 @@ namespace GoBike.API.Service.Models.Team.View
         /// <summary>
         /// Gets or sets MemberList
         /// </summary>
-        public IEnumerable<TeamMemberInfoView> MemberList { get; set; }
+        public IEnumerable<TeamMemberInfoViewDto> MemberList { get; set; }
 
         /// <summary>
         /// Gets or sets PhotoUrl

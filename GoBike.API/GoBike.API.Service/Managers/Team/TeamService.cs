@@ -4,6 +4,7 @@ using GoBike.API.Core.Resource;
 using GoBike.API.Core.Resource.Enum;
 using GoBike.API.Repository.Interface;
 using GoBike.API.Service.Interface.Team;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
 using GoBike.API.Service.Models.Team.Data;
 using GoBike.API.Service.Models.Team.View;
@@ -124,7 +125,7 @@ namespace GoBike.API.Service.Managers.Team
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>()
                     };
                 }
 
@@ -159,7 +160,7 @@ namespace GoBike.API.Service.Managers.Team
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>()
                     };
                 }
 
@@ -194,7 +195,7 @@ namespace GoBike.API.Service.Managers.Team
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>()
                     };
                 }
 
@@ -234,8 +235,8 @@ namespace GoBike.API.Service.Managers.Team
                     IEnumerable<string> memberIDs = getTeamDto.TeamMemberIDs;
                     postData = JsonConvert.SerializeObject(memberIDs);
                     httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember/List", postData);
-                    IEnumerable<TeamMemberInfoView> teamMemberList = httpResponseMessage.IsSuccessStatusCode ? await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamMemberInfoView>>() : new List<TeamMemberInfoView>();
-                    foreach (TeamMemberInfoView teamMember in teamMemberList)
+                    IEnumerable<TeamMemberInfoViewDto> teamMemberList = httpResponseMessage.IsSuccessStatusCode ? await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamMemberInfoViewDto>>() : new List<TeamMemberInfoViewDto>();
+                    foreach (TeamMemberInfoViewDto teamMember in teamMemberList)
                     {
                         string fuzzyCacheKey = $"{CommonFlagHelper.CommonFlag.RedisFlag.Session}-*-{teamMember.MemberID}";
                         string cacheKey = this.redisRepository.GetRedisKeys(fuzzyCacheKey).FirstOrDefault();
@@ -270,7 +271,7 @@ namespace GoBike.API.Service.Managers.Team
                     }
                     else
                     {
-                        TeamNoJoinInfoView teamNoJoinInfoView = this.mapper.Map<TeamNoJoinInfoView>(getTeamDto);
+                        TeamNoJoinInfoViewDto teamNoJoinInfoView = this.mapper.Map<TeamNoJoinInfoViewDto>(getTeamDto);
                         teamNoJoinInfoView.MemberList = teamMemberList;
                         teamNoJoinInfoView.JoinStatus = getTeamDto.JoinStatus;
                         return new ResponseResultDto()
@@ -314,7 +315,7 @@ namespace GoBike.API.Service.Managers.Team
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<IEnumerable<TeamSimpleInfoView>>>()
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<IEnumerable<TeamSimpleInfoViewDto>>>()
                     };
                 }
 
@@ -351,7 +352,7 @@ namespace GoBike.API.Service.Managers.Team
                     return new ResponseResultDto()
                     {
                         Ok = true,
-                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoView>>()
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamSimpleInfoViewDto>>()
                     };
                 }
 
@@ -635,7 +636,7 @@ namespace GoBike.API.Service.Managers.Team
         /// <summary>
         /// 建立車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> CreateTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
         {
@@ -663,7 +664,7 @@ namespace GoBike.API.Service.Managers.Team
         /// <summary>
         /// 刪除車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> DeleteTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
         {
@@ -691,7 +692,7 @@ namespace GoBike.API.Service.Managers.Team
         /// <summary>
         /// 編輯車隊公告資料
         /// </summary>
-        /// <param name="teamDto">teamDto</param>
+        /// <param name="teamAnnouncementDto">teamAnnouncementDto</param>
         /// <returns>ResponseResultDto</returns>
         public async Task<ResponseResultDto> EditTeamAnnouncementData(TeamAnnouncementDto teamAnnouncementDto)
         {
@@ -717,5 +718,197 @@ namespace GoBike.API.Service.Managers.Team
         }
 
         #endregion 車隊公告
+
+        #region 車隊活動
+
+        /// <summary>
+        /// 建立車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> CreateTeamEventData(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Create", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Create Team Event Data Error >>> Data:{JsonConvert.SerializeObject(teamEventDto)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "建立車隊活動資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 刪除車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> DeleteTeamEventData(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Delete", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Delete Team Event Data Error >>> EventID:{teamEventDto.EventID} MemberID:{teamEventDto.MemberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "刪除車隊活動資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 編輯車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> EditTeamEventData(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Edit", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Edit Team Announcement Data Error >>> Data:{JsonConvert.SerializeObject(teamEventDto)}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "編輯車隊活動資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得車隊活動資料
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetTeamEventData(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Get", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    TeamEventDto getTeamEventDto = await httpResponseMessage.Content.ReadAsAsync<TeamEventDto>();
+                    TeamEventSimpleInfoViewDto teamEventSimpleInfoView = this.mapper.Map<TeamEventSimpleInfoViewDto>(getTeamEventDto);
+                    teamEventSimpleInfoView.JoinType = getTeamEventDto.JoinMemberIDs.Contains(teamEventDto.MemberID) ? (int)TeamEventJoinType.Join : (int)TeamEventJoinType.None;
+
+                    postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = teamEventDto.MemberID });
+                    httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        teamEventSimpleInfoView.Executor = await httpResponseMessage.Content.ReadAsAsync<TeamMemberInfoViewDto>();
+
+                        return new ResponseResultDto()
+                        {
+                            Ok = true,
+                            Data = teamEventSimpleInfoView
+                        };
+                    }
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Team Event Data Error >>> TeamID:{teamEventDto.TeamID} EventID:{teamEventDto.EventID} MemberID:{teamEventDto.MemberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得車隊活動資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 加入車隊活動
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> JoinTeamEvent(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Join", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Team Event Error >>> TeamID:{teamEventDto.TeamID} EventID:{teamEventDto.EventID} MemberID:{teamEventDto.MemberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入車隊活動發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 離開車隊活動
+        /// </summary>
+        /// <param name="teamEventDto">teamEventDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> LeaveTeamEvent(TeamEventDto teamEventDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(teamEventDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/Leave", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Leave Team Event Error >>> TeamID:{teamEventDto.TeamID} EventID:{teamEventDto.EventID} MemberID:{teamEventDto.MemberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "離開車隊活動發生錯誤."
+                };
+            }
+        }
+
+        #endregion 車隊活動
     }
 }

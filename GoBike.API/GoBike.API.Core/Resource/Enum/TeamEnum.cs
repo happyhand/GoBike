@@ -1,6 +1,22 @@
 ﻿namespace GoBike.API.Core.Resource.Enum
 {
     /// <summary>
+    /// 車隊活動加入類別資料
+    /// </summary>
+    public enum TeamEventJoinType
+    {
+        /// <summary>
+        /// 未加入
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 加入
+        /// </summary>
+        Join = 1
+    }
+
+    /// <summary>
     /// 車隊身分類型資料
     /// </summary>
     public enum TeamIdentityType

@@ -3,7 +3,7 @@
     /// <summary>
     /// 車隊會員資訊可視資料
     /// </summary>
-    public class TeamMemberInfoView
+    public class TeamMemberInfoViewDto
     {
         /// <summary>
         /// Gets or sets MemberID

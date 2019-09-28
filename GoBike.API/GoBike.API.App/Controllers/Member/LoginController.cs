@@ -136,6 +136,7 @@ namespace GoBike.API.App.Controllers.Member
                 ResponseResultDto recordSessionIDResult = await this.memberService.RecordSessionID(memberID, this.HttpContext.Session.Id);
                 if (recordSessionIDResult.Ok)
                 {
+                    //// TODO 傳送 Server 連線資訊
                     return Ok(token);
                 }
                 else

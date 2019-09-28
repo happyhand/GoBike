@@ -3,7 +3,7 @@
     /// <summary>
     /// 車隊簡易資訊可視資料
     /// </summary>
-    public class TeamSimpleInfoView
+    public class TeamSimpleInfoViewDto
     {
         /// <summary>
         /// Gets or sets PhotoUrl

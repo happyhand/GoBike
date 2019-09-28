@@ -9,9 +9,12 @@ namespace GoBike.API.App.AutoMapperProfile.Team
     {
         public TeamProfile()
         {
-            CreateMap<TeamDto, TeamSimpleInfoView>();
-            CreateMap<TeamDto, TeamNoJoinInfoView>();
-            CreateMap<MemberDto, TeamMemberInfoView>();
+            CreateMap<TeamDto, TeamSimpleInfoViewDto>();
+            CreateMap<TeamDto, TeamDetailInfoViewDto>();
+            CreateMap<TeamDto, TeamNoJoinInfoViewDto>();
+            CreateMap<MemberDto, TeamMemberInfoViewDto>();
+            CreateMap<TeamEventDto, TeamEventSimpleInfoViewDto>();
+            CreateMap<TeamEventDto, TeamEventDetailInfoViewDto>();
         }
     }
 }

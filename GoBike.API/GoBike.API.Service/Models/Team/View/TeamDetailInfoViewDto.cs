@@ -5,7 +5,7 @@ namespace GoBike.API.Service.Models.Team.View
     /// <summary>
     /// 車隊詳細資訊可視資料
     /// </summary>
-    public class TeamDetailInfoViewDto : TeamSimpleInfoView
+    public class TeamDetailInfoViewDto : TeamSimpleInfoViewDto
     {
         /// <summary>
         /// Gets or sets AnnouncementList
@@ -30,7 +30,7 @@ namespace GoBike.API.Service.Models.Team.View
         /// <summary>
         /// Gets or sets MemberList
         /// </summary>
-        public IEnumerable<TeamMemberInfoView> MemberList { get; set; }
+        public IEnumerable<TeamMemberInfoViewDto> MemberList { get; set; }
 
         /// <summary>
         /// Gets or sets TeamIdentity

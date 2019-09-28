@@ -46,6 +46,12 @@ namespace GoBike.Service.Repository.Models.Team
         public ObjectId Id { get; set; }
 
         /// <summary>
+        /// Gets or sets JoinMemberIDs
+        /// </summary>
+        [BsonElement("JoinMemberIDs")]
+        public IEnumerable<string> JoinMemberIDs { get; set; }
+
+        /// <summary>
         /// Gets or sets MemberID
         /// </summary>
         [BsonElement("MemberID")]
@@ -68,5 +74,11 @@ namespace GoBike.Service.Repository.Models.Team
         /// </summary>
         [BsonElement("TeamID")]
         public string TeamID { get; set; }
+
+        /// <summary>
+        /// Gets or sets Title
+        /// </summary>
+        [BsonElement("Title")]
+        public string Title { get; set; }
     }
 }
