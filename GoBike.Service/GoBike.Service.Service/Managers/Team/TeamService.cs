@@ -1914,6 +1914,11 @@ namespace GoBike.Service.Service.Managers.Team
         private string UpdateTeamEventDataHandler(TeamEventDto teamEventDto, TeamEventData teamEventData)
         {
             //// TODO
+            if (!string.IsNullOrEmpty(teamEventDto.Title))
+            {
+                teamEventData.Title = teamEventDto.Title;
+            }
+
             if (teamEventDto.EventDate != null)
             {
                 teamEventData.EventDate = teamEventDto.EventDate;
