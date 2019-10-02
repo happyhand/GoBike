@@ -18,6 +18,11 @@ namespace GoBike.API.Service.Models.Team.View
         public IEnumerable<TeamInteractiveInfoViewDto> ApplyForList { get; set; }
 
         /// <summary>
+        /// Gets or sets EventList
+        /// </summary>
+        public IEnumerable<TeamEventSimpleInfoViewDto> EventList { get; set; }
+
+        /// <summary>
         /// Gets or sets FrontCoverUrl
         /// </summary>
         public string FrontCoverUrl { get; set; }

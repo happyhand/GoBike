@@ -70,6 +70,12 @@ namespace GoBike.Service.Repository.Models.Team
         public IEnumerable<dynamic> RoadRemarks { get; set; }
 
         /// <summary>
+        /// Gets or sets Site
+        /// </summary>
+        [BsonElement("Site")]
+        public string Site { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamID
         /// </summary>
         [BsonElement("TeamID")]

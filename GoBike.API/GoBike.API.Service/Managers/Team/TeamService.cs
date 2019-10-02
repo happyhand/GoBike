@@ -249,20 +249,32 @@ namespace GoBike.API.Service.Managers.Team
                         TeamDetailInfoViewDto teamDetailInfoView = this.mapper.Map<TeamDetailInfoViewDto>(getTeamDto);
                         teamDetailInfoView.MemberList = teamMemberList;
                         teamDetailInfoView.TeamIdentity = this.GetTeamIdentity(getTeamDto.TeamLeaderID, getTeamDto.TeamViceLeaderIDs, getTeamDto.TeamMemberIDs, teamDto.ExecutorID);
-
-                        postData = JsonConvert.SerializeObject(teamDto);
+                        //// 車隊互動
                         httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/GetTeamInteractiveDataList", postData);
                         IEnumerable<TeamInteractiveInfoViewDto> teamInteractiveList = httpResponseMessage.IsSuccessStatusCode ? await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamInteractiveInfoViewDto>>() : new List<TeamInteractiveInfoViewDto>();
                         teamDetailInfoView.ApplyForList = teamInteractiveList.Where(data => data.InteractiveType == (int)TeamInteractiveType.ApplyFor);
                         teamDetailInfoView.InviteList = teamInteractiveList.Where(data => data.InteractiveType == (int)TeamInteractiveType.Invite);
-
-                        postData = JsonConvert.SerializeObject(teamDto);
+                        //// 車隊公告
                         httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Announcement/Get", postData);
                         IEnumerable<TeamAnnouncementInfoViewDto> teamAnnouncementList = httpResponseMessage.IsSuccessStatusCode ? await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamAnnouncementInfoViewDto>>() : new List<TeamAnnouncementInfoViewDto>();
                         teamDetailInfoView.AnnouncementList = teamAnnouncementList;
+                        //// 車隊活動
+                        httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Team/Event/GetList", postData);
+                        IEnumerable<TeamEventDto> teamEventList = httpResponseMessage.IsSuccessStatusCode ? await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamEventDto>>() : new List<TeamEventDto>();
+                        List<TeamEventSimpleInfoViewDto> teamEventSimpleInfoViewList = new List<TeamEventSimpleInfoViewDto>();
+                        foreach (TeamEventDto teamEventDto in teamEventList)
+                        {
+                            TeamEventSimpleInfoViewDto teamEventSimpleInfoView = this.mapper.Map<TeamEventSimpleInfoViewDto>(teamEventDto);
+                            postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = teamEventDto.MemberID });
+                            httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
+                            if (httpResponseMessage.IsSuccessStatusCode)
+                            {
+                                teamEventSimpleInfoView.Executor = await httpResponseMessage.Content.ReadAsAsync<TeamMemberInfoViewDto>();
+                                teamEventSimpleInfoViewList.Add(teamEventSimpleInfoView);
+                            }
+                        }
 
-                        //// TODO 車隊活動
-
+                        teamDetailInfoView.EventList = teamEventSimpleInfoViewList;
                         return new ResponseResultDto()
                         {
                             Ok = true,
@@ -819,20 +831,26 @@ namespace GoBike.API.Service.Managers.Team
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     TeamEventDto getTeamEventDto = await httpResponseMessage.Content.ReadAsAsync<TeamEventDto>();
-                    TeamEventSimpleInfoViewDto teamEventSimpleInfoView = this.mapper.Map<TeamEventSimpleInfoViewDto>(getTeamEventDto);
-                    teamEventSimpleInfoView.JoinType = getTeamEventDto.JoinMemberIDs.Contains(teamEventDto.MemberID) ? (int)TeamEventJoinType.Join : (int)TeamEventJoinType.None;
+                    TeamEventDetailInfoViewDto teamEventDetailInfoView = this.mapper.Map<TeamEventDetailInfoViewDto>(getTeamEventDto);
+                    teamEventDetailInfoView.JoinType = getTeamEventDto.JoinMemberIDs.Contains(teamEventDto.MemberID) ? (int)TeamEventJoinType.Join : (int)TeamEventJoinType.None;
 
-                    postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = teamEventDto.MemberID });
+                    postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = getTeamEventDto.MemberID });
                     httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember", postData);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
-                        teamEventSimpleInfoView.Executor = await httpResponseMessage.Content.ReadAsAsync<TeamMemberInfoViewDto>();
-
-                        return new ResponseResultDto()
+                        teamEventDetailInfoView.Executor = await httpResponseMessage.Content.ReadAsAsync<TeamMemberInfoViewDto>();
+                        IEnumerable<string> memberIDs = getTeamEventDto.JoinMemberIDs;
+                        postData = JsonConvert.SerializeObject(memberIDs);
+                        httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/SearchMember/List", postData);
+                        if (httpResponseMessage.IsSuccessStatusCode)
                         {
-                            Ok = true,
-                            Data = teamEventSimpleInfoView
-                        };
+                            teamEventDetailInfoView.JoinMemberList = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<TeamMemberInfoViewDto>>();
+                            return new ResponseResultDto()
+                            {
+                                Ok = true,
+                                Data = teamEventDetailInfoView
+                            };
+                        }
                     }
                 }
 

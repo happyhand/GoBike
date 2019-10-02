@@ -54,6 +54,11 @@ namespace GoBike.Service.Service.Models.Team
         public IEnumerable<dynamic> RoadRemarks { get; set; }
 
         /// <summary>
+        /// Gets or sets Site
+        /// </summary>
+        public string Site { get; set; }
+
+        /// <summary>
         /// Gets or sets TeamID
         /// </summary>
         public string TeamID { get; set; }
@@ -69,6 +74,11 @@ namespace GoBike.Service.Service.Models.Team
         /// Gets or sets EditType
         /// </summary>
         public int EditType { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamName
+        /// </summary>
+        public string TeamName { get; set; }
 
         #endregion Extra Data
     }

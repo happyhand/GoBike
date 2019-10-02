@@ -18,9 +18,9 @@ namespace GoBike.API.Service.Models.Team.View
         public int EditType { get; set; }
 
         /// <summary>
-        /// Gets or sets JoinMemberIDs
+        /// Gets or sets JoinMemberList
         /// </summary>
-        public IEnumerable<TeamMemberInfoViewDto> JoinMemberIDs { get; set; }
+        public IEnumerable<TeamMemberInfoViewDto> JoinMemberList { get; set; }
 
         /// <summary>
         /// Gets or sets RoadLines (TODO)
@@ -31,5 +31,15 @@ namespace GoBike.API.Service.Models.Team.View
         /// Gets or sets RoadRemarks (TODO)
         /// </summary>
         public IEnumerable<dynamic> RoadRemarks { get; set; }
+
+        /// <summary>
+        /// Gets or sets Site
+        /// </summary>
+        public string Site { get; set; }
+
+        /// <summary>
+        /// Gets or sets TeamName
+        /// </summary>
+        public string TeamName { get; set; }
     }
 }

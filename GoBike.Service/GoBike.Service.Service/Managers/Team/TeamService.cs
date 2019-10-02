@@ -1592,6 +1592,7 @@ namespace GoBike.Service.Service.Managers.Team
                 TeamEventData teamEventData = this.mapper.Map<TeamEventData>(teamEventDto);
                 teamEventData.CreateDate = createDate;
                 teamEventData.EventID = Utility.GetSerialID(createDate);
+                teamEventData.JoinMemberIDs = new List<string>() { teamEventDto.MemberID };
                 bool isSuccess = await this.teamRepository.CreateTeamEventData(teamEventData);
                 if (!isSuccess)
                 {
@@ -1746,6 +1747,7 @@ namespace GoBike.Service.Service.Managers.Team
                 }
 
                 TeamEventDto getTeamEventDto = this.mapper.Map<TeamEventDto>(teamEventData);
+                getTeamEventDto.TeamName = teamData.TeamName;
                 getTeamEventDto.EditType = getTeamEventDto.MemberID.Equals(teamEventDto.MemberID) ? (int)TeamEventEditType.Edit : (int)TeamEventEditType.None;
                 return Tuple.Create(getTeamEventDto, string.Empty);
             }
@@ -1790,6 +1792,7 @@ namespace GoBike.Service.Service.Managers.Team
                 IEnumerable<TeamEventDto> teamEventDtos = this.mapper.Map<IEnumerable<TeamEventDto>>(teamEventDatas);
                 foreach (TeamEventDto teamEventDto in teamEventDtos)
                 {
+                    teamEventDto.TeamName = teamData.TeamName;
                     teamEventDto.EditType = teamEventDto.MemberID.Equals(teamDto.ExecutorID) ? (int)TeamEventEditType.Edit : (int)TeamEventEditType.None;
                 }
                 return Tuple.Create(teamEventDtos, string.Empty);
@@ -1934,6 +1937,11 @@ namespace GoBike.Service.Service.Managers.Team
                 teamEventData.Altitude = teamEventDto.Altitude;
             }
 
+            if (!string.IsNullOrEmpty(teamEventDto.Site))
+            {
+                teamEventData.Site = teamEventDto.Site;
+            }
+
             return string.Empty;
         }
 
@@ -1974,6 +1982,11 @@ namespace GoBike.Service.Service.Managers.Team
             if (teamEventDto.Altitude == 0)
             {
                 return "請輸入最高海拔.";
+            }
+
+            if (string.IsNullOrEmpty(teamEventDto.Site))
+            {
+                return "請輸入集合地點.";
             }
 
             //// TODO
