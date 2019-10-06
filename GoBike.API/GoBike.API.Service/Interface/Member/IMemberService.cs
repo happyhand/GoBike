@@ -119,5 +119,65 @@ namespace GoBike.API.Service.Interface.Member
         Task<ResponseResultDto> AddRideData(RideDto rideDto);
 
         #endregion 騎乘資料
+
+        #region 互動資料
+
+        /// <summary>
+        /// 取得被加入好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetBeAddFriendList(string memberID);
+
+        /// <summary>
+        /// 取得黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetBlackList(string memberID);
+
+        /// <summary>
+        /// 取得好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetFriendList(string memberID);
+
+        /// <summary>
+        /// 加入黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> JoinBlack(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 加入好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> JoinFriend(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 移除黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> RemoveBlack(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 移除好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> RemoveFriend(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 搜尋好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> SearchFriend(InteractiveDto interactiveDto);
+
+        #endregion 互動資料
     }
 }

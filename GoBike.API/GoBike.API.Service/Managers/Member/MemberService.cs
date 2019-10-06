@@ -11,6 +11,7 @@ using GoBike.API.Service.Models.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -595,5 +596,269 @@ namespace GoBike.API.Service.Managers.Member
         }
 
         #endregion 騎乘資料
+
+        #region 互動資料
+
+        /// <summary>
+        /// 取得被加入好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetBeAddFriendList(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/GetBeAddFriendList", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberSimpleInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Be Add Friend List Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得被加入好友名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetBlackList(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/GetBlackList", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberSimpleInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Black List Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetFriendList(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/GetFriendList", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<MemberSimpleInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得好友名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 加入黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> JoinBlack(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(interactiveDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/JoinBlack", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Black Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 加入好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> JoinFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(interactiveDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/JoinFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Friend Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "加入好友發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 移除黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RemoveBlack(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(interactiveDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/RemoveBlack", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Remove Black Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "移除黑名單發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 移除好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> RemoveFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(interactiveDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/RemoveFriend", postData);
+                return new ResponseResultDto()
+                {
+                    Ok = httpResponseMessage.IsSuccessStatusCode,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Remove Friend Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "移除好友發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 搜尋好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> SearchFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(interactiveDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Friendship/SearchFriend", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<MemberSimpleInfoViewDto>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Friend Error >>> MemberID:{interactiveDto.MemberID} SearchKey:{interactiveDto.SearchKey}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "搜尋好友發生錯誤."
+                };
+            }
+        }
+
+        #endregion 互動資料
     }
 }

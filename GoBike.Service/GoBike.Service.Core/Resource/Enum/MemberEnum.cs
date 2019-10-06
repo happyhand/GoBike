@@ -22,6 +22,27 @@
     }
 
     /// <summary>
+    /// 會員互動類別資料
+    /// </summary>
+    public enum InteractiveType
+    {
+        /// <summary>
+        /// 未設定
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 好友
+        /// </summary>
+        Friend = 1,
+
+        /// <summary>
+        /// 黑名單
+        /// </summary>
+        Black = 2
+    }
+
+    /// <summary>
     /// 行動電話綁定類別資料
     /// </summary>
     public enum MoblieBindType

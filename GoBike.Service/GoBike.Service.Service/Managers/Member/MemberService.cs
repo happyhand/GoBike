@@ -21,6 +21,11 @@ namespace GoBike.Service.Service.Managers.Member
     public class MemberService : IMemberService
     {
         /// <summary>
+        /// interactiveRepository
+        /// </summary>
+        private readonly IInteractiveRepository interactiveRepository;
+
+        /// <summary>
         /// logger
         /// </summary>
         private readonly ILogger<MemberService> logger;
@@ -47,12 +52,13 @@ namespace GoBike.Service.Service.Managers.Member
         /// <param name="mapper">mapper</param>
         /// <param name="memberRepository">memberRepository</param>
         /// <param name="rideRepository">rideRepository</param>
-        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IRideRepository rideRepository)
+        public MemberService(ILogger<MemberService> logger, IMapper mapper, IMemberRepository memberRepository, IRideRepository rideRepository, IInteractiveRepository interactiveRepository)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.memberRepository = memberRepository;
             this.rideRepository = rideRepository;
+            this.interactiveRepository = interactiveRepository;
         }
 
         #region 註冊\登入
@@ -679,5 +685,334 @@ namespace GoBike.Service.Service.Managers.Member
         }
 
         #endregion 騎乘資料
+
+        #region 互動資料
+
+        /// <summary>
+        /// 取得被加入好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<MemberDto>, string>> GetBeAddFriendList(string memberID)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberID))
+                {
+                    return Tuple.Create<IEnumerable<MemberDto>, string>(null, "會員編號無效.");
+                }
+
+                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetBeInteractiveDataList(memberID);
+                IEnumerable<string> beFriendIDList = interactiveDatas.Where(options => options.Status == (int)InteractiveType.Friend).Select(options => options.MemberID);
+                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemberDataList(beFriendIDList);
+                return Tuple.Create(this.mapper.Map<IEnumerable<MemberDto>>(memberDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Be Add Friend List Error >>> MemberID:{memberID}\n{ex}");
+                return Tuple.Create<IEnumerable<MemberDto>, string>(null, "取得被加入好友名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<MemberDto>, string>> GetBlackList(string memberID)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberID))
+                {
+                    return Tuple.Create<IEnumerable<MemberDto>, string>(null, "會員編號無效.");
+                }
+
+                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetInteractiveDataList(memberID);
+                IEnumerable<string> blackIDList = interactiveDatas.Where(options => options.Status == (int)InteractiveType.Black).Select(options => options.MemberID);
+                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemberDataList(blackIDList);
+                return Tuple.Create(this.mapper.Map<IEnumerable<MemberDto>>(memberDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Black List Error >>> MemberID:{memberID}\n{ex}");
+                return Tuple.Create<IEnumerable<MemberDto>, string>(null, "取得黑名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 取得好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<MemberDto>, string>> GetFriendList(string memberID)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberID))
+                {
+                    return Tuple.Create<IEnumerable<MemberDto>, string>(null, "會員編號無效.");
+                }
+
+                IEnumerable<InteractiveData> interactiveDatas = await this.interactiveRepository.GetInteractiveDataList(memberID);
+                IEnumerable<string> friendIDList = interactiveDatas.Where(options => options.Status == (int)InteractiveType.Friend).Select(options => options.MemberID);
+                IEnumerable<MemberData> memberDatas = await this.memberRepository.GetMemberDataList(friendIDList);
+                return Tuple.Create(this.mapper.Map<IEnumerable<MemberDto>>(memberDatas), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Friend List Error >>> MemberID:{memberID}\n{ex}");
+                return Tuple.Create<IEnumerable<MemberDto>, string>(null, "取得好友名單發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 加入黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        public async Task<string> JoinBlack(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(interactiveDto.MemberID))
+                {
+                    return "會員編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(interactiveDto.InteractiveID))
+                {
+                    return "對方會員編號無效.";
+                }
+
+                InteractiveData interactiveData = await this.interactiveRepository.GetAppointInteractiveData(interactiveDto.MemberID, interactiveDto.InteractiveID);
+                if (interactiveData == null)
+                {
+                    interactiveData = this.CreateInteractiveData(interactiveDto, (int)InteractiveType.Black);
+                    bool isSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
+                    if (!isSuccess)
+                    {
+                        return "加入黑名單失敗.";
+                    }
+                }
+                else
+                {
+                    if (interactiveData.Status != (int)InteractiveType.Black)
+                    {
+                        interactiveData.Status = (int)InteractiveType.Black;
+                        bool updateInteractiveDataResult = await this.interactiveRepository.UpdateInteractiveData(interactiveData);
+                        if (!updateInteractiveDataResult)
+                        {
+                            return "加入黑名單失敗.";
+                        }
+                    }
+                }
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Black Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return "加入黑名單發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 加入好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        public async Task<string> JoinFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(interactiveDto.MemberID))
+                {
+                    return "會員編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(interactiveDto.InteractiveID))
+                {
+                    return "對方會員編號無效.";
+                }
+
+                InteractiveData interactiveData = await this.interactiveRepository.GetAppointInteractiveData(interactiveDto.MemberID, interactiveDto.InteractiveID);
+                if (interactiveData == null)
+                {
+                    interactiveData = this.CreateInteractiveData(interactiveDto, (int)InteractiveType.Friend);
+                    bool isSuccess = await this.interactiveRepository.CreateInteractiveData(interactiveData);
+                    if (!isSuccess)
+                    {
+                        return "加入好友失敗.";
+                    }
+                }
+                else
+                {
+                    if (interactiveData.Status != (int)InteractiveType.Friend)
+                    {
+                        interactiveData.Status = (int)InteractiveType.Friend;
+                        bool updateInteractiveDataResult = await this.interactiveRepository.UpdateInteractiveData(interactiveData);
+                        if (!updateInteractiveDataResult)
+                        {
+                            return "加入好友失敗.";
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Join Friend Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return "加入好友發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 移除黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        public async Task<string> RemoveBlack(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(interactiveDto.MemberID))
+                {
+                    return "會員編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(interactiveDto.InteractiveID))
+                {
+                    return "對方會員編號無效.";
+                }
+
+                InteractiveData interactiveData = await this.interactiveRepository.GetAppointInteractiveData(interactiveDto.MemberID, interactiveDto.InteractiveID);
+                if (interactiveData == null)
+                {
+                    //// 不做處理，認定已移除黑名單
+                    this.logger.LogWarning($"No Interactive Data For Remove Black >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}");
+                }
+                else
+                {
+                    if (interactiveData.Status == (int)InteractiveType.Black)
+                    {
+                        interactiveData.Status = (int)InteractiveType.None;
+                        bool updateInteractiveDataResult = await this.interactiveRepository.UpdateInteractiveData(interactiveData);
+                        if (!updateInteractiveDataResult)
+                        {
+                            return "移除黑名單失敗.";
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Remove Black Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return "移除黑名單發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 移除好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        public async Task<string> RemoveFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(interactiveDto.MemberID))
+                {
+                    return "會員編號無效.";
+                }
+
+                if (string.IsNullOrEmpty(interactiveDto.InteractiveID))
+                {
+                    return "對方會員編號無效.";
+                }
+
+                InteractiveData interactiveData = await this.interactiveRepository.GetAppointInteractiveData(interactiveDto.MemberID, interactiveDto.InteractiveID);
+                if (interactiveData == null)
+                {
+                    //// 不做處理，認定已移除好友
+                    this.logger.LogWarning($"No Interactive Data For Remove Friend >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}");
+                }
+                else
+                {
+                    if (interactiveData.Status == (int)InteractiveType.Friend)
+                    {
+                        interactiveData.Status = (int)InteractiveType.None;
+                        bool updateInteractiveDataResult = await this.interactiveRepository.UpdateInteractiveData(interactiveData);
+                        if (!updateInteractiveDataResult)
+                        {
+                            return "移除好友失敗.";
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Remove Friend Error >>> MemberID:{interactiveDto.MemberID} InteractiveID:{interactiveDto.InteractiveID}\n{ex}");
+                return "移除好友發生錯誤.";
+            }
+        }
+
+        /// <summary>
+        /// 搜尋好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>Tuple(MemberDto, string)</returns>
+        public async Task<Tuple<MemberDto, string>> SearchFriend(InteractiveDto interactiveDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(interactiveDto.MemberID))
+                {
+                    return Tuple.Create<MemberDto, string>(null, "會員編號無效.");
+                }
+
+                if (string.IsNullOrEmpty(interactiveDto.SearchKey))
+                {
+                    return Tuple.Create<MemberDto, string>(null, "請輸入搜尋條件.");
+                }
+
+                MemberData memberData = await this.memberRepository.GetMemberDataByEmail(interactiveDto.SearchKey);
+                if (memberData == null)
+                {
+                    return Tuple.Create<MemberDto, string>(null, "無會員資料.");
+                }
+
+                InteractiveData interactiveData = await this.interactiveRepository.GetAppointInteractiveData(interactiveDto.MemberID, memberData.MemberID);
+                if (interactiveData != null && interactiveData.Status == (int)InteractiveType.Friend)
+                {
+                    return Tuple.Create<MemberDto, string>(null, "已加入好友.");
+                }
+
+                return Tuple.Create(this.mapper.Map<MemberDto>(memberData), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Search Friend Error >>> MemberID:{interactiveDto.MemberID} SearchKey:{interactiveDto.SearchKey}\n{ex}");
+                return Tuple.Create<MemberDto, string>(null, "搜尋好友發生錯誤.");
+            }
+        }
+
+        /// <summary>
+        /// 建立互動資料
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>InteractiveData</returns>
+        private InteractiveData CreateInteractiveData(InteractiveDto interactiveDto, int status)
+        {
+            InteractiveData interactiveData = this.mapper.Map<InteractiveData>(interactiveDto);
+            interactiveData.Status = status;
+            return interactiveData;
+        }
+
+        #endregion 互動資料
     }
 }

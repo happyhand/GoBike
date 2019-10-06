@@ -72,6 +72,7 @@ namespace GoBike.Service.API
             services.AddSingleton<ICommonRepository, CommonRepository>();
             services.AddSingleton<IMemberRepository, MemberRepository>();
             services.AddSingleton<IRideRepository, RideRepository>();
+            services.AddSingleton<IInteractiveRepository, InteractiveRepository>();
             services.AddSingleton<ITeamRepository, TeamRepository>();
         }
 

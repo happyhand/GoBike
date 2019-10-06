@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace GoBike.Service.Repository.Managers.Member
 {
     /// <summary>
-    /// 會員資料庫
+    /// 騎乘資料庫
     /// </summary>
     public class RideRepository : IRideRepository
     {

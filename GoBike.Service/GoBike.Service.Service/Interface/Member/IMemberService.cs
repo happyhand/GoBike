@@ -91,5 +91,65 @@ namespace GoBike.Service.Service.Interface.Member
         Task<Tuple<RideDto, string>> GetRideData(RideDto rideDto);
 
         #endregion 騎乘資料
+
+        #region 互動資料
+
+        /// <summary>
+        /// 取得被加入好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        Task<Tuple<IEnumerable<MemberDto>, string>> GetBeAddFriendList(string memberID);
+
+        /// <summary>
+        /// 取得黑名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        Task<Tuple<IEnumerable<MemberDto>, string>> GetBlackList(string memberID);
+
+        /// <summary>
+        /// 取得好友名單
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>Tuple(MemberDtos, string)</returns>
+        Task<Tuple<IEnumerable<MemberDto>, string>> GetFriendList(string memberID);
+
+        /// <summary>
+        /// 加入黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        Task<string> JoinBlack(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 加入好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        Task<string> JoinFriend(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 移除黑名單
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        Task<string> RemoveBlack(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 移除好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>string</returns>
+        Task<string> RemoveFriend(InteractiveDto interactiveDto);
+
+        /// <summary>
+        /// 搜尋好友
+        /// </summary>
+        /// <param name="interactiveDto">interactiveDto</param>
+        /// <returns>Tuple(MemberDto, string)</returns>
+        Task<Tuple<MemberDto, string>> SearchFriend(InteractiveDto interactiveDto);
+
+        #endregion 互動資料
     }
 }
