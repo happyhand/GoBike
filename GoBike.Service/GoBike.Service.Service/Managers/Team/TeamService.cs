@@ -201,7 +201,7 @@ namespace GoBike.Service.Service.Managers.Team
 
                 int searchOpenStatus = (int)TeamSearchStatusType.Open;
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByCityID(teamDto.CityID);
-                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus).Take(10);
                 return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
             }
             catch (Exception ex)
@@ -223,7 +223,7 @@ namespace GoBike.Service.Service.Managers.Team
                 TimeSpan timeSpan = new TimeSpan(AppSettingHelper.Appsetting.DaysOfNewCreation, 0, 0, 0, 0);
                 int searchOpenStatus = (int)TeamSearchStatusType.Open;
                 IEnumerable<TeamData> teamDatas = await this.teamRepository.GetTeamDataListByTimeLimit(timeSpan);
-                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus);
+                IEnumerable<TeamData> allowTeamDatas = teamDatas.Where(data => data.SearchStatus == searchOpenStatus).Take(10);
                 return Tuple.Create(this.mapper.Map<IEnumerable<TeamDto>>(allowTeamDatas), string.Empty);
             }
             catch (Exception ex)
@@ -1510,16 +1510,18 @@ namespace GoBike.Service.Service.Managers.Team
         /// <param name="teamAnnouncementData">teamAnnouncementData</param>
         private string UpdateTeamAnnouncementDataHandler(TeamAnnouncementDto teamAnnouncementDto, TeamAnnouncementData teamAnnouncementData)
         {
+            if (string.IsNullOrEmpty(teamAnnouncementDto.Context))
+            {
+                return "公告內容無效.";
+            }
+
             if (teamAnnouncementDto.Context.Length > AppSettingHelper.Appsetting.TeamAnnouncementMaxLength)
             {
                 return $"公告內容字數不得超過 {AppSettingHelper.Appsetting.TeamAnnouncementMaxLength} 字元.";
             }
 
-            if (!string.IsNullOrEmpty(teamAnnouncementDto.Context))
-            {
-                teamAnnouncementData.Context = teamAnnouncementDto.Context;
-            }
-
+            teamAnnouncementData.Context = teamAnnouncementDto.Context;
+            teamAnnouncementData.MemberID = teamAnnouncementDto.MemberID;
             return string.Empty;
         }
 

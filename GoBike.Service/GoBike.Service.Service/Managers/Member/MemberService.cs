@@ -673,7 +673,7 @@ namespace GoBike.Service.Service.Managers.Member
 
             if (string.IsNullOrEmpty(rideDto.Title))
             {
-                return "未輸入分享標題.";
+                rideDto.Title = $"{DateTime.Now:yyyy/MM/dd}";
             }
 
             if (string.IsNullOrEmpty(rideDto.Content))
