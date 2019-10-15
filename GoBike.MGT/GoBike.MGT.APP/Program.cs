@@ -4,7 +4,7 @@ using NLog;
 using NLog.Web;
 using System;
 
-namespace GoBike.API.App
+namespace GoBike.MGT.APP
 {
     /// <summary>
     /// Program

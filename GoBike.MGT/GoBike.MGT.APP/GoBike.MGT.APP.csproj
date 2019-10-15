@@ -5,19 +5,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\GoBike\api.gobike.com\GoBike.API.Swagger.xml</DocumentationFile>
-    <OutputPath></OutputPath>
-    <NoWarn>1701;1702;1591</NoWarn>
+    <OutputPath>D:\GoBike\mgt.gobike.com\</OutputPath>
+    <DocumentationFile>D:\GoBike\mgt.gobike.com\GoBike.MGT.Swagger.xml</DocumentationFile>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>D:\GoBike\api.gobike.com\GoBike.API.Swagger.xml</DocumentationFile>
-    <OutputPath>D:\GoBike\api.gobike.com\</OutputPath>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Controllers\Member\ve-B4E7.tmp" />
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
@@ -29,15 +19,15 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GoBike.API.Core\GoBike.API.Core.csproj" />
-    <ProjectReference Include="..\GoBike.API.Repository\GoBike.API.Repository.csproj" />
-    <ProjectReference Include="..\GoBike.API.Service\GoBike.API.Service.csproj" />
+    <ProjectReference Include="..\GoBike.MGT.Core\GoBike.MGT.Core.csproj" />
+    <ProjectReference Include="..\GoBike.MGT.Repository\GoBike.MGT.Repository.csproj" />
+    <ProjectReference Include="..\GoBike.MGT.Service\GoBike.MGT.Service.csproj" />
   </ItemGroup>
 
   <ItemGroup>

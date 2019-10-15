@@ -1,16 +1,6 @@
 ﻿using AutoMapper;
-using GoBike.API.Core.Applibs;
-using GoBike.API.Core.Resource;
-using GoBike.API.Repository.Interface;
-using GoBike.API.Repository.Managers;
-using GoBike.API.Service.Interface.Common;
-using GoBike.API.Service.Interface.Member;
-using GoBike.API.Service.Interface.Team;
-using GoBike.API.Service.Interface.Verifier;
-using GoBike.API.Service.Managers.Common;
-using GoBike.API.Service.Managers.Member;
-using GoBike.API.Service.Managers.Team;
-using GoBike.API.Service.Managers.Verifier;
+using GoBike.MGT.Core.Applibs;
+using GoBike.MGT.Core.Resource;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +11,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
 
-namespace GoBike.API.App
+namespace GoBike.MGT.APP
 {
     /// <summary>
     /// Startup
@@ -31,7 +21,7 @@ namespace GoBike.API.App
         /// <summary>
         /// Startup
         /// </summary>
-        /// <param name="configuration">configuration</param>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -118,11 +108,6 @@ namespace GoBike.API.App
         /// <param name="services">services</param>
         private void DependencyInjectionHandler(IServiceCollection services)
         {
-            services.AddSingleton<ICommonService, CommonService>();
-            services.AddSingleton<IMemberService, MemberService>();
-            services.AddSingleton<ITeamService, TeamService>();
-            services.AddSingleton<IVerifierService, VerifierService>();
-            services.AddSingleton<IRedisRepository, RedisRepository>();
             //services.AddSingleton<IInteractiveService, InteractiveService>();
         }
 
@@ -154,9 +139,9 @@ namespace GoBike.API.App
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "GoBike API", Version = "v1", Description = "apigobike.zapto.org:18592" });
+                c.SwaggerDoc("v1", new Info { Title = "GoBike MGT", Version = "v1", Description = "apigobike.zapto.org:18592" });
                 var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-                var xmlPath = Path.Combine(basePath, "GoBike.API.Swagger.xml");
+                var xmlPath = Path.Combine(basePath, "GoBike.MGT.Swagger.xml");
                 c.IncludeXmlComments(xmlPath);
             });
         }

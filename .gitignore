@@ -75,3 +75,13 @@
 /GoBike.Service/GoBike.Service.Service/bin
 /api.gobike.old.com
 /service.gobike.com
+/GoBike.MGT/.vs
+/GoBike.MGT/GoBike.MGT.APP/obj
+/GoBike.MGT/GoBike.MGT.APP/bin
+/GoBike.MGT/GoBike.MGT.Core/obj
+/GoBike.MGT/GoBike.MGT.Core/bin
+/GoBike.MGT/GoBike.MGT.Repository/obj
+/GoBike.MGT/GoBike.MGT.Repository/bin
+/GoBike.MGT/GoBike.MGT.Service/obj
+/GoBike.MGT/GoBike.MGT.Service/bin
+/mgt.gobike.com

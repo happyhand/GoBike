@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoBike.MGT.APP", "GoBike.MGT.APP\GoBike.MGT.APP.csproj", "{00943F62-D6C5-4BC9-A2E0-77B77B38EDD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.MGT.Service", "GoBike.MGT.Service\GoBike.MGT.Service.csproj", "{357E3CAC-7B3C-4301-8472-CF91481A6513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.MGT.Repository", "GoBike.MGT.Repository\GoBike.MGT.Repository.csproj", "{2DE877EC-D073-4455-ABD0-4701935EC230}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoBike.MGT.Core", "GoBike.MGT.Core\GoBike.MGT.Core.csproj", "{8EF07E04-949D-48C3-9AA8-42A3DE7F0F1D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00943F62-D6C5-4BC9-A2E0-77B77B38EDD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00943F62-D6C5-4BC9-A2E0-77B77B38EDD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00943F62-D6C5-4BC9-A2E0-77B77B38EDD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00943F62-D6C5-4BC9-A2E0-77B77B38EDD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{357E3CAC-7B3C-4301-8472-CF91481A6513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{357E3CAC-7B3C-4301-8472-CF91481A6513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{357E3CAC-7B3C-4301-8472-CF91481A6513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{357E3CAC-7B3C-4301-8472-CF91481A6513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DE877EC-D073-4455-ABD0-4701935EC230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DE877EC-D073-4455-ABD0-4701935EC230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DE877EC-D073-4455-ABD0-4701935EC230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DE877EC-D073-4455-ABD0-4701935EC230}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EF07E04-949D-48C3-9AA8-42A3DE7F0F1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EF07E04-949D-48C3-9AA8-42A3DE7F0F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EF07E04-949D-48C3-9AA8-42A3DE7F0F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EF07E04-949D-48C3-9AA8-42A3DE7F0F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A022FD9-485E-4E30-8BC7-C982CD86B612}
+	EndGlobalSection
+EndGlobal
