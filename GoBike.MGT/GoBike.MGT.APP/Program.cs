@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Web;
 using System;
@@ -16,10 +17,16 @@ namespace GoBike.MGT.APP
         /// </summary>
         /// <param name="args">args</param>
         /// <returns>IWebHostBuilder</returns>
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseNLog();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                      .ConfigureAppConfiguration((webHostBuilder, configurationBinder) =>
+                      {
+                          configurationBinder.AddJsonFile("appsettings.json", optional: true);
+                      })
+                      .UseStartup<Startup>()
+                      .UseNLog();
+        }
 
         /// <summary>
         /// Main

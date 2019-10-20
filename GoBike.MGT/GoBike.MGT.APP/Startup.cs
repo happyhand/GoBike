@@ -1,10 +1,16 @@
 ﻿using AutoMapper;
 using GoBike.MGT.Core.Applibs;
 using GoBike.MGT.Core.Resource;
+using GoBike.MGT.Repository.Interface;
+using GoBike.MGT.Repository.Managers;
+using GoBike.MGT.Repository.Models.Context;
+using GoBike.MGT.Service.Interface;
+using GoBike.MGT.Service.Managers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -38,7 +44,8 @@ namespace GoBike.MGT.APP
         /// </summary>
         /// <param name="app">app</param>
         /// <param name="env">env</param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        /// <param name="mgtdb">mgtdb</param>
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Mgtdb mgtdb)
         {
             if (env.IsDevelopment())
             {
@@ -52,6 +59,13 @@ namespace GoBike.MGT.APP
             app.UseHttpsRedirection();
             //app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
             app.UseSession();
+
+            #region DB
+
+            mgtdb.Database.EnsureCreated();
+            app.UseMvcWithDefaultRoute();
+
+            #endregion DB
 
             #region Swagger
 
@@ -75,6 +89,7 @@ namespace GoBike.MGT.APP
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
+
             this.ConfigurationHandler(services);
             this.SessionHandler(services);
             this.DependencyInjectionHandler(services);
@@ -103,12 +118,27 @@ namespace GoBike.MGT.APP
         }
 
         /// <summary>
-        /// Service 處理器
+        /// 相依注入處理器
         /// </summary>
         /// <param name="services">services</param>
         private void DependencyInjectionHandler(IServiceCollection services)
         {
-            //services.AddSingleton<IInteractiveService, InteractiveService>();
+            #region Service
+
+            services.AddSingleton<IMgtService, MgtService>();
+
+            #endregion Service
+
+            #region DB
+
+            services.AddDbContext<Mgtdb>(options =>
+            {
+                options.UseSqlServer(this.Configuration.GetConnectionString("DBConnection"));
+            });
+
+            services.AddSingleton<IMgtRepository, MgtRepository>();
+
+            #endregion DB
         }
 
         /// <summary>
@@ -119,7 +149,7 @@ namespace GoBike.MGT.APP
         {
             services.AddDistributedRedisCache(o =>
             {
-                o.Configuration = AppSettingHelper.Appsetting.RedisConnection;
+                o.Configuration = AppSettingHelper.Appsetting.ConnectionStrings.RedisConnection;
             });
             services.AddSession(options =>
             {
@@ -139,7 +169,7 @@ namespace GoBike.MGT.APP
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "GoBike MGT", Version = "v1", Description = "apigobike.zapto.org:18592" });
+                c.SwaggerDoc("v1", new Info { Title = "GoBike MGT", Version = "v1", Description = "mgtgobike.hopto.org:18595" });
                 var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
                 var xmlPath = Path.Combine(basePath, "GoBike.MGT.Swagger.xml");
                 c.IncludeXmlComments(xmlPath);

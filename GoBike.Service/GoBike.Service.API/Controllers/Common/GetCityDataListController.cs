@@ -37,7 +37,7 @@ namespace GoBike.Service.API.Controllers.Common
         }
 
         /// <summary>
-        /// POST
+        /// GET
         /// </summary>
         /// <param name="rideDto">rideDto</param>
         /// <returns>IActionResult</returns>

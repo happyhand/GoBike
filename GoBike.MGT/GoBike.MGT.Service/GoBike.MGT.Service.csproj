@@ -18,4 +18,8 @@
     <ProjectReference Include="..\GoBike.MGT.Repository\GoBike.MGT.Repository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>
