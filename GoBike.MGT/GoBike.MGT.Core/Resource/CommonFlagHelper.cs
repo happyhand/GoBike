@@ -46,6 +46,10 @@
         /// </summary>
         public class RedisSetting
         {
+            /// <summary>
+            /// Gets or sets Agent
+            /// </summary>
+            public string Agent { get; set; }
         }
     }
 }

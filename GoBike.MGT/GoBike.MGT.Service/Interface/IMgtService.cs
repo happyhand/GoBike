@@ -21,5 +21,13 @@ namespace GoBike.MGT.Service.Interface
         /// <param name="id">id</param>
         /// <returns>Tuple(AgentData, string)</returns>
         Task<Tuple<AgentData, string>> GetAgent(long id);
+
+        /// <summary>
+        /// 代理商登入
+        /// </summary>
+        /// <param name="account">account</param>
+        /// <param name="password">password</param>
+        /// <returns>bool</returns>
+        Task<string> AgentLogin(string account, string password);
     }
 }

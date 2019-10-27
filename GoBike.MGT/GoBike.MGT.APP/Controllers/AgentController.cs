@@ -41,16 +41,16 @@ namespace GoBike.MGT.APP.Controllers
         /// <param name="postData">postData</param>
         /// <returns>IActionResult</returns>
         [HttpPost]
-        public IActionResult Add(AddAgentPostData postData)
+        public IActionResult Add(AgentPostData postData)
         {
             try
             {
-                this.mgtService.AddAgent(postData.Nickname, postData.Password);
+                this.mgtService.AddAgent(postData.Account, postData.Password);
                 return Ok("新增代理商資料成功.");
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Add Agent Error >>> Nickname:{postData.Nickname} Password:{postData.Password}\n{ex}");
+                this.logger.LogError($"Add Agent Error >>> Account:{postData.Account} Password:{postData.Password}\n{ex}");
                 return BadRequest("新增代理商資料發生錯誤.");
             }
         }
@@ -81,14 +81,39 @@ namespace GoBike.MGT.APP.Controllers
         }
 
         /// <summary>
+        /// 代理商 - 代理商登入
+        /// </summary>
+        /// <param name="postData">postData</param>
+        /// <returns>IActionResult</returns>
+        [HttpPost]
+        public async Task<IActionResult> Login(AgentPostData postData)
+        {
+            try
+            {
+                string result = await this.mgtService.AgentLogin(postData.Account, postData.Password);
+                if (string.IsNullOrEmpty(result))
+                {
+                    return Ok("代理商登入成功.");
+                }
+
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Agent Login Error >>> Account:{postData.Account} Password:{postData.Password}\n{ex}");
+                return BadRequest("代理商登入發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 新增代理商資料 Post Data
         /// </summary>
-        public class AddAgentPostData
+        public class AgentPostData
         {
             /// <summary>
-            /// Gets or sets Nickname
+            /// Gets or sets Account
             /// </summary>
-            public string Nickname { get; set; }
+            public string Account { get; set; }
 
             /// <summary>
             /// Gets or sets Password

@@ -15,10 +15,10 @@ namespace GoBike.MGT.Repository.Models.Data
         public long Id { get; set; }
 
         /// <summary>
-        /// Gets or sets Nickname
+        /// Gets or sets Account
         /// </summary>
         [Required]
-        public string Nickname { get; set; }
+        public string Account { get; set; }
 
         /// <summary>
         /// Gets or sets Password

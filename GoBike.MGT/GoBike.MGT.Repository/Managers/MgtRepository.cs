@@ -75,5 +75,27 @@ namespace GoBike.MGT.Repository.Managers
                 return null;
             }
         }
+
+        /// <summary>
+        /// 取得代理商資料
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <param name="password">密碼</param>
+        /// <returns>AgentData</returns>
+        public async Task<AgentData> GetAgent(string account, string password)
+        {
+            try
+            {
+                using (var mgtdb = new Mgtdb(this.serviceProvider.GetRequiredService<DbContextOptions<Mgtdb>>()))
+                {
+                    return await mgtdb.Agent.FirstOrDefaultAsync(options => options.Account.Equals(account) && options.Password.Equals(password));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Agent Error >>> Account:{account} Password:{password}\n{ex}");
+                return null;
+            }
+        }
     }
 }
