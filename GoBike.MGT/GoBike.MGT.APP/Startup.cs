@@ -137,6 +137,7 @@ namespace GoBike.MGT.APP
             });
 
             services.AddSingleton<IMgtRepository, MgtRepository>();
+            services.AddSingleton<IRedisRepository, RedisRepository>();
 
             #endregion DB
         }
