@@ -57,7 +57,7 @@ namespace GoBike.MGT.APP
             }
 
             app.UseHttpsRedirection();
-            //app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
+            app.UseCors("ProductNoPolicy"); // 必須建立在  app.UseMvc 之前
             app.UseSession();
 
             #region DB
@@ -94,17 +94,18 @@ namespace GoBike.MGT.APP
             this.SessionHandler(services);
             this.DependencyInjectionHandler(services);
             this.SwaggerHandler(services);
-            //services.AddCors(options =>
-            //{
-            //    // CorsPolicy 是自訂的 Policy 名稱
-            //    options.AddPolicy("ProductNoPolicy", policy =>
-            //    {
-            //        policy.AllowAnyOrigin()
-            //              .AllowAnyHeader()
-            //              .AllowAnyMethod()
-            //              .AllowCredentials();
-            //    });
-            //});
+            services.AddCors(options =>
+            {
+                // CorsPolicy 是自訂的 Policy 名稱
+                options.AddPolicy("ProductNoPolicy", policy =>
+                {
+                    policy.WithOrigins("http://saboteur.hopto.org:18593")
+                          .AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
         }
 
         /// <summary>

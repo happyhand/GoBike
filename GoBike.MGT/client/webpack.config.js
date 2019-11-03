@@ -6,7 +6,7 @@ module.exports = {
   entry: "./src/main.jsx",
   output: {
     // path.join => 兩個參數，依當前的作業系統幫你在中間加 '/' 或 '\'，然後串接
-    path: path.join(__dirname, "dist"),
+    path: path.resolve(__dirname, "D:/GoBike/mgtc.gobike.com"),
     //這裡是打包後的檔案名稱
     filename: "bundle.js"
   },
@@ -43,9 +43,13 @@ module.exports = {
         test: /\.less$/,
         loader: "style!css?sourceMap!less?sourceMap"
       },
+      // {
+      //   test: /\.(jpe?g|JPE?G|png|PNG|gif|GIF|svg|SVG|woff|woff2|eot|ttf)(\?v=\d+\.\d+\.\d+)?$/,
+      //   loader: "url?limit=1024&name=[sha512:hash:base64:7].[ext]"
+      // }
       {
         test: /\.(jpe?g|JPE?G|png|PNG|gif|GIF|svg|SVG|woff|woff2|eot|ttf)(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=1024&name=[sha512:hash:base64:7].[ext]"
+        use: ["file-loader"]
       }
     ]
   },

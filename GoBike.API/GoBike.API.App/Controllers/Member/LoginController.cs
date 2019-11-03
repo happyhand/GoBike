@@ -1,6 +1,7 @@
 ﻿using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Service.Interface.Member;
+using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -136,8 +137,8 @@ namespace GoBike.API.App.Controllers.Member
                 ResponseResultDto recordSessionIDResult = await this.memberService.RecordSessionID(memberID, this.HttpContext.Session.Id);
                 if (recordSessionIDResult.Ok)
                 {
-                    //// TODO 傳送 Server 連線資訊
-                    return Ok(token);
+                    //// TODO 傳送 Server 連線資訊 (先偷懶寫死 QQ)
+                    return Ok(new MemberLoginInfoViewDto() { Token = token, ServerIP = "122.117.34.52", ServerPort = 1564 });
                 }
                 else
                 {

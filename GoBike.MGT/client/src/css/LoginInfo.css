@@ -1,0 +1,60 @@
+.LoginInfoBox {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.LoginButtonContent {
+  font-family: "Noto Sans TC", sans-serif;
+  text-align: right;
+}
+
+#formAccount.LoginInput,
+#formPassword.LoginInput {
+  font-family: "Noto Sans TC", sans-serif;
+  border-radius: 0 15px 15px 0;
+}
+
+#inputGroup-login-account.LoginInput,
+#inputGroup-login-password.LoginInput {
+  font-family: "Noto Sans TC", sans-serif;
+  border-radius: 15px 0 0 15px;
+}
+
+/* 
+新增 bootstrap 按鈕顏色樣式
+*/
+.btn.btn-login {
+  color: #fff;
+  background-color: #2b5971;
+  border-radius: 8px;
+}
+
+.btn.btn-login:hover {
+  color: rgb(22, 75, 104);
+  background-color: #4f8daf;
+}
+
+.btn.btn-login:focus,
+.btn.btn-login.focus {
+  box-shadow: 0 0 0 0.2rem rgba(43, 89, 114, 0.5);
+}
+
+.btn.btn-login.disabled,
+.btn.btn-login:disabled {
+  color: #999999;
+  background-color: rgb(37, 64, 78);
+}
+
+.btn.btn-login:not(:disabled):not(.disabled):active,
+.btn.btn-login:not(:disabled):not(.disabled).active,
+.show > .btn.btn-login.dropdown-toggle {
+  color: #fff;
+  background-color: #2b5972;
+}
+
+.btn.btn-login:not(:disabled):not(.disabled):active:focus,
+.btn.btn-login:not(:disabled):not(.disabled).active:focus,
+.show > .btn.btn-login.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(43, 89, 114, 0.5);
+}
