@@ -5,8 +5,14 @@ using System;
 
 namespace GoBike.API.App.AutoMapperProfile.Member
 {
+    /// <summary>
+    /// MemberProfile
+    /// </summary>
     public class MemberProfile : Profile
     {
+        /// <summary>
+        /// MemberProfile
+        /// </summary>
         public MemberProfile()
         {
             CreateMap<MemberDto, MemberSimpleInfoViewDto>();

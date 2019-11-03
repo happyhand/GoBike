@@ -5,8 +5,14 @@ using GoBike.API.Service.Models.Team.View;
 
 namespace GoBike.API.App.AutoMapperProfile.Team
 {
+    /// <summary>
+    /// TeamProfile
+    /// </summary>
     public class TeamProfile : Profile
     {
+        /// <summary>
+        /// TeamProfile
+        /// </summary>
         public TeamProfile()
         {
             CreateMap<TeamDto, TeamSimpleInfoViewDto>();
