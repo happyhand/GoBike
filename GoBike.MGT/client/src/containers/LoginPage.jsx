@@ -8,7 +8,13 @@ import { faBiking } from "@fortawesome/free-solid-svg-icons";
 import LoginInfo from "../components/LoginInfo";
 import Logo from "../assets/img/logo.png";
 import "../css/LoginPage.css";
+import App from "./App";
 export default class LoginPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { isLogin: false };
+  }
+
   render() {
     return (
       <Container fluid className="LoginPageContainer">

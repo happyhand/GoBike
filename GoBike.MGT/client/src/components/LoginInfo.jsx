@@ -1,4 +1,5 @@
 import React, { Component, useState } from "react";
+import { Route, Link, Switch, Redirect } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
 import Form, { FormRow } from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -20,6 +21,7 @@ export default class LoginInfo extends Component {
 }
 
 function FormContent() {
+  const [isLogin, setIsLogin] = useState(false);
   const [validated, setValidated] = useState(false);
   const handleSubmit = event => {
     event.preventDefault();
@@ -48,8 +50,14 @@ function FormContent() {
       })
       .then(json => {
         alert(json);
+        setIsLogin(true);
+        localStorage.setItem("isLogin", true);
       });
   };
+
+  if (isLogin) {
+    return <Redirect to="/Home" />;
+  }
 
   return (
     <Form noValidate validated={validated} onSubmit={handleSubmit}>
