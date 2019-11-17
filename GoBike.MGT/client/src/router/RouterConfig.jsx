@@ -8,7 +8,8 @@ const routeMap = [
   {
     path: "/",
     component: HomePage,
-    exact: true
+    exact: true,
+    requiresAuth: true
   },
   {
     path: "/Home",
@@ -16,13 +17,16 @@ const routeMap = [
     routes: [
       {
         path: "/Home/Account",
-        component: AccountManagerPage
+        component: AccountManagerPage,
+        requiresAuth: true
       },
       {
         path: "/Home/Member",
-        component: MemberManagerPage
+        component: MemberManagerPage,
+        requiresAuth: true
       }
-    ]
+    ],
+    requiresAuth: true
   },
   {
     path: "/Login",

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { renderRoutes } from "react-router-config";
 
-export default class HomePage extends Component {
+class HomePage extends Component {
   constructor(props) {
     super(props);
   }
@@ -10,8 +11,22 @@ export default class HomePage extends Component {
     return (
       <div>
         <h2>This Is Home Page</h2>
-        {renderRoutes(this.props.route.routes)}
       </div>
+      // <div>
+      //   Login: {isLogin.toString()}
+      //   <button onClick={onAgentLogin}>login</button>
+      //   <button onClick={onAgentLogout}>logout</button>
+      // </div>
     );
   }
 }
+
+/**
+ * 繫結 Redux State
+ * @param {object} state
+ */
+function mapStateToProps(state) {
+  return state;
+}
+
+export default connect(mapStateToProps)(HomePage);

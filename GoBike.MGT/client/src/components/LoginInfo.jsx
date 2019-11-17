@@ -32,32 +32,34 @@ function FormContent() {
       return;
     }
 
-    fetch("http://saboteur.hopto.org:18593/api/Agent/Login", {
-      method: "POST",
-      body: JSON.stringify({
-        account: form.formAccount.value,
-        password: form.formPassword.value
-      }),
-      headers: {
-        Accept: "application/json",
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then(response => {
-        console.log("response >>", response);
+    // fetch("http://saboteur.hopto.org:18593/api/Agent/Login", {
+    //   method: "POST",
+    //   body: JSON.stringify({
+    //     account: form.formAccount.value,
+    //     password: form.formPassword.value
+    //   }),
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-type": "application/json; charset=UTF-8"
+    //   }
+    // })
+    //   .then(response => {
+    //     console.log("response >>", response);
 
-        return response.json();
-      })
-      .then(json => {
-        alert(json);
-        setIsLogin(true);
-        localStorage.setItem("isLogin", true);
-      });
+    //     return response.json();
+    //   })
+    //   .then(json => {
+    //     alert(json);
+    //     setIsLogin(true);
+    //     localStorage.setItem("isLogin", true);
+    //   });
+
+    localStorage.setItem("isLogin", true);
   };
 
-  if (isLogin) {
-    return <Redirect to="/Home" />;
-  }
+  // if (isLogin) {
+  //   return <Redirect to="/Home" />;
+  // }
 
   return (
     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -67,7 +69,10 @@ function FormContent() {
             <Form.Group role="form" controlId="formAccount">
               <InputGroup>
                 <InputGroup.Prepend>
-                  <InputGroup.Text id="inputGroup-login-account" className="LoginInput">
+                  <InputGroup.Text
+                    id="inputGroup-login-account"
+                    className="LoginInput"
+                  >
                     <FontAwesomeIcon icon={faUser} size="2x" color="#999" />
                   </InputGroup.Text>
                 </InputGroup.Prepend>
@@ -79,7 +84,9 @@ function FormContent() {
                   aria-describedby="inputGroup-login-account"
                   required
                 />
-                <Form.Control.Feedback type="invalid">Please enter account.</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  Please enter account.
+                </Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
           </Col>
@@ -89,7 +96,10 @@ function FormContent() {
             <Form.Group role="form" controlId="formPassword">
               <InputGroup>
                 <InputGroup.Prepend>
-                  <InputGroup.Text id="inputGroup-login-password" className="LoginInput">
+                  <InputGroup.Text
+                    id="inputGroup-login-password"
+                    className="LoginInput"
+                  >
                     <FontAwesomeIcon icon={faLock} size="2x" color="#999" />
                   </InputGroup.Text>
                 </InputGroup.Prepend>
@@ -101,7 +111,9 @@ function FormContent() {
                   aria-describedby="inputGroup-login-password"
                   required
                 />
-                <Form.Control.Feedback type="invalid">Please enter password.</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  Please enter password.
+                </Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
           </Col>
