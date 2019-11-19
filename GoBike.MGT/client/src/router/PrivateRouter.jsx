@@ -1,29 +1,25 @@
 import React, { Component } from "react";
-import { Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
+import { Route, Redirect } from "react-router-dom";
 import { onAgentLogin, onAgentLogout } from "../actions/Action";
 
 class PrivateRouter extends Component {
   constructor(props) {
     super(props);
-    console.log(this.props);
   }
 
   render() {
-    const { component: Component } = this.props;
-    const isLogin = localStorage.getItem("isLogin");
+    const { exact, path, component: Component } = this.props;
+    const isLogin = Boolean(localStorage.getItem("isLogin"));
+    if (isLogin) {
+      return (
+        <Route exact={exact} path={path}>
+          <Component></Component>
+        </Route>
+      );
+    }
 
-    return (
-      <Route
-        render={props =>
-          isLogin ? (
-            <Component {...props} />
-          ) : (
-            <Redirect to={{ pathname: "/Login" }} />
-          )
-        }
-      />
-    );
+    return <Redirect to="/Login"></Redirect>;
   }
 }
 
@@ -32,7 +28,6 @@ class PrivateRouter extends Component {
  * @param {object} state
  */
 function mapStateToProps(state) {
-  console.log("PrivateRouter mapStateToProps >>>", state);
   return { isLogin: state.isLogin };
 }
 
@@ -47,4 +42,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PrivateRouter);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PrivateRouter);

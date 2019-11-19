@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { renderRoutes } from "react-router-config";
+import { Switch } from "react-router-dom";
+import AccountManagerPage from "./AccountManagerPage";
+import PrivateRouter from "../router/PrivateRouter";
 
 class HomePage extends Component {
   constructor(props) {
@@ -11,12 +13,10 @@ class HomePage extends Component {
     return (
       <div>
         <h2>This Is Home Page</h2>
+        <Switch>
+          <PrivateRouter path="/Home/Account" component={AccountManagerPage} />
+        </Switch>
       </div>
-      // <div>
-      //   Login: {isLogin.toString()}
-      //   <button onClick={onAgentLogin}>login</button>
-      //   <button onClick={onAgentLogout}>logout</button>
-      // </div>
     );
   }
 }

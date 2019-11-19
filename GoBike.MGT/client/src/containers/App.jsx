@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { Route, HashRouter, Switch } from "react-router-dom";
-import "../css/App.css";
 import PrivateRouter from "../router/PrivateRouter";
 import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
-import AccountManagerPage from "./AccountManagerPage";
+import ErrorPage from "./ErrorPage";
+import "../css/App.css";
 
 export default class App extends Component {
   constructor(props) {
@@ -15,20 +15,16 @@ export default class App extends Component {
     return (
       <HashRouter>
         <Switch>
-          <Route exact path="/Home">
-            <HomePage />
-          </Route>
-          <Route path="/Login">
+          <Route exact path="/Login">
             <LoginPage />
           </Route>
-          <Route path="/Home/Account">
-            <AccountManagerPage />
+          <PrivateRouter exact path="/" component={HomePage} />
+          <PrivateRouter path="/Home" component={HomePage} />
+          <Route path="*">
+            <ErrorPage />
           </Route>
         </Switch>
-        <PrivateRouter component={HomePage} />
       </HashRouter>
     );
-    // return <PrivateRouter component = {HomePage}></PrivateRouter>;
-    // return <HomePage></HomePage>;
   }
 }
