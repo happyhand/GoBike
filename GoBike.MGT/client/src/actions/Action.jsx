@@ -9,3 +9,10 @@ export const onAgentLogout = () => {
     type: "AGENT_LOGOUT"
   };
 };
+
+export const onCheckLoginValidated = value => {
+  return {
+    type: "CHECK_LOGIN_VALIDATED",
+    validated: value
+  };
+};

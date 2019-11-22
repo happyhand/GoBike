@@ -1,8 +1,4 @@
-import { combineReducers } from "redux";
-
-const initState = {
-  isLogin: false
-};
+const initState = {};
 
 /**
  * 這邊可以放組合的 Reducer
@@ -12,10 +8,12 @@ const reducer = (state = initState, action) => {
   switch (action.type) {
     case "AGENT_LOGIN":
       localStorage.setItem("isLogin", true);
-      return { isLogin: true };
+      return state;
     case "AGENT_LOGOUT":
-      localStorage.setItem("isLogin", false);
-      return { isLogin: false };
+      localStorage.removeItem("isLogin");
+      return state;
+    case "CHECK_LOGIN_VALIDATED":
+      return { validated: action.validated };
     default:
       return state;
   }
