@@ -10,9 +10,16 @@ export const onAgentLogout = () => {
   };
 };
 
-export const onCheckLoginValidated = value => {
+export const onLoginLoading = value => {
   return {
-    type: "CHECK_LOGIN_VALIDATED",
-    validated: value
+    type: "LOGIN_LOADING",
+    isLoading: value
+  };
+};
+
+export const onLoginValid = value => {
+  return {
+    type: "LOGIN_VALID",
+    isValid: value
   };
 };

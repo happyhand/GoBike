@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Switch } from "react-router-dom";
-import AccountManagerPage from "./AccountManagerPage";
+import Container from "react-bootstrap/Container";
 import PrivateRouter from "../router/PrivateRouter";
+import AccountManagerPage from "./AccountManagerPage";
+import MemberManagerPage from "./MemberManagerPage";
+import MenuBar from "../components/MenuBar";
+import TitleBar from "../components/TitleBar";
 
 class HomePage extends Component {
   constructor(props) {
@@ -12,10 +16,14 @@ class HomePage extends Component {
   render() {
     return (
       <div>
-        <h2>This Is Home Page</h2>
-        <Switch>
-          <PrivateRouter path="/Home/Account" component={AccountManagerPage} />
-        </Switch>
+        <TitleBar />
+        <MenuBar />
+        <Container fluid>
+          <Switch>
+            <PrivateRouter path="/Home/Account" component={AccountManagerPage} />
+            <PrivateRouter path="/Home/Member" component={MemberManagerPage} />
+          </Switch>
+        </Container>
       </div>
     );
   }

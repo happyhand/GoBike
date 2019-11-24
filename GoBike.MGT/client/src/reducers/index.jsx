@@ -1,4 +1,7 @@
-const initState = {};
+const initState = {
+  isLoading: false,
+  isValid: true
+};
 
 /**
  * 這邊可以放組合的 Reducer
@@ -12,8 +15,10 @@ const reducer = (state = initState, action) => {
     case "AGENT_LOGOUT":
       localStorage.removeItem("isLogin");
       return state;
-    case "CHECK_LOGIN_VALIDATED":
-      return { validated: action.validated };
+    case "LOGIN_LOADING":
+      return { isValid: state.isValid, isLoading: action.isLoading };
+    case "LOGIN_VALID":
+      return { isValid: action.isValid, isLoading: state.isLoading };
     default:
       return state;
   }

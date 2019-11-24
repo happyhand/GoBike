@@ -1,15 +1,14 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Route, Link, Switch, Redirect, withRouter } from "react-router-dom";
-import { onCheckLoginValidated, onAgentLogin, onAgentLogout } from "../actions/Action";
-import Badge from "react-bootstrap/Badge";
-import Form, { FormRow } from "react-bootstrap/Form";
+import { withRouter } from "react-router-dom";
+import { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout } from "../actions/Action";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import "../css/LoginInfo.css";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import InputGroup from "react-bootstrap/InputGroup";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -24,13 +23,20 @@ class LoginInfo extends Component {
    * @param {Event} evt
    */
   handleSubmit(evt) {
-    const { onCheckLoginValidated, onAgentLogin, onAgentLogout } = this.props;
-    const form = evt.currentTarget;
-    if (form.checkValidity() === false) {
-      onCheckLoginValidated("false");
+    evt.preventDefault();
+    const { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout, isLoading } = this.props;
+    if (isLoading) {
       return;
     }
 
+    const form = evt.currentTarget;
+    if (form.checkValidity() === false) {
+      onLoginValid(false);
+      return;
+    }
+
+    onLoginValid(true);
+    onLoginLoading(true);
     fetch("http://saboteur.hopto.org:18593/api/Agent/Login", {
       method: "POST",
       body: JSON.stringify({
@@ -43,6 +49,7 @@ class LoginInfo extends Component {
       }
     })
       .then(response => {
+        onLoginLoading(false);
         if (response.ok) {
           onAgentLogin();
           this.redirectPage();
@@ -68,14 +75,14 @@ class LoginInfo extends Component {
   }
 
   render() {
-    const { validated } = this.props;
+    const { isValid } = this.props;
     const isLogin = localStorage.getItem("isLogin");
-    if (isLogin === "true") {
+    if (isLogin === true) {
       this.redirectPage();
     }
 
     return (
-      <Form noValidate validated={validated} onSubmit={this.handleSubmit}>
+      <Form noValidate validated={!isValid} onSubmit={this.handleSubmit}>
         <Container className="LoginInfoBox">
           <Row>
             <Col>
@@ -139,7 +146,7 @@ class LoginInfo extends Component {
  * @param {object} state
  */
 function mapStateToProps(state) {
-  return { validated: state.validated };
+  return { isValid: state.isValid, isLoading: state.isLoading };
 }
 
 /**
@@ -148,7 +155,8 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    onCheckLoginValidated: value => dispatch(onCheckLoginValidated(value)),
+    onLoginValid: value => dispatch(onLoginValid(value)),
+    onLoginLoading: value => dispatch(onLoginLoading(value)),
     onAgentLogin: () => dispatch(onAgentLogin()),
     onAgentLogout: () => dispatch(onAgentLogout())
   };

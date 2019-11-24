@@ -1,0 +1,18 @@
+/* 
+新增 bootstrap 按鈕顏色樣式
+*/
+.Logout,
+.Logout:hover,
+.Logout:focus,
+.Logout:active {
+  color: #ccc;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-family: "Noto Sans TC";
+  font-size: 16px;
+}
+
+.Logout:hover {
+  color: #fff;
+}
