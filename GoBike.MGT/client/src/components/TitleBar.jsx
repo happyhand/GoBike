@@ -38,7 +38,7 @@ class TitleBar extends Component {
             <FontAwesomeIcon icon={faHome} size="3x" color="#fff" />
           </Col>
           <Col md="auto" style={col}>
-            <span style={title}>加樂設計</span>
+            <span style={title}>加樂設計 Double Happiness</span>
           </Col>
         </Row>
       </Container>

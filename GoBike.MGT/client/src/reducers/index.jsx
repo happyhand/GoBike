@@ -14,11 +14,13 @@ const reducer = (state = initState, action) => {
       return state;
     case "AGENT_LOGOUT":
       localStorage.removeItem("isLogin");
-      return state;
+      return { isValid: true, isLoading: false };
     case "LOGIN_LOADING":
       return { isValid: state.isValid, isLoading: action.isLoading };
     case "LOGIN_VALID":
       return { isValid: action.isValid, isLoading: state.isLoading };
+    case "LOAD_ACCOUNT_DATA":
+      return { accountData: action.data };
     default:
       return state;
   }

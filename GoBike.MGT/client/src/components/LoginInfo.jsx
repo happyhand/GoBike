@@ -76,11 +76,6 @@ class LoginInfo extends Component {
 
   render() {
     const { isValid } = this.props;
-    const isLogin = localStorage.getItem("isLogin");
-    if (isLogin === true) {
-      this.redirectPage();
-    }
-
     return (
       <Form noValidate validated={!isValid} onSubmit={this.handleSubmit}>
         <Container className="LoginInfoBox">

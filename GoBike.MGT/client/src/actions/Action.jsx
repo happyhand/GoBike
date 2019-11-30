@@ -23,3 +23,10 @@ export const onLoginValid = value => {
     isValid: value
   };
 };
+
+export const onLoadAccountData = value => {
+  return {
+    type: "LOAD_ACCOUNT_DATA",
+    data: value
+  };
+};
