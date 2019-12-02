@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   //這個webpack打包的對象，這裡面加上剛剛建立的index.js
-  entry: "./src/main.jsx",
+  entry: "./src/main.tsx",
   output: {
     // path.join => 兩個參數，依當前的作業系統幫你在中間加 '/' 或 '\'，然後串接
     path: path.resolve(__dirname, "D:/GoBike/mgtc.gobike.com"),
@@ -11,11 +11,29 @@ module.exports = {
     filename: "bundle.js"
   },
   resolve: {
-    extensions: [".js", ".jsx", "css", ".scss"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", "css", ".scss"]
   },
   //將loader的設定寫在module的rules屬性中
   module: {
     rules: [
+      {
+        test: /.ts$/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/typescript", "@babel/preset-env"]
+          }
+        }
+      },
+      {
+        test: /.tsx$/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/typescript", "@babel/preset-react", "@babel/preset-env"]
+          }
+        }
+      },
       //第一個loader編譯JSX
       {
         test: /.jsx$/,

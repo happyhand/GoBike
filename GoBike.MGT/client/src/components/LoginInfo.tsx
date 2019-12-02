@@ -1,19 +1,50 @@
-import React, { Component } from "react";
+import React, { Component, FormEvent } from "react";
+import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout } from "../actions/Action";
+import { History } from "history";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import "../css/LoginInfo.css";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout } from "../actions/Action";
 
-class LoginInfo extends Component {
-  constructor(props) {
+//#region Css
+const loginInfoBox = {
+  backgroundColor: "#fff",
+  borderRadius: "8px",
+  padding: "20px"
+};
+
+const loginInputContent = {
+  borderRadius: "15px 0 0 15px"
+};
+
+const loginInputTitle = {
+  borderRadius: "0 15px 15px 0"
+};
+
+const loginButtonContent = {
+  textAlign: "right"
+};
+
+//#endregion
+interface IProp {
+  onLoginValid: Function;
+  onLoginLoading: Function;
+  onAgentLogin: Function;
+  onAgentLogout: Function;
+  isValid: boolean;
+  isLoading: boolean;
+  history: History;
+}
+
+class LoginInfo extends Component<IProp> {
+  constructor(props: Readonly<IProp>) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -22,7 +53,7 @@ class LoginInfo extends Component {
    * 發送表單
    * @param {Event} evt
    */
-  handleSubmit(evt) {
+  handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault();
     const { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout, isLoading } = this.props;
     if (isLoading) {
@@ -78,20 +109,20 @@ class LoginInfo extends Component {
     const { isValid } = this.props;
     return (
       <Form noValidate validated={!isValid} onSubmit={this.handleSubmit}>
-        <Container className="LoginInfoBox">
+        <Container style={loginInfoBox}>
           <Row>
             <Col>
               <Form.Group role="form" controlId="formAccount">
                 <InputGroup>
                   <InputGroup.Prepend>
-                    <InputGroup.Text id="inputGroup-login-account" className="LoginInput">
+                    <InputGroup.Text id="inputGroup-login-account" style={loginInputContent}>
                       <FontAwesomeIcon icon={faUser} size="2x" color="#999" />
                     </InputGroup.Text>
                   </InputGroup.Prepend>
                   <Form.Control
-                    className="LoginInput"
                     size="lg"
                     type="text"
+                    style={loginInputTitle}
                     placeholder="Account"
                     aria-describedby="inputGroup-login-account"
                     required
@@ -106,14 +137,14 @@ class LoginInfo extends Component {
               <Form.Group role="form" controlId="formPassword">
                 <InputGroup>
                   <InputGroup.Prepend>
-                    <InputGroup.Text id="inputGroup-login-password" className="LoginInput">
+                    <InputGroup.Text id="inputGroup-login-password" style={loginInputContent}>
                       <FontAwesomeIcon icon={faLock} size="2x" color="#999" />
                     </InputGroup.Text>
                   </InputGroup.Prepend>
                   <Form.Control
-                    className="LoginInput"
                     size="lg"
                     type="password"
+                    style={loginInputTitle}
                     placeholder="Password"
                     aria-describedby="inputGroup-login-password"
                     required
@@ -124,8 +155,8 @@ class LoginInfo extends Component {
             </Col>
           </Row>
           <Row>
-            <Col className="LoginButtonContent">
-              <Button variant="login" type="submit" size="lg">
+            <Col style={loginButtonContent}>
+              <Button className="login" type="submit" size="lg">
                 Submit
               </Button>
             </Col>
@@ -138,20 +169,20 @@ class LoginInfo extends Component {
 
 /**
  * 繫結 Redux State
- * @param {object} state
+ * @param {any} state
  */
-function mapStateToProps(state) {
+function mapStateToProps(state: any) {
   return { isValid: state.isValid, isLoading: state.isLoading };
 }
 
 /**
  * 繫結 Redux Action
- * @param {function} dispatch
+ * @param {Dispatch} dispatch
  */
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    onLoginValid: value => dispatch(onLoginValid(value)),
-    onLoginLoading: value => dispatch(onLoginLoading(value)),
+    onLoginValid: (value: Boolean) => dispatch(onLoginValid(value)),
+    onLoginLoading: (value: Boolean) => dispatch(onLoginLoading(value)),
     onAgentLogin: () => dispatch(onAgentLogin()),
     onAgentLogout: () => dispatch(onAgentLogout())
   };

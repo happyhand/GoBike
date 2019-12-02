@@ -6,8 +6,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-<i class="fab fa-earlybirds"></i>;
-
 //#region Css
 const bar = {
   backgroundColor: "#2b5971",
@@ -15,7 +13,6 @@ const bar = {
 };
 
 const title = {
-  fontFamily: "Noto Sans TC",
   fontSize: "24px",
   color: "#fff"
 };
@@ -25,11 +22,7 @@ const col = {
 };
 //#endregion
 
-class TitleBar extends Component {
-  constructor(props) {
-    super(props);
-  }
-
+export default class TitleBar extends Component {
   render() {
     return (
       <Container fluid style={bar}>
@@ -45,13 +38,3 @@ class TitleBar extends Component {
     );
   }
 }
-
-/**
- * 繫結 Redux State
- * @param {object} state
- */
-function mapStateToProps(state) {
-  return state;
-}
-
-export default connect(mapStateToProps)(TitleBar);

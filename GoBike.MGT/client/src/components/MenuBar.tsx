@@ -1,31 +1,34 @@
 import React, { Component } from "react";
+import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { onAgentLogout } from "../actions/Action";
+import { History } from "history";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { onAgentLogout } from "../actions/Action";
 import "../css/Button.css";
+import "../css/Nav.css";
 
 //#region Css
 const menuBar = {
   backgroundColor: "#2b5971",
-  borderRadius: "0px"
-};
-
-const menuLink = {
-  fontFamily: "Noto Sans TC",
+  borderRadius: "0px",
   fontSize: "16px"
 };
 
 //#endregion
+interface IProp {
+  onAgentLogout: Function;
+  history: History;
+}
 
-class MenuBar extends Component {
-  constructor(props) {
+class MenuBar extends Component<IProp> {
+  constructor(props: Readonly<IProp>) {
     super(props);
     this.handleLogout = this.handleLogout.bind(this);
   }
 
-  handleLogout(evt) {
+  handleLogout(evt: React.MouseEvent) {
     const { onAgentLogout } = this.props;
     const isLogout = confirm("確定要登出嗎?");
     if (isLogout) {
@@ -38,13 +41,13 @@ class MenuBar extends Component {
     return (
       <Navbar expand="lg" variant="dark" style={menuBar}>
         <Nav className="mr-auto">
-          <Nav.Link href="#Home" style={menuLink}>
+          <Nav.Link href="#Home" className="menuLink">
             首頁
           </Nav.Link>
-          <Nav.Link href="#Home/Account" style={menuLink}>
+          <Nav.Link href="#Account" className="menuLink">
             帳號管理
           </Nav.Link>
-          <Nav.Link href="#Home/Member" style={menuLink}>
+          <Nav.Link href="#Member" className="menuLink">
             會員管理
           </Nav.Link>
         </Nav>
@@ -61,21 +64,13 @@ class MenuBar extends Component {
 }
 
 /**
- * 繫結 Redux State
- * @param {object} state
- */
-function mapStateToProps(state) {
-  return state;
-}
-
-/**
  * 繫結 Redux Action
- * @param {function} dispatch
+ * @param {Dispatch} dispatch
  */
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
   return {
     onAgentLogout: () => dispatch(onAgentLogout())
   };
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MenuBar));
+export default withRouter(connect(null, mapDispatchToProps)(MenuBar));

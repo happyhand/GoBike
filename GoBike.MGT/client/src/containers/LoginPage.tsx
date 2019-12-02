@@ -6,14 +6,11 @@ import Image from "react-bootstrap/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBiking } from "@fortawesome/free-solid-svg-icons";
 import LoginInfo from "../components/LoginInfo";
-import Logo from "../assets/img/logo.png";
 import "../css/LoginPage.css";
-export default class LoginPage extends Component {
-  constructor(props) {
-    super(props);
-  }
 
+export default class LoginPage extends Component {
   render() {
+    const logo = require("../assets/img/logo.png");
     return (
       <Container fluid className="LoginPageContainer">
         <Row className="justify-content-md-center">
@@ -23,7 +20,7 @@ export default class LoginPage extends Component {
         </Row>
         <Row className="justify-content-md-center LoginPageRow">
           <Col md="auto">
-            <Image src={Logo} className="LoginPageLogo"></Image>
+            <Image src={logo} className="LoginPageLogo"></Image>
           </Col>
         </Row>
         <Row className="justify-content-md-center LoginPageRow">

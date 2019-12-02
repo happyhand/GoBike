@@ -1,3 +1,5 @@
+import { AnyAction } from "redux";
+
 const initState = {
   isLoading: false,
   isValid: true
@@ -7,10 +9,10 @@ const initState = {
  * 這邊可以放組合的 Reducer
  */
 // export default combineReducers({});
-const reducer = (state = initState, action) => {
+const reducer = (state = initState, action: AnyAction): any => {
   switch (action.type) {
     case "AGENT_LOGIN":
-      localStorage.setItem("isLogin", true);
+      localStorage.setItem("isLogin", "true");
       return state;
     case "AGENT_LOGOUT":
       localStorage.removeItem("isLogin");
@@ -19,8 +21,6 @@ const reducer = (state = initState, action) => {
       return { isValid: state.isValid, isLoading: action.isLoading };
     case "LOGIN_VALID":
       return { isValid: action.isValid, isLoading: state.isLoading };
-    case "LOAD_ACCOUNT_DATA":
-      return { accountData: action.data };
     default:
       return state;
   }
