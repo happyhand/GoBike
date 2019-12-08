@@ -1,9 +1,6 @@
 import { AnyAction } from "redux";
 
-const initState = {
-  isLoading: false,
-  isValid: true
-};
+const initState = {};
 
 /**
  * 這邊可以放組合的 Reducer
@@ -17,10 +14,10 @@ const reducer = (state = initState, action: AnyAction): any => {
     case "AGENT_LOGOUT":
       localStorage.removeItem("isLogin");
       return { isValid: true, isLoading: false };
-    case "LOGIN_LOADING":
-      return { isValid: state.isValid, isLoading: action.isLoading };
-    case "LOGIN_VALID":
-      return { isValid: action.isValid, isLoading: state.isLoading };
+    case "LOGIN_ACTION":
+      return { isValid: action.isValid, isLoading: action.isLoading };
+    case "LOAD_HOME_DATA":
+      return { isLoading: action.isLoading, data: action.data };
     default:
       return state;
   }

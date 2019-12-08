@@ -12,16 +12,18 @@ export const onAgentLogout = (): AnyAction => {
   };
 };
 
-export const onLoginLoading = (value: Boolean): AnyAction => {
+export const onLoginAction = (isValid: boolean, isLoading: boolean): AnyAction => {
   return {
-    type: "LOGIN_LOADING",
-    isLoading: value
+    type: "LOGIN_ACTION",
+    isValid: isValid,
+    isLoading: isLoading
   };
 };
 
-export const onLoginValid = (value: Boolean): AnyAction => {
+export const onLoadHomeData = (isLoading: boolean, data: any): AnyAction => {
   return {
-    type: "LOGIN_VALID",
-    isValid: value
+    type: "LOAD_HOME_DATA",
+    isLoading: isLoading,
+    data: data
   };
 };

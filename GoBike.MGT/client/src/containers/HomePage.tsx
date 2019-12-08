@@ -2,110 +2,124 @@ import React, { Component } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import PieChart from "../components/PieChart";
 import PieChartData from "../model/PieChartData";
-import { Line } from "react-chartjs-2";
+import LineChartData from "../model/LineChartData";
+import LineChart from "../components/LineChart";
+import Button from "react-bootstrap/Button";
+import { Dispatch } from "redux";
+import { onLoadHomeData } from "../actions/Action";
+import { connect } from "react-redux";
+import PieChart from "../components/PieChart";
+import { isNullOrUndefined } from "util";
 
 //#region Css
-const pie = {
+const chart = {
   textAlign: "center",
   color: "#666",
   fontSize: "16px"
 };
 
 //#endregion
-interface IProp {}
-export default class HomePage extends Component<IProp> {
+//#endregion
+interface IProp {
+  isLoading: boolean;
+  loginData: any;
+  registerData: PieChartData[];
+  teamAreaData: PieChartData[];
+  onLoadHomeData: Function;
+}
+class HomePage extends Component<IProp> {
   constructor(props: Readonly<IProp>) {
     super(props);
+    const { loginData, registerData, teamAreaData } = this.props;
+    this.onReload = this.onReload.bind(this);
+
+    if (isNullOrUndefined(loginData)) {
+      this.onReload();
+    }
   }
 
-  onLoadLoginData() {
-    return {
-      labels: ["January", "February", "March", "April", "May", "June", "July"],
-      datasets: [
-        {
-          label: "My First dataset",
-          fill: false,
-          lineTension: 0,
-          backgroundColor: "rgba(75,192,192,0.4)",
-          borderColor: "rgba(75,192,192,1)",
-          borderCapStyle: "butt",
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: "miter",
-          pointBorderColor: "rgba(75,192,192,1)",
-          pointBackgroundColor: "#fff",
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: "rgba(75,192,192,1)",
-          pointHoverBorderColor: "rgba(220,220,220,1)",
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: [65, 59, 80, 81, 56, 55, 40]
-        },
-        {
-          label: "My First dataset",
-          fill: false,
-          lineTension: 0.1,
-          backgroundColor: "rgba(75,192,192,0.4)",
-          borderColor: "rgba(75,192,192,1)",
-          borderCapStyle: "butt",
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: "miter",
-          pointBorderColor: "rgba(75,192,192,1)",
-          pointBackgroundColor: "#fff",
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: "rgba(75,192,192,1)",
-          pointHoverBorderColor: "rgba(220,220,220,1)",
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: [65, 59, 80, 81, 56, 55, 40]
-        }
-      ]
-    };
+  onLoadLoginData(): any {
+    const startDay: number = Math.round(Math.random() * 14) + 1;
+    const stopDay: number = Math.round(Math.random() * 15) + 16;
+    const groups: number[] = [];
+    const google: LineChartData = new LineChartData("Google", []);
+    const fb: LineChartData = new LineChartData("FB", []);
+    const local: LineChartData = new LineChartData("Local", []);
+    for (let index = startDay; index <= stopDay; index++) {
+      groups.push(index);
+      google.counts.push(Math.round(Math.random() * 100));
+      fb.counts.push(Math.round(Math.random() * 100));
+      local.counts.push(Math.round(Math.random() * 100));
+    }
+
+    return { groups: groups, datas: [google, fb, local] };
   }
 
   onLoadRegisterData(): PieChartData[] {
     return [
-      new PieChartData("Google", Math.round(Math.random() * 1000), "#FF6384"),
-      new PieChartData("FB", Math.round(Math.random() * 1000), "#36A2EB"),
-      new PieChartData("Local", Math.round(Math.random() * 1000), "#FFCE56")
+      new PieChartData("Google", Math.round(Math.random() * 1000)),
+      new PieChartData("FB", Math.round(Math.random() * 1000)),
+      new PieChartData("Local", Math.round(Math.random() * 1000))
     ];
   }
 
   onLoadTeamAreaData(): PieChartData[] {
     return [
-      new PieChartData("台北", Math.round(Math.random() * 1000), "#FF6384"),
-      new PieChartData("台中", Math.round(Math.random() * 1000), "#36A2EB"),
-      new PieChartData("台南", Math.round(Math.random() * 1000), "#FFCE56"),
-      new PieChartData("台東", Math.round(Math.random() * 1000), "#adffd1")
+      new PieChartData("台北", Math.round(Math.random() * 1000)),
+      new PieChartData("台中", Math.round(Math.random() * 1000)),
+      new PieChartData("台南", Math.round(Math.random() * 1000)),
+      new PieChartData("台東", Math.round(Math.random() * 1000))
     ];
   }
 
+  onReload() {
+    const { onLoadHomeData, isLoading } = this.props;
+    if (isLoading) {
+      return;
+    }
+
+    const loginData = this.onLoadLoginData();
+    const registerData = this.onLoadRegisterData();
+    const teamAreaData = this.onLoadTeamAreaData();
+    onLoadHomeData(true, {});
+    setTimeout(() => {
+      onLoadHomeData(false, { loginData: loginData, registerData: registerData, teamAreaData: teamAreaData });
+    }, 3000);
+  }
+
   render() {
+    const { loginData, registerData, teamAreaData } = this.props;
+
     return (
       <Container fluid>
         <Row>
-          <Col md={3}>
-            <Line data={this.onLoadLoginData()} />
+          <Col>
+            <Button onClick={this.onReload}>Reload</Button>
           </Col>
         </Row>
         <Row>
           <Col md={3}>
-            <div style={pie}>
+            <div style={chart}>
+              <span>登入人數圖表</span>
+              <LineChart
+                datas={loginData ? loginData.datas : undefined}
+                groups={loginData ? loginData.groups : undefined}
+              />
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={3}>
+            <div style={chart}>
               <span>總註冊來源分布圖</span>
-              <PieChart data={this.onLoadRegisterData()}></PieChart>
+              <PieChart datas={registerData}></PieChart>
             </div>
           </Col>
           <Col md={3}>
-            <div style={pie}>
+            <div style={chart}>
               <span>車隊地區分布圖</span>
-              <PieChart data={this.onLoadTeamAreaData()}></PieChart>
+              <PieChart datas={teamAreaData}></PieChart>
             </div>
           </Col>
         </Row>
@@ -113,3 +127,28 @@ export default class HomePage extends Component<IProp> {
     );
   }
 }
+
+/**
+ * 繫結 Redux State
+ * @param {any} state
+ */
+function mapStateToProps(state: any) {
+  return {
+    isLoading: isNullOrUndefined(state.isLoading) ? false : state.isLoading,
+    loginData: isNullOrUndefined(state.data) ? undefined : state.data.loginData,
+    registerData: isNullOrUndefined(state.data) ? undefined : state.data.registerData,
+    teamAreaData: isNullOrUndefined(state.data) ? undefined : state.data.teamAreaData
+  };
+}
+
+/**
+ * 繫結 Redux Action
+ * @param {Dispatch} dispatch
+ */
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    onLoadHomeData: (isLoading: boolean, data: any) => dispatch(onLoadHomeData(isLoading, data))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

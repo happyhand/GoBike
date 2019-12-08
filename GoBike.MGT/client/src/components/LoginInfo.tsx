@@ -11,7 +11,8 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout } from "../actions/Action";
+import { onLoginAction, onAgentLogin, onAgentLogout } from "../actions/Action";
+import { isNullOrUndefined } from "util";
 
 //#region Css
 const loginInfoBox = {
@@ -34,8 +35,7 @@ const loginButtonContent = {
 
 //#endregion
 interface IProp {
-  onLoginValid: Function;
-  onLoginLoading: Function;
+  onLoginAction: Function;
   onAgentLogin: Function;
   onAgentLogout: Function;
   isValid: boolean;
@@ -55,19 +55,18 @@ class LoginInfo extends Component<IProp> {
    */
   handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    const { onLoginValid, onLoginLoading, onAgentLogin, onAgentLogout, isLoading } = this.props;
+    const { onLoginAction, onAgentLogin, onAgentLogout, isLoading } = this.props;
     if (isLoading) {
       return;
     }
 
     const form = evt.currentTarget;
     if (form.checkValidity() === false) {
-      onLoginValid(false);
+      onLoginAction(false, false);
       return;
     }
 
-    onLoginValid(true);
-    onLoginLoading(true);
+    onLoginAction(true, true);
     fetch("http://saboteur.hopto.org:18593/api/Agent/Login", {
       method: "POST",
       body: JSON.stringify({
@@ -80,7 +79,7 @@ class LoginInfo extends Component<IProp> {
       }
     })
       .then(response => {
-        onLoginLoading(false);
+        onLoginAction(true, false);
         if (response.ok) {
           onAgentLogin();
           this.redirectPage();
@@ -172,7 +171,10 @@ class LoginInfo extends Component<IProp> {
  * @param {any} state
  */
 function mapStateToProps(state: any) {
-  return { isValid: state.isValid, isLoading: state.isLoading };
+  return {
+    isValid: isNullOrUndefined(state.isValid) ? true : state.isValid,
+    isLoading: isNullOrUndefined(state.isLoading) ? false : state.isLoading
+  };
 }
 
 /**
@@ -181,8 +183,7 @@ function mapStateToProps(state: any) {
  */
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    onLoginValid: (value: Boolean) => dispatch(onLoginValid(value)),
-    onLoginLoading: (value: Boolean) => dispatch(onLoginLoading(value)),
+    onLoginAction: (isValid: boolean, isLoading: boolean) => dispatch(onLoginAction(isValid, isLoading)),
     onAgentLogin: () => dispatch(onAgentLogin()),
     onAgentLogout: () => dispatch(onAgentLogout())
   };

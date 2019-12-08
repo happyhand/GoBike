@@ -1,42 +1,39 @@
 import React, { Component } from "react";
 import { Doughnut } from "react-chartjs-2";
-import PropTypes from "prop-types";
 import PieChartData from "../model/PieChartData";
+import { colors } from "../config/appconfig.json";
+import { isNullOrUndefined } from "util";
 
 interface IProp {
-  data: PieChartData[];
+  datas: PieChartData[];
 }
+
 export default class PieChart extends Component<IProp> {
-  static propTypes: { data: PropTypes.Validator<PieChartData[]> };
   constructor(props: Readonly<IProp>) {
     super(props);
   }
 
   render() {
-    const { data } = this.props;
-    let labels: Array<string> = [];
-    let datas: number[] = [];
-    let backgroundColors: string[] = [];
-    let hoverBackgroundColors: string[] = [];
-    data.forEach(item => {
-      labels.push(item.label);
-      datas.push(item.count);
-      backgroundColors.push(item.color);
-      hoverBackgroundColors.push(item.color);
-    });
-    let chartDatas = {
-      labels: labels,
-      datasets: [{ data: datas, backgroundColor: backgroundColors, hoverBackgroundColor: hoverBackgroundColors }]
-    };
+    const { datas } = this.props;
+    if (isNullOrUndefined(datas)) {
+      return (
+        <div>
+          <span>Loading</span>
+        </div>
+      );
+    }
 
-    return (
-      <div>
-        <Doughnut data={chartDatas} />
-      </div>
-    );
+    let data = {
+      labels: datas.map(item => item.label),
+      datasets: [
+        {
+          data: datas.map(item => item.count),
+          backgroundColor: datas.map((item, index) => colors[index][0]),
+          hoverBackgroundColor: datas.map((item, index) => colors[index][1]),
+          hoverBorderWidth: 0
+        }
+      ]
+    };
+    return <Doughnut data={data} />;
   }
 }
-
-PieChart.propTypes = {
-  data: PropTypes.array.isRequired
-};
