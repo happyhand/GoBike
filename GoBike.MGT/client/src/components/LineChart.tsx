@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
-import LineChartData from "../model/LineChartData";
-import { colors } from "../config/appconfig.json";
 import { isNullOrUndefined } from "util";
+import { colors } from "../config/appconfig.json";
+import LineChartData from "../model/LineChartData";
 
 interface IProp {
   groups: string[];

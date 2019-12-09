@@ -20,6 +20,13 @@ export const onLoginAction = (isValid: boolean, isLoading: boolean): AnyAction =
   };
 };
 
+export const onChangeMenu = (menuKey: string): AnyAction => {
+  return {
+    type: "CHANGE_MENU",
+    menuKey: menuKey
+  };
+};
+
 export const onLoadHomeData = (isLoading: boolean, data: any): AnyAction => {
   return {
     type: "LOAD_HOME_DATA",

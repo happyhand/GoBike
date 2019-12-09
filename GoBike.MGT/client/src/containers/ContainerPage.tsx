@@ -6,6 +6,7 @@ import MenuBar from "../components/MenuBar";
 import TitleBar from "../components/TitleBar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { routerTag } from "../config/appconfig.json";
 import HomePage from "./HomePage";
 import AccountManagerPage from "./AccountManagerPage";
 import MemberManagerPage from "./MemberManagerPage";
@@ -30,7 +31,7 @@ export default class ContainerPage extends Component {
           </Row>
           <Row>
             <Col style={col}>
-              <MenuBar />
+              <MenuBar menuKey={"#" + routerTag.HomePage} />
             </Col>
           </Row>
           <Row>
@@ -38,9 +39,9 @@ export default class ContainerPage extends Component {
               <Container fluid>
                 <Switch>
                   <PrivateRouter exact path="/" component={HomePage} />
-                  <PrivateRouter exact path="/Home" component={HomePage} />
-                  <PrivateRouter exact path="/Account" component={AccountManagerPage} />
-                  <PrivateRouter exact path="/Member" component={MemberManagerPage} />
+                  <PrivateRouter exact path={"/" + routerTag.HomePage} component={HomePage} />
+                  <PrivateRouter exact path={"/" + routerTag.AccountManagerPage} component={AccountManagerPage} />
+                  <PrivateRouter exact path={"/" + routerTag.MemberManagerPage} component={MemberManagerPage} />
                   <Route path="*">
                     <ErrorPage />
                   </Route>

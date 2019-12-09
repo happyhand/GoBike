@@ -1,13 +1,17 @@
 import React, { Component } from "react";
 import { Dispatch } from "redux";
+import { History } from "history";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { History } from "history";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { routerTag } from "../config/appconfig.json";
 import { onAgentLogout } from "../actions/Action";
+
 import "../css/Button.css";
 import "../css/Nav.css";
+import { isNullOrUndefined } from "util";
 
 //#region Css
 const menuBar = {
@@ -18,6 +22,7 @@ const menuBar = {
 
 //#endregion
 interface IProp {
+  menuKey: string;
   onAgentLogout: Function;
   history: History;
 }
@@ -38,16 +43,17 @@ class MenuBar extends Component<IProp> {
   }
 
   render() {
+    const { menuKey } = this.props;
     return (
       <Navbar expand="lg" variant="dark" style={menuBar}>
-        <Nav className="mr-auto">
-          <Nav.Link href="#Home" className="menuLink">
+        <Nav className="mr-auto" activeKey={menuKey}>
+          <Nav.Link href={"#" + routerTag.HomePage} className="menuLink">
             首頁
           </Nav.Link>
-          <Nav.Link href="#Account" className="menuLink">
+          <Nav.Link href={"#" + routerTag.AccountManagerPage} className="menuLink">
             帳號管理
           </Nav.Link>
-          <Nav.Link href="#Member" className="menuLink">
+          <Nav.Link href={"#" + routerTag.MemberManagerPage} className="menuLink">
             會員管理
           </Nav.Link>
         </Nav>
@@ -64,6 +70,15 @@ class MenuBar extends Component<IProp> {
 }
 
 /**
+ * 繫結 Redux State
+ * @param {any} state
+ */
+function mapStateToProps(state: any, own: any) {
+  own.menuKey = isNullOrUndefined(state.menuKey) ? own.menuKey : state.menuKey;
+  return state;
+}
+
+/**
  * 繫結 Redux Action
  * @param {Dispatch} dispatch
  */
@@ -73,4 +88,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default withRouter(connect(null, mapDispatchToProps)(MenuBar));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MenuBar));

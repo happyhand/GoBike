@@ -1,8 +1,8 @@
 import React, { Component, FormEvent } from "react";
 import { Dispatch } from "redux";
+import { History } from "history";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { History } from "history";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Container from "react-bootstrap/Container";
@@ -11,8 +11,9 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { onLoginAction, onAgentLogin, onAgentLogout } from "../actions/Action";
+import { onLoginAction, onAgentLogin } from "../actions/Action";
 import { isNullOrUndefined } from "util";
+import CSS from "csstype";
 
 //#region Css
 const loginInfoBox = {
@@ -29,7 +30,7 @@ const loginInputTitle = {
   borderRadius: "0 15px 15px 0"
 };
 
-const loginButtonContent = {
+const loginButtonContent: CSS.Properties = {
   textAlign: "right"
 };
 
@@ -37,7 +38,6 @@ const loginButtonContent = {
 interface IProp {
   onLoginAction: Function;
   onAgentLogin: Function;
-  onAgentLogout: Function;
   isValid: boolean;
   isLoading: boolean;
   history: History;
@@ -55,7 +55,7 @@ class LoginInfo extends Component<IProp> {
    */
   handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    const { onLoginAction, onAgentLogin, onAgentLogout, isLoading } = this.props;
+    const { onLoginAction, onAgentLogin, isLoading } = this.props;
     if (isLoading) {
       return;
     }
@@ -83,8 +83,6 @@ class LoginInfo extends Component<IProp> {
         if (response.ok) {
           onAgentLogin();
           this.redirectPage();
-        } else {
-          onAgentLogout();
         }
 
         return response.json();
@@ -184,8 +182,7 @@ function mapStateToProps(state: any) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     onLoginAction: (isValid: boolean, isLoading: boolean) => dispatch(onLoginAction(isValid, isLoading)),
-    onAgentLogin: () => dispatch(onAgentLogin()),
-    onAgentLogout: () => dispatch(onAgentLogout())
+    onAgentLogin: () => dispatch(onAgentLogin())
   };
 }
 

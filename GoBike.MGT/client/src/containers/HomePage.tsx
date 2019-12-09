@@ -1,42 +1,42 @@
 import React, { Component } from "react";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import PieChartData from "../model/PieChartData";
-import LineChartData from "../model/LineChartData";
-import LineChart from "../components/LineChart";
 import Button from "react-bootstrap/Button";
-import { Dispatch } from "redux";
-import { onLoadHomeData } from "../actions/Action";
-import { connect } from "react-redux";
-import PieChart from "../components/PieChart";
 import { isNullOrUndefined } from "util";
+import { routerTag } from "../config/appconfig.json";
+import { onLoadHomeData, onChangeMenu } from "../actions/Action";
+import LineChart from "../components/LineChart";
+import PieChart from "../components/PieChart";
+import LineChartData from "../model/LineChartData";
+import PieChartData from "../model/PieChartData";
+import CSS from "csstype";
 
 //#region Css
-const chart = {
+const chart: CSS.Properties = {
   textAlign: "center",
   color: "#666",
   fontSize: "16px"
 };
 
 //#endregion
-//#endregion
 interface IProp {
   isLoading: boolean;
   loginData: any;
   registerData: PieChartData[];
   teamAreaData: PieChartData[];
+  onChangeMenu: Function;
   onLoadHomeData: Function;
 }
 class HomePage extends Component<IProp> {
   constructor(props: Readonly<IProp>) {
     super(props);
-    const { loginData, registerData, teamAreaData } = this.props;
+    const { onChangeMenu } = this.props;
     this.onReload = this.onReload.bind(this);
-
-    if (isNullOrUndefined(loginData)) {
-      this.onReload();
-    }
+    this.onReload();
+    onChangeMenu("#" + routerTag.HomePage);
   }
 
   onLoadLoginData(): any {
@@ -85,7 +85,7 @@ class HomePage extends Component<IProp> {
     onLoadHomeData(true, {});
     setTimeout(() => {
       onLoadHomeData(false, { loginData: loginData, registerData: registerData, teamAreaData: teamAreaData });
-    }, 3000);
+    }, 1000);
   }
 
   render() {
@@ -132,13 +132,13 @@ class HomePage extends Component<IProp> {
  * 繫結 Redux State
  * @param {any} state
  */
-function mapStateToProps(state: any) {
-  return {
-    isLoading: isNullOrUndefined(state.isLoading) ? false : state.isLoading,
-    loginData: isNullOrUndefined(state.data) ? undefined : state.data.loginData,
-    registerData: isNullOrUndefined(state.data) ? undefined : state.data.registerData,
-    teamAreaData: isNullOrUndefined(state.data) ? undefined : state.data.teamAreaData
-  };
+function mapStateToProps(state: any, own: any) {
+  own.isLoading = isNullOrUndefined(state.isLoading) ? own.isLoading : state.isLoading;
+  own.loginData = isNullOrUndefined(state.data) ? own.loginData : state.data.loginData;
+  own.registerData = isNullOrUndefined(state.data) ? own.registerData : state.data.registerData;
+  own.teamAreaData = isNullOrUndefined(state.data) ? own.teamAreaData : state.data.teamAreaData;
+
+  return state;
 }
 
 /**
@@ -147,6 +147,7 @@ function mapStateToProps(state: any) {
  */
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
+    onChangeMenu: (menuKey: string) => dispatch(onChangeMenu(menuKey)),
     onLoadHomeData: (isLoading: boolean, data: any) => dispatch(onLoadHomeData(isLoading, data))
   };
 }
