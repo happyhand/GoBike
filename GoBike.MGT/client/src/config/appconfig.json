@@ -1,5 +1,4 @@
 {
-  "routerTag": { "HomePage": "Home", "AccountManagerPage": "Account", "MemberManagerPage": "Member" },
   "colors": [
     ["#fbb4ae", "#ff8278"],
     ["#b3cde3", "#6bade4"],

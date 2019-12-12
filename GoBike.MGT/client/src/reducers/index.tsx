@@ -7,10 +7,10 @@ import { AnyAction } from "redux";
 const reducer = (state = {}, action: AnyAction): any => {
   switch (action.type) {
     case "AGENT_LOGIN":
-      localStorage.setItem("isLogin", "true");
+      localStorage.setItem("login", "true");
       return state;
     case "AGENT_LOGOUT":
-      localStorage.removeItem("isLogin");
+      localStorage.removeItem("login");
       return state;
     case "LOGIN_ACTION":
       return { isValid: action.isValid, isLoading: action.isLoading };

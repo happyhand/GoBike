@@ -5,8 +5,8 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import { isNullOrUndefined } from "util";
-import { routerTag } from "../config/appconfig.json";
 import { onLoadHomeData, onChangeMenu } from "../actions/Action";
 import LineChart from "../components/LineChart";
 import PieChart from "../components/PieChart";
@@ -16,27 +16,29 @@ import CSS from "csstype";
 
 //#region Css
 const chart: CSS.Properties = {
+  padding: "20px",
   textAlign: "center",
   color: "#666",
   fontSize: "16px"
 };
 
 //#endregion
+
 interface IProp {
   isLoading: boolean;
-  loginData: any;
-  registerData: PieChartData[];
-  teamAreaData: PieChartData[];
+  data: any;
   onChangeMenu: Function;
   onLoadHomeData: Function;
 }
+
 class HomePage extends Component<IProp> {
+  static PAGE_PATH: string = "Home";
   constructor(props: Readonly<IProp>) {
     super(props);
     const { onChangeMenu } = this.props;
     this.onReload = this.onReload.bind(this);
     this.onReload();
-    onChangeMenu("#" + routerTag.HomePage);
+    onChangeMenu("#" + HomePage.PAGE_PATH);
   }
 
   onLoadLoginData(): any {
@@ -88,8 +90,23 @@ class HomePage extends Component<IProp> {
     }, 1000);
   }
 
+  shouldComponentUpdate(nextProps: { isLoading: any }) {
+    return !isNullOrUndefined(nextProps.isLoading);
+  }
+
   render() {
-    const { loginData, registerData, teamAreaData } = this.props;
+    const { isLoading, data } = this.props;
+    if (isNullOrUndefined(isLoading) || isLoading) {
+      return (
+        <Container fluid>
+          <Row>
+            <Col>
+              <Spinner animation="border" />
+            </Col>
+          </Row>
+        </Container>
+      );
+    }
 
     return (
       <Container fluid>
@@ -103,8 +120,8 @@ class HomePage extends Component<IProp> {
             <div style={chart}>
               <span>登入人數圖表</span>
               <LineChart
-                datas={loginData ? loginData.datas : undefined}
-                groups={loginData ? loginData.groups : undefined}
+                datas={data && data.loginData ? data.loginData.datas : undefined}
+                groups={data && data.loginData ? data.loginData.groups : undefined}
               />
             </div>
           </Col>
@@ -113,13 +130,13 @@ class HomePage extends Component<IProp> {
           <Col md={3}>
             <div style={chart}>
               <span>總註冊來源分布圖</span>
-              <PieChart datas={registerData}></PieChart>
+              <PieChart datas={data ? data.registerData : undefined}></PieChart>
             </div>
           </Col>
           <Col md={3}>
             <div style={chart}>
               <span>車隊地區分布圖</span>
-              <PieChart datas={teamAreaData}></PieChart>
+              <PieChart datas={data ? data.teamAreaData : undefined}></PieChart>
             </div>
           </Col>
         </Row>
@@ -132,12 +149,7 @@ class HomePage extends Component<IProp> {
  * 繫結 Redux State
  * @param {any} state
  */
-function mapStateToProps(state: any, own: any) {
-  own.isLoading = isNullOrUndefined(state.isLoading) ? own.isLoading : state.isLoading;
-  own.loginData = isNullOrUndefined(state.data) ? own.loginData : state.data.loginData;
-  own.registerData = isNullOrUndefined(state.data) ? own.registerData : state.data.registerData;
-  own.teamAreaData = isNullOrUndefined(state.data) ? own.teamAreaData : state.data.teamAreaData;
-
+function mapStateToProps(state: any) {
   return state;
 }
 

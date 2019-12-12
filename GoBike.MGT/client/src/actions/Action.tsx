@@ -12,11 +12,11 @@ export const onAgentLogout = (): AnyAction => {
   };
 };
 
-export const onLoginAction = (isValid: boolean, isLoading: boolean): AnyAction => {
+export const onLoginAction = (isValid: boolean, isLogin: boolean): AnyAction => {
   return {
     type: "LOGIN_ACTION",
     isValid: isValid,
-    isLoading: isLoading
+    isLogin: isLogin
   };
 };
 

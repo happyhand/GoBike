@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Spinner from "react-bootstrap/Spinner";
 import { Doughnut } from "react-chartjs-2";
 import PieChartData from "../model/PieChartData";
 import { colors } from "../config/appconfig.json";
@@ -18,7 +19,7 @@ export default class PieChart extends Component<IProp> {
     if (isNullOrUndefined(datas)) {
       return (
         <div>
-          <span>Loading</span>
+          <Spinner animation="border" />
         </div>
       );
     }

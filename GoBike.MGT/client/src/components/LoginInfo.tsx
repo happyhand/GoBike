@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { onLoginAction, onAgentLogin } from "../actions/Action";
 import { isNullOrUndefined } from "util";
 import CSS from "csstype";
+import Spinner from "react-bootstrap/Spinner";
 
 //#region Css
 const loginInfoBox = {
@@ -39,7 +40,7 @@ interface IProp {
   onLoginAction: Function;
   onAgentLogin: Function;
   isValid: boolean;
-  isLoading: boolean;
+  isLogin: boolean;
   history: History;
 }
 
@@ -55,8 +56,8 @@ class LoginInfo extends Component<IProp> {
    */
   handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    const { onLoginAction, onAgentLogin, isLoading } = this.props;
-    if (isLoading) {
+    const { onLoginAction, onAgentLogin, isLogin } = this.props;
+    if (isLogin) {
       return;
     }
 
@@ -83,12 +84,15 @@ class LoginInfo extends Component<IProp> {
         if (response.ok) {
           onAgentLogin();
           this.redirectPage();
+          return undefined;
         }
 
         return response.json();
       })
-      .then(json => {
-        alert(json);
+      .then(message => {
+        if (!isNullOrUndefined(message)) {
+          alert(message);
+        }
       })
       .catch(err => {
         console.log("Login Error:", err);
@@ -103,7 +107,7 @@ class LoginInfo extends Component<IProp> {
   }
 
   render() {
-    const { isValid } = this.props;
+    const { isValid, isLogin } = this.props;
     return (
       <Form noValidate validated={!isValid} onSubmit={this.handleSubmit}>
         <Container style={loginInfoBox}>
@@ -153,9 +157,13 @@ class LoginInfo extends Component<IProp> {
           </Row>
           <Row>
             <Col style={loginButtonContent}>
-              <Button className="login" type="submit" size="lg">
-                Submit
-              </Button>
+              {isLogin ? (
+                <Spinner animation="border" />
+              ) : (
+                <Button className="login" type="submit" size="lg">
+                  Submit
+                </Button>
+              )}
             </Col>
           </Row>
         </Container>
@@ -171,7 +179,7 @@ class LoginInfo extends Component<IProp> {
 function mapStateToProps(state: any) {
   return {
     isValid: isNullOrUndefined(state.isValid) ? true : state.isValid,
-    isLoading: isNullOrUndefined(state.isLoading) ? false : state.isLoading
+    isLogin: isNullOrUndefined(state.isLogin) ? false : state.isLogin
   };
 }
 
@@ -181,7 +189,7 @@ function mapStateToProps(state: any) {
  */
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    onLoginAction: (isValid: boolean, isLoading: boolean) => dispatch(onLoginAction(isValid, isLoading)),
+    onLoginAction: (isValid: boolean, isLogin: boolean) => dispatch(onLoginAction(isValid, isLogin)),
     onAgentLogin: () => dispatch(onAgentLogin())
   };
 }

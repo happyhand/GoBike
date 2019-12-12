@@ -1,17 +1,17 @@
 import React, { Component } from "react";
 import { Dispatch } from "redux";
 import { History } from "history";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { routerTag } from "../config/appconfig.json";
 import { onAgentLogout } from "../actions/Action";
-
+import { isNullOrUndefined } from "util";
+import HomePage from "../containers/HomePage";
+import AccountManagerPage from "../containers/AccountManagerPage";
+import MemberManagerPage from "../containers/MemberManagerPage";
 import "../css/Button.css";
 import "../css/Nav.css";
-import { isNullOrUndefined } from "util";
 
 //#region Css
 const menuBar = {
@@ -42,18 +42,22 @@ class MenuBar extends Component<IProp> {
     }
   }
 
+  shouldComponentUpdate(nextProps: { menuKey: string }) {
+    return !isNullOrUndefined(nextProps.menuKey) && this.props.menuKey !== nextProps.menuKey;
+  }
+
   render() {
     const { menuKey } = this.props;
     return (
       <Navbar expand="lg" variant="dark" style={menuBar}>
         <Nav className="mr-auto" activeKey={menuKey}>
-          <Nav.Link href={"#" + routerTag.HomePage} className="menuLink">
+          <Nav.Link href={"#" + HomePage.PAGE_PATH} className="menuLink">
             首頁
           </Nav.Link>
-          <Nav.Link href={"#" + routerTag.AccountManagerPage} className="menuLink">
+          <Nav.Link href={"#" + AccountManagerPage.PAGE_PATH} className="menuLink">
             帳號管理
           </Nav.Link>
-          <Nav.Link href={"#" + routerTag.MemberManagerPage} className="menuLink">
+          <Nav.Link href={"#" + MemberManagerPage.PAGE_PATH} className="menuLink">
             會員管理
           </Nav.Link>
         </Nav>
@@ -74,7 +78,6 @@ class MenuBar extends Component<IProp> {
  * @param {any} state
  */
 function mapStateToProps(state: any, own: any) {
-  own.menuKey = isNullOrUndefined(state.menuKey) ? own.menuKey : state.menuKey;
   return state;
 }
 
