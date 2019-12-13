@@ -16,7 +16,7 @@ export default class PrivateRouter extends Component<IProp> {
   };
   render() {
     const { exact, path, component: Component } = this.props;
-    const isLogin = Boolean(localStorage.getItem("isLogin"));
+    const isLogin = Boolean(localStorage.getItem("login"));
     if (isLogin) {
       return (
         <Route exact={exact} path={path}>

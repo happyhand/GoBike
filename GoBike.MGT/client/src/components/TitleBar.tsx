@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Image from "react-bootstrap/Image";
 
 //#region Css
 const bar = {
@@ -13,6 +11,7 @@ const bar = {
 };
 
 const title = {
+  verticalAlign: "-webkit-baseline-middle",
   fontSize: "24px",
   color: "#fff"
 };
@@ -24,13 +23,12 @@ const col = {
 
 export default class TitleBar extends Component {
   render() {
+    const logoUrl = require("../assets/img/logo_s.png");
     return (
       <Container fluid style={bar}>
         <Row>
           <Col md="auto" style={col}>
-            <FontAwesomeIcon icon={faHome} size="3x" color="#fff" />
-          </Col>
-          <Col md="auto" style={col}>
+            <Image src={logoUrl} />
             <span style={title}>加樂設計 Double Happiness</span>
           </Col>
         </Row>

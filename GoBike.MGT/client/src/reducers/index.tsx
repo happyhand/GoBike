@@ -13,7 +13,7 @@ const reducer = (state = {}, action: AnyAction): any => {
       localStorage.removeItem("login");
       return state;
     case "LOGIN_ACTION":
-      return { isValid: action.isValid, isLoading: action.isLoading };
+      return { isValid: action.isValid, isLogin: action.isLogin };
     case "CHANGE_MENU":
       return { menuKey: action.menuKey };
     case "LOAD_HOME_DATA":
