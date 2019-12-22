@@ -3,8 +3,9 @@
 */
 
 /*
-* Login
+* Login or normal
 */
+.normal.btn,
 .login.btn {
   color: #fff;
   background-color: #2b5971;
@@ -13,18 +14,23 @@
   outline: none;
 }
 
+.normal.btn:hover,
 .login.btn:hover {
   color: rgb(22, 75, 104);
   background-color: #4f8daf;
   border-color: #4f8daf;
 }
 
+.normal.btn:focus,
+.normal.btn.focus,
 .login.btn:focus,
 .login.btn.focus {
   box-shadow: none;
   outline: none;
 }
 
+.normal.btn.disabled,
+.normal.btn:disabled,
 .login.btn.disabled,
 .login.btn:disabled {
   color: #999999;
@@ -32,16 +38,22 @@
   border-color: rgb(37, 64, 78);
 }
 
+.normal.btn:not(:disabled):not(.disabled):active,
+.normal.btn:not(:disabled):not(.disabled).active,
 .login.btn:not(:disabled):not(.disabled):active,
 .login.btn:not(:disabled):not(.disabled).active,
+.show > .normal.btn.dropdown-toggle,
 .show > .login.btn.dropdown-toggle {
   color: #fff;
   background-color: #2b5972;
   border-color: #2b5972;
 }
 
+.normal.btn:not(:disabled):not(.disabled):active:focus,
+.normal.btn:not(:disabled):not(.disabled).active:focus,
 .login.btn:not(:disabled):not(.disabled):active:focus,
 .login.btn:not(:disabled):not(.disabled).active:focus,
+.show > .normal.btn.dropdown-toggle:focus,
 .show > .login.btn.dropdown-toggle:focus {
   box-shadow: none;
 }
