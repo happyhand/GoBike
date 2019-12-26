@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GoBike.Service.Service.Models.Member
 {
@@ -8,19 +9,14 @@ namespace GoBike.Service.Service.Models.Member
     public class RideDto
     {
         /// <summary>
-        /// Gets or sets CityID
+        /// Gets or sets Altitude
         /// </summary>
-        public int CityID { get; set; }
+        public string Altitude { get; set; }
 
         /// <summary>
-        /// Gets or sets Climb
+        /// Gets or sets CountyID
         /// </summary>
-        public double Climb { get; set; }
-
-        /// <summary>
-        /// Gets or sets Content
-        /// </summary>
-        public string Content { get; set; }
+        public int CountyID { get; set; }
 
         /// <summary>
         /// Gets or sets CreateDate
@@ -30,17 +26,12 @@ namespace GoBike.Service.Service.Models.Member
         /// <summary>
         /// Gets or sets Distance
         /// </summary>
-        public double Distance { get; set; }
+        public string Distance { get; set; }
 
         /// <summary>
         /// Gets or sets Level
         /// </summary>
         public int Level { get; set; }
-
-        /// <summary>
-        /// Gets or sets MapUrl
-        /// </summary>
-        public string MapUrl { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID
@@ -58,9 +49,24 @@ namespace GoBike.Service.Service.Models.Member
         public string RideID { get; set; }
 
         /// <summary>
-        /// Gets or sets RideTime
+        /// Gets or sets Route
         /// </summary>
-        public long RideTime { get; set; }
+        public IEnumerable<RideRouteDto> Route { get; set; }
+
+        /// <summary>
+        /// Gets or sets ShareContent
+        /// </summary>
+        public IEnumerable<RideContentDto> ShareContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets SharedType
+        /// </summary>
+        public int SharedType { get; set; }
+
+        /// <summary>
+        /// Gets or sets Time
+        /// </summary>
+        public string Time { get; set; }
 
         /// <summary>
         /// Gets or sets Title

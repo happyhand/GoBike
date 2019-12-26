@@ -1,6 +1,7 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace GoBike.Service.Repository.Models.Member
 {
@@ -10,22 +11,16 @@ namespace GoBike.Service.Repository.Models.Member
     public class RideData
     {
         /// <summary>
-        /// Gets or sets CityID
+        /// Gets or sets Altitude
         /// </summary>
-        [BsonElement("CityID")]
-        public int CityID { get; set; }
+        [BsonElement("Altitude")]
+        public string Altitude { get; set; }
 
         /// <summary>
-        /// Gets or sets Climb
+        /// Gets or sets CountyID
         /// </summary>
-        [BsonElement("Climb")]
-        public double Climb { get; set; }
-
-        /// <summary>
-        /// Gets or sets Content
-        /// </summary>
-        [BsonElement("Content")]
-        public string Content { get; set; }
+        [BsonElement("CountyID")]
+        public int CountyID { get; set; }
 
         /// <summary>
         /// Gets or sets CreateDate
@@ -37,7 +32,7 @@ namespace GoBike.Service.Repository.Models.Member
         /// Gets or sets Distance
         /// </summary>
         [BsonElement("Distance")]
-        public double Distance { get; set; }
+        public string Distance { get; set; }
 
         /// <summary>
         /// Gets or sets Id
@@ -49,12 +44,6 @@ namespace GoBike.Service.Repository.Models.Member
         /// </summary>
         [BsonElement("Level")]
         public int Level { get; set; }
-
-        /// <summary>
-        /// Gets or sets MapUrl
-        /// </summary>
-        [BsonElement("MapUrl")]
-        public string MapUrl { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID
@@ -75,10 +64,28 @@ namespace GoBike.Service.Repository.Models.Member
         public string RideID { get; set; }
 
         /// <summary>
-        /// Gets or sets RideTime
+        /// Gets or sets Route
         /// </summary>
-        [BsonElement("RideTime")]
-        public long RideTime { get; set; }
+        [BsonElement("Route")]
+        public IEnumerable<RideRouteData> Route { get; set; }
+
+        /// <summary>
+        /// Gets or sets ShareContent
+        /// </summary>
+        [BsonElement("ShareContent")]
+        public IEnumerable<RideContentData> ShareContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets SharedType
+        /// </summary>
+        [BsonElement("SharedType")]
+        public int SharedType { get; set; }
+
+        /// <summary>
+        /// Gets or sets Time
+        /// </summary>
+        [BsonElement("Time")]
+        public string Time { get; set; }
 
         /// <summary>
         /// Gets or sets Title

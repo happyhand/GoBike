@@ -1,6 +1,6 @@
-﻿using GoBike.API.Service.Models.Member.Data;
+﻿using System.Threading.Tasks;
+using GoBike.API.Service.Models.Member.Data;
 using GoBike.API.Service.Models.Response;
-using System.Threading.Tasks;
 
 namespace GoBike.API.Service.Interface.Member
 {
@@ -117,6 +117,20 @@ namespace GoBike.API.Service.Interface.Member
         /// <param name="rideDto">rideDto</param>
         /// <returns>ResponseResultDto</returns>
         Task<ResponseResultDto> AddRideData(RideDto rideDto);
+
+        /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetRideData(RideDto rideDto);
+
+        /// <summary>
+        /// 取得會員的騎乘資料列表
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        Task<ResponseResultDto> GetRideDataListOfMember(string memberID);
 
         #endregion 騎乘資料
 

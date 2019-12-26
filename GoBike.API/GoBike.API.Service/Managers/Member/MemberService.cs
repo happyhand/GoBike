@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
 using GoBike.API.Core.Applibs;
 using GoBike.API.Core.Resource;
 using GoBike.API.Core.Resource.Enum;
@@ -10,11 +15,6 @@ using GoBike.API.Service.Models.Member.View;
 using GoBike.API.Service.Models.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace GoBike.API.Service.Managers.Member
 {
@@ -577,7 +577,7 @@ namespace GoBike.API.Service.Managers.Member
             try
             {
                 string postData = JsonConvert.SerializeObject(rideDto);
-                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/AddRideData", postData);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Ride/Add", postData);
                 return new ResponseResultDto()
                 {
                     Ok = httpResponseMessage.IsSuccessStatusCode,
@@ -591,6 +591,80 @@ namespace GoBike.API.Service.Managers.Member
                 {
                     Ok = false,
                     Data = "新增騎乘資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得騎乘資料
+        /// </summary>
+        /// <param name="rideDto">rideDto</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetRideData(RideDto rideDto)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(rideDto);
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Ride/Get", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<RideDetailInfoViewDto>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Ride Data Error >>> RideID:{rideDto.RideID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得騎乘資料發生錯誤."
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得會員的騎乘資料列表
+        /// </summary>
+        /// <param name="memberID">memberID</param>
+        /// <returns>ResponseResultDto</returns>
+        public async Task<ResponseResultDto> GetRideDataListOfMember(string memberID)
+        {
+            try
+            {
+                string postData = JsonConvert.SerializeObject(new MemberDto() { MemberID = memberID });
+                HttpResponseMessage httpResponseMessage = await Utility.ApiPost(AppSettingHelper.Appsetting.ServiceDomain.Service, "api/Member/Ride/GetList", postData);
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new ResponseResultDto()
+                    {
+                        Ok = true,
+                        Data = await httpResponseMessage.Content.ReadAsAsync<IEnumerable<RideDetailInfoViewDto>>()
+                    };
+                }
+
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = await httpResponseMessage.Content.ReadAsAsync<string>()
+                };
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Ride Data List Of Member Error >>> MemberID:{memberID}\n{ex}");
+                return new ResponseResultDto()
+                {
+                    Ok = false,
+                    Data = "取得會員的騎乘資料列表發生錯誤."
                 };
             }
         }

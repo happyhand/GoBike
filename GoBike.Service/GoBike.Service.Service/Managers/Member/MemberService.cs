@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using AutoMapper;
 using GoBike.Service.Core.Resource;
 using GoBike.Service.Core.Resource.Enum;
 using GoBike.Service.Repository.Interface.Member;
@@ -7,11 +12,6 @@ using GoBike.Service.Service.Interface.Member;
 using GoBike.Service.Service.Models.Member;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GoBike.Service.Service.Managers.Member
 {
@@ -634,6 +634,30 @@ namespace GoBike.Service.Service.Managers.Member
         }
 
         /// <summary>
+        /// 取得會員的騎乘資料列表
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>Tuple(RideDtos, string)</returns>
+        public async Task<Tuple<IEnumerable<RideDto>, string>> GetRideDataListOfMember(MemberDto memberDto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberDto.MemberID))
+                {
+                    return Tuple.Create<IEnumerable<RideDto>, string>(null, "會員編號無效.");
+                }
+
+                IEnumerable<RideData> rideDataList = await this.rideRepository.GetRideDataList(memberDto.MemberID);
+                return Tuple.Create(this.mapper.Map<IEnumerable<RideDto>>(rideDataList), string.Empty);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Get Ride Data List Of Member Error >>> MemberID:{memberDto.MemberID}\n{ex}");
+                return Tuple.Create<IEnumerable<RideDto>, string>(null, "取得會員的騎乘資料列表發生錯誤.");
+            }
+        }
+
+        /// <summary>
         /// 驗證騎乘資料
         /// </summary>
         /// <param name="memberDto">memberDto</param>
@@ -646,22 +670,22 @@ namespace GoBike.Service.Service.Managers.Member
                 return "會員編號無效.";
             }
 
-            if (rideDto.RideTime == 0)
+            if (string.IsNullOrEmpty(rideDto.Time))
             {
-                return "無騎乘時間.";
+                return "騎乘時間無效.";
             }
 
-            if (rideDto.Distance == 0)
+            if (string.IsNullOrEmpty(rideDto.Distance))
             {
-                return "無騎乘距離.";
+                return "騎乘距離無效.";
             }
 
-            if (rideDto.Climb == 0)
+            if (string.IsNullOrEmpty(rideDto.Altitude))
             {
-                return "無爬升高度.";
+                return "爬升高度無效.";
             }
 
-            if (rideDto.CityID == (int)CityType.None)
+            if (rideDto.CountyID == (int)CityType.None)
             {
                 return "未設定騎乘市區.";
             }
@@ -674,11 +698,6 @@ namespace GoBike.Service.Service.Managers.Member
             if (string.IsNullOrEmpty(rideDto.Title))
             {
                 rideDto.Title = $"{DateTime.Now:yyyy/MM/dd}";
-            }
-
-            if (string.IsNullOrEmpty(rideDto.Content))
-            {
-                return "未輸入分享內容.";
             }
 
             return string.Empty;

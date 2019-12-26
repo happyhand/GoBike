@@ -15,12 +15,7 @@ namespace GoBike.API.Service.Models.Member.View
         /// <summary>
         /// Gets or sets Distance
         /// </summary>
-        public double Distance { get; set; }
-
-        /// <summary>
-        /// Gets or sets MapUrl
-        /// </summary>
-        public string MapUrl { get; set; }
+        public string Distance { get; set; }
 
         /// <summary>
         /// Gets or sets MemberID
@@ -38,9 +33,9 @@ namespace GoBike.API.Service.Models.Member.View
         public string RideID { get; set; }
 
         /// <summary>
-        /// Gets or sets RideTime
+        /// Gets or sets Time
         /// </summary>
-        public long RideTime { get; set; }
+        public string Time { get; set; }
 
         /// <summary>
         /// Gets or sets Title

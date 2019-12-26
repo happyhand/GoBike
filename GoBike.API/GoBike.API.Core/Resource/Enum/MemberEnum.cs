@@ -36,4 +36,20 @@
         /// </summary>
         Online = 1
     }
+
+    /// <summary>
+    /// 騎乘資料分享類別資料
+    /// </summary>
+    public enum RideSharedType
+    {
+        /// <summary>
+        /// 不分享
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 分享
+        /// </summary>
+        Shared = 1
+    }
 }

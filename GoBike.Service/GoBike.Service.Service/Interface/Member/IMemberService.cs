@@ -1,7 +1,7 @@
-﻿using GoBike.Service.Service.Models.Member;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GoBike.Service.Service.Models.Member;
 
 namespace GoBike.Service.Service.Interface.Member
 {
@@ -89,6 +89,13 @@ namespace GoBike.Service.Service.Interface.Member
         /// <param name="rideDto">rideDto</param>
         /// <returns>Tuple(RideDto, string)</returns>
         Task<Tuple<RideDto, string>> GetRideData(RideDto rideDto);
+
+        /// <summary>
+        /// 取得會員的騎乘資料列表
+        /// </summary>
+        /// <param name="memberDto">memberDto</param>
+        /// <returns>Tuple(RideDtos, string)</returns>
+        Task<Tuple<IEnumerable<RideDto>, string>> GetRideDataListOfMember(MemberDto memberDto);
 
         #endregion 騎乘資料
 
