@@ -75,6 +75,7 @@ class LoginInfo extends Component<IProp> {
         password: form.formPassword.value
       }),
       headers: {
+        "Access-Control-Allow-Origin": "*",
         Accept: "application/json",
         "Content-type": "application/json; charset=UTF-8"
       }

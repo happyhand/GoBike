@@ -99,11 +99,9 @@ namespace GoBike.MGT.APP
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("ProductNoPolicy", policy =>
                 {
-                    policy.WithOrigins("http://saboteur.hopto.org:18593")
-                          .AllowAnyOrigin()
+                    policy.WithOrigins("http://mgtgobike.hopto.org:18595")
                           .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                          .AllowAnyMethod();
                 });
             });
         }
